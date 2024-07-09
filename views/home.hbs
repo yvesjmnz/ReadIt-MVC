@@ -1,0 +1,64 @@
+<!-- views/home.handlebars -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReadIT Home</title>
+    <link rel="stylesheet" href="/css/style_home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
+    <script src="/js/script_home.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <a href="/">
+                <img src="/img/ReadIt.png" alt="ReadIT logo" class="logo">
+                <h1 class="site-title">Read<span class="highlight">IT</span></h1>
+            </a>
+        </div>
+        <div class="user-info">
+            <div class="dropdown" id="profile-dropdown">
+                <span class="username" id="username">{{username}}</span>
+                <img src="/img/{{username.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <div class="dropdown-content" id="dropdown-content">
+                    <a href="/profile/{{username}}">View Profile</a>
+                    <a href="#" id="logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h2>Communities</h2>
+            <ul id="community-list">
+                <li data-community="all">All Communities</li>
+                <li data-community="All Time Low"><a href="/community/alltimelow">All Time Low</a></li>
+                <li data-community="C Programming Tutors"><a href="/community/cprogramming">C Programming Tutors</a></li>
+                <li data-community="DLSU"><a href="/community/dlsu">DLSU</a></li>
+                <li data-community="AmIWrong?"><a href="/community/amiwrong">AmIWrong?</a></li>
+                <li data-community="pyuterperipherals"><a href="/community/pyuterperipherals">pyuterperipherals</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="filter-section">
+                <select id="sort-filter">
+                    <option value="recent">Recent</option>
+                    <option value="most-popular">Most Popular</option>
+                    <option value="least-popular">Least Popular</option>
+                    <option value="my-posts">My Posts</option>
+                </select>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search...">
+                </div>
+            </div>
+
+            <div class="posts-section">
+                <div id="posts-container"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
