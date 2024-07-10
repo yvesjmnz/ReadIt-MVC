@@ -5,6 +5,13 @@ const path = require('path');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const multer = require('multer');
+const communityRoutes = require('./routes/communityRoutes'); // Import community routes
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 // Multer Storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -23,7 +30,6 @@ const upload = multer({
         checkFileType(file, cb);
     }
 }).single('profilePic'); // Field name for the file input in your form
-dotenv.config();
 
 // Check File Type
 function checkFileType(file, cb) {
@@ -37,11 +43,6 @@ function checkFileType(file, cb) {
         cb('Error: Images only!');
     }
 }
-
-module.exports = upload;
-
-const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
@@ -62,6 +63,8 @@ app.set('view engine', 'hbs');
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
+
+app.use('/community', communityRoutes); // Mount community routes under /community
 
 app.use('/', require('./routes/userRoutes'));
 

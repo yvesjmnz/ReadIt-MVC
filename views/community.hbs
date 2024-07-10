@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{community.name}}</title>
+    <link rel="stylesheet" href="/style_home.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <a href="/home">
+                <img src="/ReadIt.png" alt="ReadIT logo" class="logo">
+                <h1 class="site-title">Read<span class="highlight">IT</span></h1>
+            </a>
+        </div>
+        <div class="user-info">
+            <a href="/profile">
+                <span class="username" id="username">{{user.username}}</span>
+                <img src="/orangecar.jpg" alt="Profile Picture" class="profile-pic">
+            </a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="filter-section">
+            <h2>{{community.name}}</h2>
+            <p>{{community.description}}</p>
+        </div>
+
+        <div class="posts-section">
+            {{#each posts}}
+                <div class="post">
+                    <h3>{{this.title}}</h3>
+                    <p>{{this.content}}</p>
+                </div>
+            {{/each}}
+            <button id="load-more-button">Load More</button>
+        </div>
+    </div>
+</body>
+</html>
