@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Community = require('../models/Community');
-const Post = require('../models/Post'); // Assuming you have a Post model
+//const Post = require('../models/Post'); // Assuming you have a Post model
 
 // GET all communities
 router.get('/communities', async (req, res) => {

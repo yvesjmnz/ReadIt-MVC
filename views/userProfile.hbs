@@ -1,9 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/css/style_userprofile.css">
     <script src="/js/script_userprofile.js" defer></script>
+    <script src="/js/profileDropdown.js" defer></script>
 </head>
 <body>
 <div class="header">
@@ -16,7 +19,7 @@
     <div class="user-info">
         <div class="dropdown" id="profile-dropdown" onclick="toggleDropdown()">
             <span class="username" id="username">{{user.username}}</span>
-            <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+            <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
             <div class="dropdown-content" id="dropdown-content">
                 <a href="/profile/{{user.username}}">View Profile</a>
                 <a href="#" id="logout">Logout</a>
@@ -27,7 +30,7 @@
 <div class="content">
     <div class="profile-header">
         <div class="profile-pic-container">
-            <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
+            <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
             <button class="edit-button" id="edit-pic-button" onclick="editPic()">Edit</button>
             <input type="file" id="profile-pic-input" style="display: none;">
         </div>
@@ -67,3 +70,4 @@
     </div>
 </div>
 </body>
+</html>

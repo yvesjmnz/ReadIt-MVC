@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup, renderLogin } = require('../controllers/userController');
-const userController = require('../controllers/userController');
+const fs = require('fs');
+const path = require('path');
+const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup, renderLogin, logoutUser } = require('../controllers/userController');
+
 // Middleware to check if user is logged in
 const requireLogin = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -17,7 +19,6 @@ router.get('/', requireLogin, (req, res) => {
     res.render('home', { user });
 });
 
-
 // Route to render registration page
 router.get('/register', renderSignup);
 
@@ -30,9 +31,33 @@ router.get('/login', renderLogin);
 // Route to handle login form submission
 router.post('/login', loginUser);
 
+// Route to render user profile
 router.get('/profile/:username', getUserProfile);
-router.post('/profile/:username', updateUserProfile);
 
-router.get('/logout', userController.logoutUser);
+// Route to handle profile update including file upload
+router.post('/profile/:username', (req, res) => {
+    const { username } = req.params;
+    const user = req.session.user;
+
+    if (req.files && req.files.profilePic) {
+        const profilePic = req.files.profilePic;
+        const uploadPath = path.join(__dirname, '..', 'public', 'img', profilePic.name);
+
+        profilePic.mv(uploadPath, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(err);
+            }
+
+            user.profilePic = `/img/${profilePic.name}`;
+            updateUserProfile(req, res);
+        });
+    } else {
+        updateUserProfile(req, res);
+    }
+});
+
+// Logout route
+router.get('/logout', logoutUser);
 
 module.exports = router;

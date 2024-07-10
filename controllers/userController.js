@@ -1,7 +1,6 @@
-
 const User = require('../models/User');
-
-
+const path = require('path');
+const fs = require('fs');
 
 // Middleware to check if user is logged in
 const requireLogin = (req, res, next) => {
@@ -20,7 +19,7 @@ exports.renderSignup = (req, res) => {
 // Register User
 exports.registerUser = async (req, res) => {
     try {
-        const { username, password, confirmPassword, quote, profilePic } = req.body;
+        const { username, password, confirmPassword, quote } = req.body;
 
         if (password !== confirmPassword) {
             return res.status(400).send('Passwords do not match');
@@ -31,11 +30,24 @@ exports.registerUser = async (req, res) => {
             return res.status(400).send('User already exists');
         }
 
-        const newUser = new User({ username, password, quote, profilePic });
+        let profilePicPath = '';
+        if (req.files && req.files.profilePic) {
+            const profilePic = req.files.profilePic;
+            profilePicPath = '/img/' + profilePic.name;
+            const uploadPath = path.join(__dirname, '..', 'public', 'img', profilePic.name);
+            profilePic.mv(uploadPath, (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Error uploading file');
+                }
+            });
+        }
+
+        const newUser = new User({ username, password, quote, profilePic: profilePicPath });
         await newUser.save();
 
         // Optionally, log in the user after registration
-        req.session.user = { username: newUser.username }; // Store user in session
+        req.session.user = { username: newUser.username, profilePic: profilePicPath }; // Store user in session
         res.redirect('/'); // Redirect to home page after successful registration
     } catch (error) {
         console.error(error);
@@ -59,7 +71,7 @@ exports.loginUser = async (req, res) => {
         }
 
         // Log in the user
-        req.session.user = { username: user.username }; // Store user in session
+        req.session.user = { username: user.username, profilePic: user.profilePic }; // Store user in session
         res.redirect('/'); // Redirect to home page after successful login
     } catch (error) {
         console.error(error);
@@ -80,14 +92,25 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
-
 exports.updateUserProfile = async (req, res) => {
     try {
         const { quote } = req.body;
-        await User.findOneAndUpdate(
-            { username: req.params.username },
-            { quote }
-        );
+        let updateData = { quote };
+
+        if (req.files && req.files.profilePic) {
+            const profilePic = req.files.profilePic;
+            const profilePicPath = '/img/' + profilePic.name;
+            const uploadPath = path.join(__dirname, '..', 'public', 'img', profilePic.name);
+            profilePic.mv(uploadPath, (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Error uploading file');
+                }
+            });
+            updateData.profilePic = profilePicPath;
+        }
+
+        await User.findOneAndUpdate({ username: req.params.username }, updateData);
         res.redirect(`/profile/${req.params.username}`);
     } catch (error) {
         console.error(error);
@@ -106,4 +129,3 @@ exports.logoutUser = (req, res) => {
         }
     });
 };
-

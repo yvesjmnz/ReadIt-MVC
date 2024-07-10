@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style_home.css">
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
     <script src="/js/script_home.js" defer></script>
+    <script src="/js/profileDropdown.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -19,7 +20,7 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username" id="username">{{user.username}}</span>
-                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="dropdown-content" id="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="#" id="logout">Logout</a>
