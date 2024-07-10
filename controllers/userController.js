@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
+const sampleProfiles = require('../models/sampleProfiles');
+
 
 // Middleware to check if user is logged in
 const requireLogin = (req, res, next) => {
@@ -79,13 +81,37 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+// Get User Profile
 exports.getUserProfile = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username }).lean(); // Using .lean() to get a plain JavaScript object
-        if (!user) {
+        const loggedInUser = req.session.user;
+        const username = req.params.username;
+
+        // Check if the user exists in MongoDB
+        const userFromDB = await User.findOne({ username }).lean();
+
+        // Check if the user exists in the sampleProfiles
+        const userFromSample = sampleProfiles.find(profile => profile.username === username);
+
+        if (!userFromDB && !userFromSample) {
             return res.status(404).send('User not found');
         }
-        res.render('userProfile', { user });
+
+        // Render user profile
+        if (userFromDB) {
+            // Determine if the profile belongs to the logged-in user or another user
+            const isOwnProfile = loggedInUser && loggedInUser.username === username;
+            if (isOwnProfile) {
+                // Render user's own profile
+                res.render('userProfile', { visitedUser: userFromDB, loggedInUser });
+            } else {
+                // Render another user's profile
+                res.render('profile', { visitedUser: userFromDB, loggedInUser });
+            }
+        } else if (userFromSample) {
+            // Render profile using sample data if found
+            res.render('profile', { visitedUser: userFromSample, loggedInUser });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');

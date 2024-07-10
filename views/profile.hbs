@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/css/style_userprofile.css">
     <script src="/js/script_userprofile.js" defer></script>
     <script src="/js/profileDropdown.js" defer></script>
-    <script src="/js/editButton.js" defer></script>
 </head>
 <body>
 <div class="header">
@@ -31,31 +30,24 @@
 <div class="content">
     <div class="profile-header">
         <div class="profile-pic-container">
-            <img src="{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
-            <button class="edit-button" id="edit-pic-button" onclick="document.getElementById('profile-pic-input').click()">Edit</button>
-            <form action="/profile/{{loggedInUser.username}}" method="POST" enctype="multipart/form-data">
-                <input type="file" id="profile-pic-input" name="profilePic" style="display: none;" onchange="this.form.submit()">
-            </form>
+            <img src="{{visitedUser.profilePic}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
         </div>
         <div class="profile-details">
-            <h2 class="profile-username">{{loggedInUser.username}}</h2>
+            <h2 class="profile-username">{{visitedUser.username}}</h2>
             <div class="quote-container">
-                <p class="profile-quote">{{loggedInUser.quote}}</p>
-                <button class="edit-button" id="edit-quote-button" onclick="toggleQuoteEdit()">Edit</button>
-                <div class="edit-quote-input" id="quote-form" style="display: none;">
-                    <form action="/profile/{{loggedInUser.username}}" method="POST">
-                        <input type="text" id="quote-input" name="quote" value="{{loggedInUser.quote}}">
-                        <button type="submit" class="save-button" id="save-quote-button">Save</button>
-                    </form>
-                </div>
+                <p class="profile-quote">{{visitedUser.quote}}</p>
             </div>
+        </div>
+        <div class="profile-buttons">
+            <button class="follow-button" id="follow-button" onclick="followUser()">Follow</button>
+            <button class="message-button">Message</button>
         </div>
     </div>
     <div class="sections">
         <div class="favorite-communities">
             <h3>Favorite Communities</h3>
-            {{#if loggedInUser.favoriteCommunities.length}}
-                {{#each loggedInUser.favoriteCommunities}}
+            {{#if visitedUser.favoriteCommunities.length}}
+                {{#each visitedUser.favoriteCommunities}}
                     <button class="community-button"><a href="{{this}}">{{this}}<span>&#x1F4AC;</span></a></button>
                 {{/each}}
             {{else}}
