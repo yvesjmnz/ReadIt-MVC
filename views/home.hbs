@@ -1,4 +1,3 @@
-<!-- views/home.handlebars -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,10 +18,10 @@
         </div>
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
-                <span class="username" id="username">{{username}}</span>
-                <img src="/img/{{username.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <span class="username" id="username">{{user.username}}</span>
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="dropdown-content" id="dropdown-content">
-                    <a href="/profile/{{username}}">View Profile</a>
+                    <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="#" id="logout">Logout</a>
                 </div>
             </div>

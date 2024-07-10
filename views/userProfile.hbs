@@ -1,4 +1,3 @@
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,6 +5,7 @@
     <link rel="stylesheet" href="/css/style_userprofile.css">
     <script src="/js/script_userprofile.js" defer></script>
 </head>
+<body>
 <div class="header">
     <div class="logo-container">
         <a href="/">
@@ -15,10 +15,10 @@
     </div>
     <div class="user-info">
         <div class="dropdown" id="profile-dropdown" onclick="toggleDropdown()">
-            <span class="username" id="username">{{#if user.username}}{{user.username}}{{else}}Username{{/if}}</span>
-            <img src="/img/{{#if user.profilePic}}{{user.profilePic}}{{else}}default.jpg{{/if}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+            <span class="username" id="username">{{user.username}}</span>
+            <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
             <div class="dropdown-content" id="dropdown-content">
-                <a href="/profile/{{#if user.username}}{{user.username}}{{else}}Username{{/if}}">View Profile</a>
+                <a href="/profile/{{user.username}}">View Profile</a>
                 <a href="#" id="logout">Logout</a>
             </div>
         </div>
@@ -27,18 +27,18 @@
 <div class="content">
     <div class="profile-header">
         <div class="profile-pic-container">
-            <img src="/img/{{#if user.profilePic}}{{user.profilePic}}{{else}}default.jpg{{/if}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
+            <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
             <button class="edit-button" id="edit-pic-button" onclick="editPic()">Edit</button>
             <input type="file" id="profile-pic-input" style="display: none;">
         </div>
         <div class="profile-details">
-            <h2 class="profile-username">{{#if user.username}}{{user.username}}{{else}}Username{{/if}}</h2>
+            <h2 class="profile-username">{{user.username}}</h2>
             <div class="quote-container">
-                <p class="profile-quote">{{#if user.quote}}{{user.quote}}{{else}}No quote available{{/if}}</p>
+                <p class="profile-quote">{{user.quote}}</p>
                 <button class="edit-button" id="edit-quote-button" onclick="editQuote()">Edit</button>
                 <div class="edit-quote-input" style="display: none;">
-                    <form action="/profile/{{#if user.username}}{{user.username}}{{else}}Username{{/if}}" method="POST">
-                        <input type="text" id="quote-input" name="quote" value="{{#if user.quote}}{{user.quote}}{{/if}}">
+                    <form action="/profile/{{user.username}}" method="POST">
+                        <input type="text" id="quote-input" name="quote" value="{{user.quote}}">
                         <button type="submit" class="save-button" id="save-quote-button">Save</button>
                     </form>
                 </div>
@@ -52,7 +52,7 @@
     <div class="sections">
         <div class="favorite-communities">
             <h3>Favorite Communities</h3>
-            {{#if user.favoriteCommunities}}
+            {{#if user.favoriteCommunities.length}}
                 {{#each user.favoriteCommunities}}
                     <button class="community-button"><a href="{{this}}">{{this}}<span>&#x1F4AC;</span></a></button>
                 {{/each}}
@@ -66,4 +66,4 @@
         </div>
     </div>
 </div>
-
+</body>

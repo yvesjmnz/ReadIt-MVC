@@ -69,13 +69,17 @@ exports.loginUser = async (req, res) => {
 
 exports.getUserProfile = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username });
+        const user = await User.findOne({ username: req.params.username }).lean(); // Using .lean() to get a plain JavaScript object
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
         res.render('userProfile', { user });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
 };
+
 
 exports.updateUserProfile = async (req, res) => {
     try {

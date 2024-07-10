@@ -13,8 +13,10 @@ const requireLogin = (req, res, next) => {
 
 // Route to render home page
 router.get('/', requireLogin, (req, res) => {
-    res.render('home', { username: req.session.user.username }); // Render home page with logged in user's username
+    const user = req.session.user; // Ensure user object is directly accessible
+    res.render('home', { user });
 });
+
 
 // Route to render registration page
 router.get('/register', renderSignup);
