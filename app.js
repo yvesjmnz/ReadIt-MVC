@@ -5,7 +5,9 @@ const path = require('path');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const multer = require('multer');
+const fileUpload = require('express-fileupload');
 const communityRoutes = require('./routes/communityRoutes'); // Import community routes
+const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 
@@ -48,6 +50,7 @@ function checkFileType(file, cb) {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
 
 // Session middleware setup
 app.use(session({
@@ -65,6 +68,7 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error(err));
 
 app.use('/api', communityRoutes); // Mount community routes under /api
+app.use('/', userRoutes);
 
 app.use('/', require('./routes/userRoutes'));
 
