@@ -4,29 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{community.name}}</title>
-    <link rel="stylesheet" href="/style_home.css">
+    <link rel="stylesheet" href="/css/style_home.css">
     <script src="/js/profileDropdown.js" defer></script>
 </head>
 <body>
     <div class="header">
         <div class="logo-container">
-            <a href="/">
-                <img src="/ReadIt.png" alt="ReadIT logo" class="logo">
+            <a href="/home">
+                <img src="/img/ReadIt.png" alt="ReadIT logo" class="logo">
                 <h1 class="site-title">Read<span class="highlight">IT</span></h1>
             </a>
         </div>
         <div class="user-info">
-            <a href="/profile/{{user.username}}">
+            <div class="dropdown" id="profile-dropdown">
                 <span class="username" id="username">{{user.username}}</span>
-                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic">
-            </a>
+                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <div class="dropdown-content" id="dropdown-content">
+                    <a href="/profile/{{user.username}}">View Profile</a>
+                    <a href="#" id="logout">Logout</a>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="content">
-        <div class="filter-section">
+        <div class="community-header">
             <h2>{{community.name}}</h2>
-            <p>{{community.description}}</p>
+            <p class="community-description">{{community.description}}</p>
         </div>
 
         <div class="posts-section">
@@ -35,8 +39,10 @@
                     <h3>{{this.title}}</h3>
                     <p>{{this.content}}</p>
                 </div>
+            {{else}}
+                <p>No posts available in this community.</p>
             {{/each}}
-            <button id="load-more-button">Load More</button>
+            <button id="load-more-button" class="">Load More</button>
         </div>
     </div>
 </body>

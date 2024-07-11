@@ -8,6 +8,8 @@ const multer = require('multer');
 const fileUpload = require('express-fileupload');
 const communityRoutes = require('./routes/communityRoutes'); // Import community routes
 const userRoutes = require('./routes/userRoutes');
+const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
+const Handlebars = require('handlebars');
 
 dotenv.config();
 
@@ -60,7 +62,11 @@ app.use(session({
     cookie: { secure: false } // Set secure: true if using HTTPS
 }));
 
-app.engine('hbs', engine({ extname: 'hbs', defaultLayout: false }));
+app.engine('hbs', engine({
+    extname: 'hbs',
+    defaultLayout: false,
+    handlebars: allowInsecurePrototypeAccess(Handlebars) // Allow prototype access
+}));
 app.set('view engine', 'hbs');
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -69,5 +75,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use('/api', communityRoutes); // Mount community routes under /api
 app.use('/', userRoutes);
+
+app.use('/', require('./routes/userRoutes'));
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

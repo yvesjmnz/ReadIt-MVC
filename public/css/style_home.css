@@ -297,3 +297,33 @@ body {
     background-color: #14a55d;
 }
 
+#load-more-button {
+    display:block;
+    width: 100%;
+    max-width: 100px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #18a863;
+    color:#fff;
+    border: none;
+    font-weight: bold;
+    text-align: center;
+}
+
+#load-more-button:hover {
+    background-color: #14a55d;
+}
+
+.community-header {
+    margin: 20px 0;
+}
+
+.community-header h2 {
+    margin-bottom: 10px;
+}
+
+.community-description {
+    font-style: italic;
+    margin-top: 5px;
+}
+
