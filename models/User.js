@@ -12,10 +12,10 @@ const userSchema = new mongoose.Schema({
     },
     profilePic: {
         type: String,
-        default: 'default.jpg' // Default image filename
+        default: 'default.jpg'
     },
     quote: String,
-    favoriteCommunities: [String],
+    favoriteCommunities: [String], // Disregard
 });
 
 const User = mongoose.model('User', userSchema);
