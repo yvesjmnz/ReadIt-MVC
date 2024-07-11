@@ -17,7 +17,7 @@ body {
     background-color: #000;
     width: 100%;
     padding: 20px;
-    margin-bottom: 20px; /* Added space between header and profile container */
+    margin-bottom: 20px;
 }
 
 .logo-container {
@@ -76,7 +76,7 @@ body {
     border-radius: 10px;
     padding: 20px;
     width: 80%;
-    max-width: 1200px; 
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -91,8 +91,8 @@ body {
 }
 
 .profile-pic-large {
-    width: 220px; 
-    height: 150px; 
+    width: 220px;
+    height: 150px;
     border-radius: 50%;
     margin-right: 20px;
 }
@@ -178,22 +178,20 @@ body {
     flex-direction: column;
 }
 
-
-
 .recent-title {
     font-weight: bold;
     margin-bottom: 5px;
-    font-size:14px; /* Adjusted font size */
-    color: #fff; /* Changed text color to white */
+    font-size: 14px;
+    color: #fff;
 }
 
 .recent-stats {
     display: flex;
     gap: 10px;
     align-items: center;
-    font-size: 0.9em; /* Adjusted font size */
-    color: #fff; /* Changed text color to white */
-    margin-top: 5px; /* Added space between title and stats */
+    font-size: 0.9em;
+    color: #fff;
+    margin-top: 5px;
 }
 
 .recent-stats span {
@@ -201,14 +199,12 @@ body {
     align-items: center;
 }
 
-
-
 .community-button {
-    background-color: #d32f2f; 
+    background-color: #d32f2f;
 }
 
 .community-button:hover {
-    background-color: #7c1f1f; 
+    background-color: #7c1f1f;
 }
 
 .community-name {
@@ -221,7 +217,6 @@ body {
     align-items: center;
     border-radius: 10px;
     padding: 10px 0px 10px 10px;
-    
 }
 
 .username {
@@ -230,8 +225,8 @@ body {
     text-align: center;
     flex-grow: 1;
     line-height: -20px;
-  
 }
+
 .user-info a {
     display: flex;
     align-items: center;
@@ -280,8 +275,6 @@ body {
     display: block;
 }
 
-/* Add/Edit these styles in your existing CSS */
-
 .edit-button {
     background-color: #3aa6f6;
     border: none;
@@ -327,4 +320,5 @@ body {
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    margin-right: 5px;
 }
