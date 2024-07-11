@@ -7,6 +7,7 @@ const session = require('express-session');
 const multer = require('multer');
 const fileUpload = require('express-fileupload');
 const communityRoutes = require('./routes/communityRoutes'); // Import community routes
+const postRoutes = require('./routes/postRoutes'); // Import post routes
 const userRoutes = require('./routes/userRoutes');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
@@ -74,6 +75,7 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error(err));
 
 app.use('/api', communityRoutes); // Mount community routes under /api
+app.use('/api', postRoutes);
 app.use('/', userRoutes);
 
 app.use('/', require('./routes/userRoutes'));
