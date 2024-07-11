@@ -20,6 +20,10 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    post_description:{
+        type: String,
+        required: true
+    },
     likes: {
         type: Number,
         default: 0
