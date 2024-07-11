@@ -27,22 +27,22 @@
         </div>
     </div>
 
+    
     <div class="content">
-        <div class="community-header">
+        <div class="filter-section">
             <h2>{{community.name}}</h2>
-            <p class="community-description">{{community.description}}</p>
+            <p>{{community.description}}</p>
         </div>
 
         <div class="posts-section">
+            <button id="create-post-button">Create Post</button>
             {{#each posts}}
                 <div class="post">
-                    <h3>{{this.title}}</h3>
-                    <p>{{this.content}}</p>
+                    <h3 class="post-title">{{this.title}}</h3>
+                    <p class="post-snippet">{{this.content}}</p>
                 </div>
-            {{else}}
-                <p>No posts available in this community.</p>
             {{/each}}
-            <button id="load-more-button" class="">Load More</button>
+            <button id="load-more-button">Load More</button>
         </div>
     </div>
 </body>
