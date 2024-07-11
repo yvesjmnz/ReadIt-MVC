@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Community = require('../models/Community');
+// const Post = require('../models/Post'); 
 
 // GET all communities
 router.get('/communities', async (req, res) => {
@@ -28,6 +29,22 @@ router.post('/community', async (req, res) => {
     } catch (error) {
         console.error('Error creating community:', error);
         res.status(500).json({ error: 'Failed to create community' });
+    }
+});
+
+// GET a specific community and its posts by name
+router.get('/community/:name', async (req, res) => {
+    try {
+        const community = await Community.findOne({ name: req.params.name });
+        if (!community) {
+            return res.status(404).json({ error: 'Community not found' });
+        }
+
+        const posts = await Post.find({ community: community._id }); // Assuming posts have a community field
+        res.render('community', { community, posts, user: req.session.user });
+    } catch (error) {
+        console.error('Error fetching community:', error);
+        res.status(500).json({ error: 'Failed to fetch community' });
     }
 });
 

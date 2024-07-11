@@ -70,6 +70,4 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api', communityRoutes); // Mount community routes under /api
 app.use('/', userRoutes);
 
-app.use('/', require('./routes/userRoutes'));
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

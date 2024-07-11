@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             communities.forEach(community => {
                 const li = document.createElement('li');
                 li.dataset.community = community.name;
-                li.innerHTML = `<a href="/community/${community.name.toLowerCase()}">${community.name}</a>`;
+                li.innerHTML = `<a href="/api/community/${community.name.toLowerCase()}">${community.name}</a>`;
                 communityList.appendChild(li);
             });
 
