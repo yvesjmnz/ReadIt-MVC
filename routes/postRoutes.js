@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Post = require('../models/Post');
+const Post = require('../models/Post'); // Import the Post model
 
 // GET all posts
 router.get('/posts', async (req, res) => {
@@ -8,21 +8,21 @@ router.get('/posts', async (req, res) => {
         const posts = await Post.find();
         res.json(posts);
     } catch (error) {
-        console.error('Error fetching pots:', error);
+        console.error('Error fetching posts:', error);
         res.status(500).json({ error: 'Failed to fetch posts' });
     }
 });
 
 // POST create a new post
-router.post('/Post', async (req, res) => {
-    const { name, description } = req.body;
+router.post('/post', async (req, res) => {
+    const { user, title, post_description, likes, dislikes, comments, date } = req.body;
 
-    if (!name || !description) {
-        return res.status(400).json({ error: 'Name and description are required' });
+    if (!user || !title || !post_description) {
+        return res.status(400).json({ error: 'User, title, and post_description are required' });
     }
 
     try {
-        const newPost= new Post({ name, description });
+        const newPost = new Post({ user, title, post_description, likes, dislikes, comments, date });
         const savedPost = await newPost.save();
         res.status(201).json(savedPost);
     } catch (error) {

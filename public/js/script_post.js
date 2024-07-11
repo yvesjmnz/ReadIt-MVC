@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     const sortFilter = document.getElementById('sort-filter');
     const createPostButton = document.getElementById('create-post-button');
+    
 
     // Function to fetch and load posts
     async function loadPosts() {

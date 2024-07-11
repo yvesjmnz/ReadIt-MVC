@@ -15,10 +15,10 @@ router.get('/posts', async (req, res) => {
 
 // POST create a new post
 router.post('/post', async (req, res) => {
-    const { name, description } = req.body;
+    const {  user, title, post_description, likes, dislikes, comments, date } = req.body;
 
     try {
-        const newPost = new Post({ title, post_description, likes, dislikes, comments, date});
+        const newPost = new Post({ user, title, post_description, likes, dislikes, comments, date});
         await newPost.save();
         res.status(201).json(newPost);
     } catch (error) {
