@@ -144,6 +144,19 @@ exports.updateUserProfile = async (req, res) => {
     }
 };
 
+
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const usersFromDB = await User.find().lean();
+        const allUsers = [...usersFromDB, ...sampleProfiles];
+        res.json(allUsers);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
 // Logout User
 exports.logoutUser = (req, res) => {
     req.session.destroy(err => {

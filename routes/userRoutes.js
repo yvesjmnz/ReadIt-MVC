@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup, renderLogin, logoutUser } = require('../controllers/userController');
-const User = require('../models/User'); // Import your MongoDB User model here
+const User = require('../models/User'); 
+const userController = require('../controllers/userController');
 
 // Middleware to check if user is logged in
 const requireLogin = (req, res, next) => {
@@ -56,6 +57,9 @@ router.post('/profile/:username', (req, res) => {
         updateUserProfile(req, res);
     }
 });
+
+// Route to get all users
+router.get('/users', userController.getAllUsers);
 
 // Route to handle logout
 router.get('/logout', logoutUser);
