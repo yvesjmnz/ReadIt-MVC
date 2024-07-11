@@ -40,7 +40,7 @@
         <div class="profile-details">
             <h2 class="profile-username">{{loggedInUser.username}}</h2>
             <div class="quote-container">
-                <p class="profile-quote">{{loggedInUser.quote}}</p>
+                <p class="profile-quote">{{visitedUser.quote}}</p>
                 <button class="edit-button" id="edit-quote-button" onclick="toggleQuoteEdit()">Edit</button>
                 <div class="edit-quote-input" id="quote-form" style="display: none;">
                     <form action="/profile/{{loggedInUser.username}}" method="POST">
