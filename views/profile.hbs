@@ -44,16 +44,7 @@
         </div>
     </div>
     <div class="sections">
-        <div class="favorite-communities">
-            <h3>Favorite Communities</h3>
-            {{#if visitedUser.favoriteCommunities.length}}
-                {{#each visitedUser.favoriteCommunities}}
-                    <button class="community-button"><a href="{{this}}">{{this}}<span>&#x1F4AC;</span></a></button>
-                {{/each}}
-            {{else}}
-                <p>No favorite communities found</p>
-            {{/if}}
-        </div>
+        
         <div class="recents">
             <h3>Recents</h3>
             No Recent posts
