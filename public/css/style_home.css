@@ -329,7 +329,6 @@ body {
 
 
 
-<<<<<<< HEAD
 #user-list {
     list-style-type: none;
     padding: 0;
@@ -367,7 +366,6 @@ body {
     font-size: 1em;
 }
 
-=======
 #create-post-button {
     background-color: #007BFF; /* Change to your preferred color */
     color: white;
@@ -382,4 +380,3 @@ body {
 #create-post-button:hover {
     background-color: #0056b3; /* Change to your preferred hover color */
 }
->>>>>>> 4ad17f7daffcb44d5fd86d68b8498d4c8685ce54
