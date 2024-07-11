@@ -324,11 +324,12 @@ body {
 
 .community-description {
     font-style: italic;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 
 
+<<<<<<< HEAD
 #user-list {
     list-style-type: none;
     padding: 0;
@@ -366,3 +367,19 @@ body {
     font-size: 1em;
 }
 
+=======
+#create-post-button {
+    background-color: #007BFF; /* Change to your preferred color */
+    color: white;
+    padding: 5px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px; /* Adjust spacing as needed */
+}
+
+#create-post-button:hover {
+    background-color: #0056b3; /* Change to your preferred hover color */
+}
+>>>>>>> 4ad17f7daffcb44d5fd86d68b8498d4c8685ce54

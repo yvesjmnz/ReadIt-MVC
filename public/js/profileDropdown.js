@@ -34,4 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const createPostButton = document.getElementById('create-post-button');
+    if (createPostButton) {
+        createPostButton.addEventListener('click', () => {
+            window.location.href = '/create-post'; // Change to the URL where the user can create a new post
+        });
+    }
 });
