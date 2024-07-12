@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownContent = document.getElementById('dropdown-content');
     const createCommunityButton = document.getElementById('create-community-button');
 
+    // Regex to check for special characters
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/g;
+
     // Function to fetch and load communities
     async function loadCommunities() {
         try {
@@ -54,10 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                await loadCommunities(); // Reload communities after successful creation
+                await loadCommunities();
                 console.log('New community created successfully');
             } else {
-                console.error('Failed to create community:', response.statusText);
+                const errorData = await response.json();
+                console.error('Failed to create community:', errorData.error);
             }
         } catch (error) {
             console.error('Error creating community:', error);
@@ -68,7 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
     createCommunityButton.addEventListener('click', async () => {
         const name = prompt('Enter community name:');
         const description = prompt('Enter community description:');
-        
+
+        if (!name || !description) {
+            alert("Community name and description cannot be empty.");
+            return;
+        }
+
+        if (specialCharRegex.test(name)) {
+            alert("Community name cannot contain special characters.");
+            return;
+        }
+
         if (name && description) {
             await createCommunity(name, description);
         }
