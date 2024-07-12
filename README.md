@@ -1,11 +1,15 @@
+Arucan, Oliver Aldrin
+Jimenez, Yves Alvin Andrei
+Sanchez, Darren Julian
+
 To run: make a database called ReadIt in mongodDB compass. 
 
 Look at .env for db setup 
 
-all dependencies are included when cloning, in case of error run "npm install" first
+run npm install to install all dependencies
 
-otherwise to run:
+then simply run using:
 
 "node app.js" 
 
-*make sure to open cmd in the folder first
+*make sure to open cmd in the right directory
