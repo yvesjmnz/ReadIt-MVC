@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReadIT Posts</title>
-    <link rel="stylesheet" href="style_post.css">
+    <link rel="stylesheet" href="style_home.css">
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
-    <script src="/js/script_post.js" defer></script>
+    <script src="/js/createPost.js" defer></script>
 </head>
 <body>
     <div class="header">
         <div class="logo-container">
-            <a href="home.html">
+            <a href="/">
                 <img src="ReadIt.png" alt="ReadIT logo" class="logo">
                 <h1 class="site-title">Read<span class="highlight">IT</span></h1>
             </a>
         </div>
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
-                <span class="username" id="username">{{username}}</span>
-                <img src="{{profilePicture}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <span class="username" id="username">{{user.username}}</span>
+                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="dropdown-content" id="dropdown-content">
-                    <a href="{{profileLink}}">View Profile</a>
+                    <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="#" id="logout">Logout</a>
                 </div>
             </div>
