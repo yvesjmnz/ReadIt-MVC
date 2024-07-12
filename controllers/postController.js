@@ -3,7 +3,7 @@ const router = express.Router();
 const Post = require('../models/Post'); // Adjust the path as per your project structure
 
 // GET all POSTS
-router.get('/posts', async (req, res) => {
+router.get('/post', async (req, res) => {
     try {
         const posts = await Post.find();
         res.json(posts);

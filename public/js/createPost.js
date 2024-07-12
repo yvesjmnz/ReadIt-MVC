@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     alert("Post created successfully!");
-                    window.location.reload();
+                    addPostToPage(postTitle, postDescription);
                 } else {
                     alert(`Failed to create post: ${data.error}`);
                 }
@@ -30,4 +30,21 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("Post title and description cannot be empty.");
         }
     });
+
+    function addPostToPage(title, description) {
+        const postsContainer = document.getElementById('posts-container');
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+
+        const postTitleElement = document.createElement('h2');
+        postTitleElement.textContent = title;
+
+        const postDescriptionElement = document.createElement('p');
+        postDescriptionElement.textContent = description;
+
+        postElement.appendChild(postTitleElement);
+        postElement.appendChild(postDescriptionElement);
+
+        postsContainer.appendChild(postElement);
+    }
 });
