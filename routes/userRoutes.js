@@ -5,6 +5,7 @@ const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup
 const User = require('../models/User'); 
 const userController = require('../controllers/userController');
 const samplePosts = require('../models/samplePost');
+const sampleProfiles = require('../models/sampleProfiles');
 const Post = require('../models/Post');
 
 // Middleware to check if user is logged in
@@ -43,8 +44,57 @@ router.get('/login', renderLogin);
 // Route to handle login form submission
 router.post('/login', loginUser);
 
-// Route to render user profile
-router.get('/profile/:username', getUserProfile);
+// GET user profile
+router.get('/profile/:username', async (req, res) => {
+    try {
+        const loggedInUser = req.session.user;
+        const username = req.params.username;
+
+        // Check if the user exists in MongoDB
+        const userFromDB = await User.findOne({ username }).lean();
+
+        // Check if the user exists in the sampleProfiles
+        const userFromSample = sampleProfiles.find(profile => profile.username === username);
+
+
+        // Check if the visited user is the same as the logged-in user
+        const isLoggedInUser = loggedInUser && loggedInUser.username === username;
+
+        // Fetch posts from the database for the visited user
+        const dbPosts = await Post.find({ user: username });
+
+        // Filter sample posts by username
+        const userSamplePosts = samplePosts.filter(post => post.user === username);
+
+        // Combine both sets of posts
+        const posts = [...dbPosts, ...userSamplePosts];
+
+
+
+        if (!userFromDB && !userFromSample) {
+            return res.status(404).send('User not found');
+        }
+
+        // Render user profile
+        if (userFromDB) {
+            // Determine if the profile belongs to the logged-in user or another user
+            const isOwnProfile = loggedInUser && loggedInUser.username === username;
+            if (isOwnProfile) {
+                // Render user's own profile
+                res.render('userProfile', { visitedUser: userFromDB, loggedInUser, posts });
+            } else {
+                // Render another user's profile
+                res.render('profile', { visitedUser: userFromDB, loggedInUser, posts });
+            }
+        } else if (userFromSample) {
+            // Render profile using sample data if found
+            res.render('profile', { visitedUser: userFromSample, loggedInUser, posts });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
 
 // Route to handle profile update including file upload
 router.post('/profile/:username', (req, res) => {
