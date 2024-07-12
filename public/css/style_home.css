@@ -300,13 +300,12 @@ body {
 #load-more-button {
     display:block;
     width: 100%;
-    max-width: 113px;
+    max-width: 100px;
     padding: 10px;
     margin: 10px 0;
     background-color: #18a863;
     color:#fff;
     border: none;
-    border-radius: 5px;
     font-weight: bold;
     text-align: center;
 }
@@ -331,15 +330,14 @@ body {
 
 
 #create-post-button {
-    background-color: #007BFF;
+    background-color: #007BFF; /* Change to your preferred color */
     color: white;
     padding: 5px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-weight: bold;
-    margin-bottom: 20px;
-    max-width: 120px;
+    font-size: 16px;
+    margin-bottom: 20px; /* Adjust spacing as needed */
 }
 
 #create-post-button:hover {
