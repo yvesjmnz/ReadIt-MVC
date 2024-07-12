@@ -20,7 +20,15 @@ const requireLogin = (req, res, next) => {
 // GET home page
 router.get('/', requireLogin, async (req, res) => {
     try {
-        res.render('home', { user: req.session.user, posts: samplePosts });
+        const loggedInUser = req.session.user;
+
+        // Fetch all posts from the database
+        const dbPosts = await Post.find().sort({ createdAt: -1 });
+
+        // Combine database posts with sample posts
+        const posts = [...dbPosts, ...samplePosts];
+
+        res.render('home', { user: loggedInUser, posts });
     } catch (error) {
         console.error('Error fetching home page:', error);
         res.status(500).json({ error: 'Failed to load home page' });
