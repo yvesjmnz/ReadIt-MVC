@@ -1,33 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const Post = require('../models/Post'); // Import the Post model
+const Post = require('../models/Post');
 
-// GET all posts
-router.get('/posts', async (req, res) => {
-    try {
-        const posts = await Post.find();
-        res.json(posts);
-    } catch (error) {
-        console.error('Error fetching posts:', error);
-        res.status(500).json({ error: 'Failed to fetch posts' });
-    }
-});
-
-// POST create a new post
 router.post('/post', async (req, res) => {
-    const { user, title, post_description, likes, dislikes, comments, date } = req.body;
+    const { title, post_description } = req.body;
 
-    if (!user || !title || !post_description) {
-        return res.status(400).json({ error: 'User, title, and post_description are required' });
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
     }
 
     try {
-        const newPost = new Post({ user, title, post_description, likes, dislikes, comments, date });
-        const savedPost = await newPost.save();
-        res.status(201).json(savedPost);
+        const newPost = new Post({ 
+            user: req.session.user.username,
+            title, 
+            post_description
+        });
+
+        await newPost.save();
+        res.json({ success: true });
     } catch (error) {
-        console.error('Error creating a post:', error);
-        res.status(500).json({ error: 'Failed to create post' });
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to create post' });
     }
 });
 

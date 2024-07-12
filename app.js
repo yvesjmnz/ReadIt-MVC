@@ -75,7 +75,7 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error(err));
 
 app.use('/api', communityRoutes); // Mount community routes under /api
-app.use('/api', postRoutes);
+app.use('/api', postRoutes); // Ensure this line is present and correct
 app.use('/', userRoutes);
 
 app.use('/', require('./routes/userRoutes'));
