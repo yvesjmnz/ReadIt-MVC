@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownContent = document.getElementById('dropdown-content');
     const createCommunityButton = document.getElementById('create-community-button');
 
-    // Regex to check for special characters
+    
     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/g;
 
-    // Function to fetch and load communities
+    
     async function loadCommunities() {
         try {
             const response = await fetch('/api/communities');
@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const communities = await response.json();
 
-            // Clear existing list
+            
             communityList.innerHTML = '';
 
-            // Rebuild community list
+            
             communities.forEach(community => {
                 const li = document.createElement('li');
                 li.dataset.community = community.name;
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 communityList.appendChild(li);
             });
 
-            // Add event listeners to new community links
+            
             communityList.querySelectorAll('li').forEach(communityItem => {
                 communityItem.addEventListener('click', () => {
                     const communityName = communityItem.dataset.community;
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to handle community creation
+   
     async function createCommunity(name, description) {
         try {
             const response = await fetch('/api/community', {
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event listener for the create community button
+    
     createCommunityButton.addEventListener('click', async () => {
         const name = prompt('Enter community name:');
         const description = prompt('Enter community description:');

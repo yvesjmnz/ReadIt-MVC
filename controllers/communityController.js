@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Community = require('../models/Community'); // Adjust the path as per your project structure
+const Community = require('../models/Community'); 
 
-// GET all communities
+
 router.get('/communities', async (req, res) => {
     try {
         const communities = await Community.find();
@@ -13,7 +13,7 @@ router.get('/communities', async (req, res) => {
     }
 });
 
-// POST create a new community
+
 router.post('/community', async (req, res) => {
     const { name, description } = req.body;
 

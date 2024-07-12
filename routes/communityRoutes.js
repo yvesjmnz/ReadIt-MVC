@@ -4,7 +4,7 @@ const router = express.Router();
 const Community = require('../models/Community');
 const Post = require('../models/Post');
 
-// GET all communities
+
 router.get('/communities', async (req, res) => {
     try {
         const communities = await Community.find();
@@ -15,7 +15,7 @@ router.get('/communities', async (req, res) => {
     }
 });
 
-// POST create a new community
+
 router.post('/community', async (req, res) => {
     const { name, description } = req.body;
 
@@ -36,7 +36,7 @@ router.post('/community', async (req, res) => {
     }
 });
 
-// GET a specific community by name
+
 router.get('/community/:name', async (req, res) => {
     try {
         const community = await Community.findOne({ name: req.params.name });

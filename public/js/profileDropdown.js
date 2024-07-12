@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logout');
     if (logoutButton) {
         logoutButton.addEventListener('click', async (event) => {
-            event.preventDefault(); // Prevent default behavior of <a> tag
+            event.preventDefault(); 
 
             try {
                 const response = await fetch('/logout', {
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    window.location.href = '/login'; // Redirect to login page
+                    window.location.href = '/login'; 
                 } else {
                     console.error('Logout failed:', response.statusText);
                 }

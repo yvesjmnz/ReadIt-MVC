@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
         default: 'default.jpg'
     },
     quote: String,
-    favoriteCommunities: [String], // Disregard
+    favoriteCommunities: [String],
 });
 
 const User = mongoose.model('User', userSchema);

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Post = require('../models/Post'); // Adjust the path as per your project structure
+const Post = require('../models/Post'); 
 
-// GET all POSTS
+
 router.get('/post', async (req, res) => {
     try {
         const posts = await Post.find();
@@ -13,7 +13,7 @@ router.get('/post', async (req, res) => {
     }
 });
 
-// POST create a new post
+
 router.post('/post', async (req, res) => {
     const {  user, title, post_description, likes, dislikes, comments, date } = req.body;
 
