@@ -5,6 +5,7 @@ const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup
 const User = require('../models/User'); 
 const userController = require('../controllers/userController');
 const samplePosts = require('../models/samplePost');
+const Post = require('../models/Post');
 
 // Middleware to check if user is logged in
 const requireLogin = (req, res, next) => {
@@ -16,7 +17,7 @@ const requireLogin = (req, res, next) => {
 };
 
 // GET home page
-router.get('/', async (req, res) => {
+router.get('/', requireLogin, async (req, res) => {
     try {
         res.render('home', { user: req.session.user, posts: samplePosts });
     } catch (error) {

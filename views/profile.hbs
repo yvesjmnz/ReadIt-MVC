@@ -44,19 +44,19 @@
         </div>
     </div>
     <div class="sections">
-        
-        {{!-- <div class="recents">
-            <h3>Recents</h3>
-            <button class="recent-button"><!--added to demonstrate recent posts-->
-                        <p class="community-name">In: AmIWrong?</p>
-                        <span class="recent-title">is it true that 5G causes cancer?</span>
-                        <div class="recent-stats">
-                            <span>&#x1F44D; 0</span>
-                            <span>&#x1F44E; 2395</span>
-                            <span>&#x1F4AC; 304 comments</span>
-                        </div> --}}
-                    
-                </button>
+         <div class="recents">
+            <h3>Recent Posts</h3>
+            {{#each posts}}
+            <button class="recent-button">
+                <p class="community-name">In: {{this.community}}</p>
+                <span class="recent-title">{{this.title}}</span>
+                <div class="recent-stats">
+                    <span>&#x1F44D; {{this.likes}}</span>
+                    <span>&#x1F44E; {{this.dislikes}}</span>
+                    <span>&#x1F4AC; {{this.comments.length}} comments</span>
+                </div>
+            </button>
+            {{/each}}
         </div>
     </div>
 </div>
