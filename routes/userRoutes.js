@@ -4,6 +4,7 @@ const path = require('path');
 const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup, renderLogin, logoutUser } = require('../controllers/userController');
 const User = require('../models/User'); 
 const userController = require('../controllers/userController');
+const samplePosts = require('../models/samplePost');
 
 // Middleware to check if user is logged in
 const requireLogin = (req, res, next) => {
@@ -14,6 +15,15 @@ const requireLogin = (req, res, next) => {
     }
 };
 
+// GET home page
+router.get('/', async (req, res) => {
+    try {
+        res.render('home', { user: req.session.user, posts: samplePosts });
+    } catch (error) {
+        console.error('Error fetching home page:', error);
+        res.status(500).json({ error: 'Failed to load home page' });
+    }
+});
 // Route to render home page
 router.get('/', requireLogin, (req, res) => {
     const user = req.session.user; // Ensure user object is directly accessible

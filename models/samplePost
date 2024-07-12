@@ -1,6 +1,6 @@
 const samplePosts = [
     {
-        user: 'alice_smith',
+        user: 'DesperateOtaku',
         title: 'Introduction to MongoDB',
         post_description: 'Learn the basics of MongoDB and its advantages.',
         likes: 15,
@@ -11,7 +11,7 @@ const samplePosts = [
         ]
     },
     {
-        user: 'bob_jones',
+        user: 'WehSingSing1',
         title: 'JavaScript Frameworks Comparison',
         post_description: 'Comparing popular JavaScript frameworks like React, Angular, and Vue.',
         likes: 20,
@@ -21,7 +21,7 @@ const samplePosts = [
         ]
     },
     {
-        user: 'eve_wilson',
+        user: 'meowzzician1224',
         title: 'Getting Started with Node.js',
         post_description: 'A beginner\'s guide to Node.js and its ecosystem.',
         likes: 12,
@@ -29,7 +29,7 @@ const samplePosts = [
         comments: []
     },
     {
-        user: 'charlie_brown',
+        user: 'hungrydegen293',
         title: 'Web Development Trends 2024',
         post_description: 'Explore the latest trends in web development for 2024.',
         likes: 8,
@@ -40,7 +40,7 @@ const samplePosts = [
         ]
     },
     {
-        user: 'diana_green',
+        user: 'katsuract',
         title: 'UX Design Principles',
         post_description: 'Key principles for effective UX design.',
         likes: 25,

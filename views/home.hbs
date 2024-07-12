@@ -56,7 +56,21 @@
             </div>
 
             <div class="posts-section">
-                <div id="posts-container"></div>
+                <div id="posts-container">
+                    {{#each posts}}
+                        <div class="post">
+                            <p>{{this.date}}</p>
+                            <h3 class="post-title">{{this.title}}</h3>
+                            <p class="post-snippet">{{this.post_description}}</p>
+                            <p class="post-community">Posted in {{this.community}} by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
+                            <div class="post-stats">
+                                <button class="like-button" aria-label="Like post"><span class="likes-count">{{this.likes}}</span> 👍</button>
+                                <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{this.dislikes}}</span> 👎</button>
+                                <span class="comments-count">{{this.comments.length}} Comments</span>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
             </div>
         </div>
     </div>
