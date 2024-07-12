@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style_userprofile.css">
     <script src="/js/script_userprofile.js" defer></script>
     <script src="/js/profileDropdown.js" defer></script>
+    <script src="/js/followButton.js" defer></script>
 </head>
 <body>
 <div class="header">
@@ -40,12 +41,11 @@
         </div>
         <div class="profile-buttons">
             <button class="follow-button" id="follow-button" onclick="followUser()">Follow</button>
-            <button class="message-button">Message</button>
         </div>
     </div>
     <div class="sections">
         
-        <div class="recents">
+        {{!-- <div class="recents">
             <h3>Recents</h3>
             <button class="recent-button"><!--added to demonstrate recent posts-->
                         <p class="community-name">In: AmIWrong?</p>
@@ -54,7 +54,7 @@
                             <span>&#x1F44D; 0</span>
                             <span>&#x1F44E; 2395</span>
                             <span>&#x1F4AC; 304 comments</span>
-                        </div>
+                        </div> --}}
                     
                 </button>
         </div>
