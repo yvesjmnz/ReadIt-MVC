@@ -9,6 +9,7 @@
     <script src="/js/script_home.js" defer></script>
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/usersection.js" defer></script>
+    <script src="/js/submitComment.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -67,6 +68,20 @@
                                 <button class="like-button" aria-label="Like post"><span class="likes-count">{{this.likes}}</span> 👍</button>
                                 <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{this.dislikes}}</span> 👎</button>
                                 <span class="comments-count">{{this.comments.length}} Comments</span>
+                            </div>
+                            <div class="comments-section">
+                                <h4>Comments</h4>
+                                <ul>
+                                    {{#each this.comments}}
+                                        <li>
+                                            <p><strong>{{this.user}}:</strong> {{this.text}}</p>
+                                        </li>
+                                    {{/each}}
+                                </ul>
+                                <form class="comment-form" data-post-id="{{this._id}}">
+                                    <textarea name="comment" placeholder="Add a comment..." required></textarea>
+                                    <button type="submit">Submit</button>
+                                </form>
                             </div>
                         </div>
                     {{/each}}
