@@ -65,16 +65,22 @@ exports.renderLogin = (req, res) => {
 
 exports.loginUser = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, rememberMe } = req.body;
 
         const user = await User.findOne({ username });
         if (!user || user.password !== password) {
             return res.status(400).send('Invalid credentials');
         }
 
-       
-        req.session.user = { username: user.username, profilePic: user.profilePic }; 
-        res.redirect('/'); 
+        // Set session user
+        req.session.user = { username: user.username, profilePic: user.profilePic };
+
+        // If "Remember Me" is checked, set a persistent cookie
+        if (rememberMe) {
+            res.cookie('user', JSON.stringify(req.session.user), { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true }); // 30 days
+        }
+
+        res.redirect('/');
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');

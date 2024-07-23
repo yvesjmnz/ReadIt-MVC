@@ -4,6 +4,7 @@ const { engine } = require('express-handlebars');
 const path = require('path');
 const dotenv = require('dotenv');
 const session = require('express-session');
+const cookieParser = require('cookie-parser'); 
 const multer = require('multer');
 const fileUpload = require('express-fileupload');
 const communityRoutes = require('./routes/communityRoutes'); // Import community routes
@@ -53,6 +54,7 @@ function checkFileType(file, cb) {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser()); // Add this line
 app.use(fileUpload());
 
 // Session middleware setup
@@ -62,6 +64,14 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false } // Set secure: true if using HTTPS
 }));
+
+// Middleware to check for "Remember Me" cookie
+app.use((req, res, next) => {
+    if (!req.session.user && req.cookies.user) {
+        req.session.user = JSON.parse(req.cookies.user);
+    }
+    next();
+});
 
 app.engine('hbs', engine({
     extname: 'hbs',
