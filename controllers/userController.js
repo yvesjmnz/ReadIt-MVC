@@ -2,8 +2,8 @@ const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
 const sampleProfiles = require('../models/sampleProfiles');
-
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10; // Define the salt rounds for bcrypt
 
 const requireLogin = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -13,11 +13,9 @@ const requireLogin = (req, res, next) => {
     }
 };
 
-
 exports.renderSignup = (req, res) => {
     res.render('register');
 };
-
 
 exports.registerUser = async (req, res) => {
     try {
@@ -45,10 +43,12 @@ exports.registerUser = async (req, res) => {
             });
         }
 
-        const newUser = new User({ username, password, quote, profilePic: profilePicPath });
+        // Hash the password before storing it
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const newUser = new User({ username, password: hashedPassword, quote, profilePic: profilePicPath });
         await newUser.save();
 
-        
         req.session.user = { username: newUser.username, profilePic: profilePicPath }; 
         res.redirect('/'); 
     } catch (error) {
@@ -57,18 +57,16 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-
 exports.renderLogin = (req, res) => {
     res.render('login');
 };
-
 
 exports.loginUser = async (req, res) => {
     try {
         const { username, password, rememberMe } = req.body;
 
         const user = await User.findOne({ username });
-        if (!user || user.password !== password) {
+        if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(400).send('Invalid credentials');
         }
 
@@ -87,35 +85,27 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-
 exports.getUserProfile = async (req, res) => {
     try {
         const loggedInUser = req.session.user;
         const username = req.params.username;
 
-        
         const userFromDB = await User.findOne({ username }).lean();
 
-        
         const userFromSample = sampleProfiles.find(profile => profile.username === username);
 
         if (!userFromDB && !userFromSample) {
             return res.status(404).send('User not found');
         }
 
-        
         if (userFromDB) {
-            
             const isOwnProfile = loggedInUser && loggedInUser.username === username;
             if (isOwnProfile) {
-              
                 res.render('userProfile', { visitedUser: userFromDB, loggedInUser });
             } else {
-                
                 res.render('profile', { visitedUser: userFromDB, loggedInUser });
             }
         } else if (userFromSample) {
-            
             res.render('profile', { visitedUser: userFromSample, loggedInUser });
         }
     } catch (error) {
@@ -150,8 +140,6 @@ exports.updateUserProfile = async (req, res) => {
     }
 };
 
-
-
 exports.getAllUsers = async (req, res) => {
     try {
         const usersFromDB = await User.find().lean();
@@ -162,7 +150,6 @@ exports.getAllUsers = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
-
 
 exports.logoutUser = (req, res) => {
     req.session.destroy(err => {
