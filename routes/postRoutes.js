@@ -64,4 +64,50 @@ router.post('/post/:_id/comment', async (req, res) => {
     }
 });
 
+// Upvote a post
+router.post('/post/:_id/upvote', async (req, res) => {
+    const { _id } = req.params;
+
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    try {
+        const post = await Post.findById(_id);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        post.likes += 1;
+        await post.save();
+        res.json({ success: true, likes: post.likes });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to upvote post' });
+    }
+});
+
+// Downvote a post
+router.post('/post/:_id/downvote', async (req, res) => {
+    const { _id } = req.params;
+
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    try {
+        const post = await Post.findById(_id);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        post.dislikes += 1;
+        await post.save();
+        res.json({ success: true, dislikes: post.dislikes });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to downvote post' });
+    }
+});
+
 module.exports = router;
