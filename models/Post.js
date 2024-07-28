@@ -40,6 +40,10 @@ const postSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    communityName: {
+        type: String,
+        required: true
     }
 });
 

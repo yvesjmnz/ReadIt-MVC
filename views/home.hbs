@@ -61,6 +61,7 @@
                     {{#each posts}}
                         <div class="post">
                             <p>{{this.date}}</p>
+                            <p class="post-community">Posted in {{this.communityName}}
                             <h3 class="post-title">{{this.title}}</h3>
                             <p class="post-snippet">{{this.post_description}}</p>
                             <p class="post-community">Posted in {{this.community}} by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>

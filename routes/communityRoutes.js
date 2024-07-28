@@ -44,9 +44,12 @@ router.get('/community/:name', async (req, res) => {
             return res.status(404).json({ error: 'Community not found' });
         }
         
-
-        const posts = await Post.find({ community: community._id });
+        try {
+        const posts = await Post.find({ communityName: req.params.name });
         res.render('community', { community, posts: posts.length > 0 ? posts : null, user: req.session.user });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to fetch posts' });
+        }
         
     } catch (error) {
         console.error('Error fetching community:', error);
