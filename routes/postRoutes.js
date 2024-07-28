@@ -64,8 +64,8 @@ router.post('/post/:_id/comment', async (req, res) => {
     }
 });
 
-// Upvote a post
-router.post('/post/:_id/upvote', async (req, res) => {
+// Like a post
+router.post('/post/:_id/like', async (req, res) => {
     const { _id } = req.params;
 
     if (!req.session.user) {
@@ -79,16 +79,17 @@ router.post('/post/:_id/upvote', async (req, res) => {
         }
 
         post.likes += 1;
+
         await post.save();
-        res.json({ success: true, likes: post.likes });
+        res.json({ success: true });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, error: 'Failed to upvote post' });
+        res.status(500).json({ success: false, error: 'Failed to like post' });
     }
 });
 
-// Downvote a post
-router.post('/post/:_id/downvote', async (req, res) => {
+// Dislike a post
+router.post('/post/:_id/dislike', async (req, res) => {
     const { _id } = req.params;
 
     if (!req.session.user) {
@@ -102,12 +103,16 @@ router.post('/post/:_id/downvote', async (req, res) => {
         }
 
         post.dislikes += 1;
+
         await post.save();
-        res.json({ success: true, dislikes: post.dislikes });
+        res.json({ success: true });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, error: 'Failed to downvote post' });
+        res.status(500).json({ success: false, error: 'Failed to dislike post' });
     }
 });
+
+
+
 
 module.exports = router;
