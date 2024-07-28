@@ -4,7 +4,7 @@ const Post = require('../models/Post');
 
 // Create a new post
 router.post('/post', async (req, res) => {
-    const { title, post_description } = req.body;
+    const { title, post_description, communityName } = req.body;
 
     if (!req.session.user) {
         return res.status(401).json({ success: false, error: 'User not authenticated' });
@@ -13,6 +13,7 @@ router.post('/post', async (req, res) => {
     try {
         const newPost = new Post({ 
             user: req.session.user.username,
+            communityName,
             title, 
             post_description
         });
