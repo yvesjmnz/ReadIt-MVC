@@ -42,8 +42,7 @@ const postSchema = new mongoose.Schema({
         default: Date.now
     },
     communityName: {
-        type: String,
-        required: true
+        type: String
     }
 });
 
