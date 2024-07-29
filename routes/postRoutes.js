@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
 
-
-
 // Create a new post
 router.post('/post', async (req, res) => {
     const { title, post_description, communityName } = req.body;
@@ -32,7 +30,7 @@ router.post('/post', async (req, res) => {
 router.get('/posts', async (req, res) => {
     try {
         const posts = await Post.find({}).lean();
-        res.json(posts);
+        res.render('posts', { posts }); 
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, error: 'Failed to retrieve posts' });

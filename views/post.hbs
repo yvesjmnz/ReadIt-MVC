@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReadIT Posts</title>
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style_home.css">
+    <link rel="stylesheet" href="/css/style_post.css">
+    <script src="/js/profileDropdown.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -30,12 +31,30 @@
     <div class="main-content">
         <div class="content">
             <div id="posts-container" class="posts-section">
-                {{#each posts}}
-                    <div class="post">
-                        <h2>{{this.title}}</h2>
-                        <p>{{this.content}}</p>
+                <div class="post">
+                    <h2>{{post.title}}</h2>
+                    <p>{{post.post_description}}</p>
+                    <p class="post-community">Posted in <a href="/api/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a> by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a></p>
+                    <div class="post-stats">
+                        <span class="likes-count">{{post.likes}} 👍</span>
+                        <span class="dislikes-count">{{post.dislikes}} 👎</span>
+                        <span class="comments-count">{{post.comments.length}} Comments</span>
                     </div>
-                {{/each}}
+                    <div class="comments-section">
+                        <h4>Comments</h4>
+                        <ul>
+                            {{#each post.comments}}
+                                <li>
+                                    <p><strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> {{this.text}}</p>
+                                </li>
+                            {{/each}}
+                        </ul>
+                        <form class="comment-form" action="/api/post/{{post._id}}/comment" method="POST">
+                            <textarea name="comment" placeholder="Add a comment..." required></textarea>
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
