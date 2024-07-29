@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style_post.css">
     <script src="/js/profileDropdown.js" defer></script>
+    <script src="/js/submitComment.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -45,11 +46,11 @@
                         <ul>
                             {{#each post.comments}}
                                 <li>
-                                    <p><strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> {{this.text}}</p>
+                                    <p class="comment-user"><strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> {{this.text}}</p>
                                 </li>
                             {{/each}}
                         </ul>
-                        <form class="comment-form" action="/api/post/{{post._id}}/comment" method="POST">
+                        <form class="comment-form" data-post-id="{{post._id}}">
                             <textarea name="comment" placeholder="Add a comment..." required></textarea>
                             <button type="submit">Submit</button>
                         </form>
