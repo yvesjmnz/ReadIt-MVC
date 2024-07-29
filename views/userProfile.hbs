@@ -55,6 +55,7 @@
          <div class="recents">
             <h3>Recent Posts</h3>
             {{#each posts}}
+            <a href="/api/post/{{this._id}}" style="color:inherit">
             <button class="recent-button">
                 <span class="recent-title">{{this.title}}</span>
                 <div class="recent-stats">
@@ -63,6 +64,7 @@
                     <span>&#x1F4AC; {{this.comments.length}} comments</span>
                 </div>
             </button>
+            </a>
             {{/each}}
         </div>
     </div>
