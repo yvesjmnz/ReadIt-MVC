@@ -112,7 +112,7 @@ router.get('/post/:_id', async (req, res) => {
         if (!post) {
             return res.status(404).send('Post not found');
         }
-        res.render('post', { post });
+        res.render('post', { post, user: req.session.user });
     } catch (error) {
         console.error(error);
         res.status(500).send('Failed to retrieve post');
