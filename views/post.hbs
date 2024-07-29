@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="/css/style_post.css">
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/submitComment.js" defer></script>
+    <script src="/js/commentActions.js" defer></script>
 </head>
-<body>
+<body data-username="{{user.username}}">
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -46,7 +47,13 @@
                         <ul>
                             {{#each post.comments}}
                                 <li>
-                                    <p class="comment-user"><strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> {{this.text}}</p>
+                                    <p class="comment-user">
+                                        <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> 
+                                        {{this.text}} 
+                                        {{#if this.edited}}<em>(edited)</em>{{/if}}
+                                    </p>
+                                    <button class="edit-button" style="display:none;" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">Edit</button>
+                                    <button class="delete-button" style="display:none;" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">Delete</button>
                                 </li>
                             {{/each}}
                         </ul>

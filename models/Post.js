@@ -6,12 +6,15 @@ const commentSchema = new mongoose.Schema({
         required: true
     },
     text: {
-        type: String,
-        required: true
+        type: String
     },
     date: {
         type: Date,
         default: Date.now
+    },
+    edited: {
+        type: Boolean,
+        default: false
     }
 });
 

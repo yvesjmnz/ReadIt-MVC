@@ -112,11 +112,87 @@ router.get('/post/:_id', async (req, res) => {
         if (!post) {
             return res.status(404).send('Post not found');
         }
+
+        // Mark comments by the logged-in user
+        post.comments = post.comments.map(comment => ({
+            ...comment,
+            isOwner: comment.user === req.session.user
+        }));
+
         res.render('post', { post, user: req.session.user });
     } catch (error) {
         console.error(error);
         res.status(500).send('Failed to retrieve post');
     }
 });
+
+// Edit a comment
+router.put('/post/:postId/comment/:commentId', async (req, res) => {
+    const { postId, commentId } = req.params;
+    const { newText } = req.body;
+
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        const comment = post.comments.id(commentId);
+        if (!comment) {
+            return res.status(404).json({ success: false, error: 'Comment not found' });
+        }
+
+        if (comment.user !== req.session.user.username) {
+            return res.status(403).json({ success: false, error: 'Not authorized to edit this comment' });
+        }
+
+        comment.text = newText;
+        comment.edited = true;
+        await post.save();
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to edit comment' });
+    }
+});
+
+// Delete a comment
+router.delete('/post/:postId/comment/:commentId', async (req, res) => {
+    const { postId, commentId } = req.params;
+
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        const comment = post.comments.id(commentId);
+        if (!comment) {
+            return res.status(404).json({ success: false, error: 'Comment not found' });
+        }
+
+        if (comment.user !== req.session.user.username) {
+            return res.status(403).json({ success: false, error: 'Not authorized to delete this comment' });
+        }
+
+        // Remove the comment from the comments array
+        post.comments.pull(commentId);
+        await post.save();
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to delete comment' });
+    }
+});
+
 
 module.exports = router;
