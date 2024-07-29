@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
 
+
+
 // Create a new post
 router.post('/post', async (req, res) => {
     const { title, post_description, communityName } = req.body;
@@ -69,10 +71,6 @@ router.post('/post/:_id/comment', async (req, res) => {
 router.post('/post/:_id/like', async (req, res) => {
     const { _id } = req.params;
 
-    if (!req.session.user) {
-        return res.status(401).json({ success: false, error: 'User not authenticated' });
-    }
-
     try {
         const post = await Post.findById(_id);
         if (!post) {
@@ -80,22 +78,17 @@ router.post('/post/:_id/like', async (req, res) => {
         }
 
         post.likes += 1;
-
         await post.save();
-        res.json({ success: true });
+        res.json({ likes: post.likes, dislikes: post.dislikes });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, error: 'Failed to like post' });
+        res.status(500).json({ success: false, error: 'Failed to update likes' });
     }
 });
 
 // Dislike a post
 router.post('/post/:_id/dislike', async (req, res) => {
     const { _id } = req.params;
-
-    if (!req.session.user) {
-        return res.status(401).json({ success: false, error: 'User not authenticated' });
-    }
 
     try {
         const post = await Post.findById(_id);
@@ -104,14 +97,16 @@ router.post('/post/:_id/dislike', async (req, res) => {
         }
 
         post.dislikes += 1;
-
         await post.save();
-        res.json({ success: true });
+        res.json({ likes: post.likes, dislikes: post.dislikes });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, error: 'Failed to dislike post' });
+        res.status(500).json({ success: false, error: 'Failed to update dislikes' });
     }
 });
+
+
+
 
 
 
