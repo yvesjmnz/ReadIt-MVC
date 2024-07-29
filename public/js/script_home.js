@@ -7,10 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownContent = document.getElementById('dropdown-content');
     const createCommunityButton = document.getElementById('create-community-button');
 
-    
     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/g;
 
-    
     async function loadCommunities() {
         try {
             const response = await fetch('/api/communities');
@@ -19,18 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const communities = await response.json();
 
-            
             communityList.innerHTML = '';
 
-            
             communities.forEach(community => {
                 const li = document.createElement('li');
                 li.dataset.community = community.name;
-                li.innerHTML = `<a href="/api/community/${community.name.toLowerCase()}">${community.name}</a>`;
+                li.innerHTML = `<a href="/api/community/${encodeURIComponent(community.name)}">${community.name}</a>`;
                 communityList.appendChild(li);
             });
 
-            
             communityList.querySelectorAll('li').forEach(communityItem => {
                 communityItem.addEventListener('click', () => {
                     const communityName = communityItem.dataset.community;
@@ -45,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   
     async function createCommunity(name, description) {
         try {
             const response = await fetch('/api/community', {
@@ -53,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name, description })
+                body: JSON.stringify({ name, description }) 
             });
 
             if (response.ok) {
@@ -68,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    
     createCommunityButton.addEventListener('click', async () => {
         const name = prompt('Enter community name:');
         const description = prompt('Enter community description:');

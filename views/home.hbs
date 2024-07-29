@@ -10,9 +10,7 @@
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/usersection.js" defer></script>
     <script src="/js/submitComment.js" defer></script>
-    <script src="/js/vote.js" defer></script>
- 
-    
+    <script src="/js/likeDislike.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -62,9 +60,8 @@
             <div class="posts-section">
                 <div id="posts-container">
                     {{#each posts}}
-                        <div class="post">
+                        <div class="post" data-post-id="{{this._id}}">
                             <p>{{this.date}}</p>
-                            <p class="post-community">Posted in {{this.communityName}}
                             <h3 class="post-title">{{this.title}}</h3>
                             <p class="post-snippet">{{this.post_description}}</p>
                             <p class="post-community">Posted in {{this.community}} by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>

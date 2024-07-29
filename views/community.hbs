@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{community.name}}</title>
-    <link rel="stylesheet" href="/css/style_home.css">
+    <link rel="stylesheet" href="/css/style_community.css">
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/createPost.js" defer></script>
 </head>
@@ -28,22 +28,32 @@
         </div>
     </div>
 
-    
-    <div class="content">
-       <div class="community-header">
-            <h2>{{community.name}}</h2>
-            <p class="community-description">"{{community.description}}"</p>
+    <div class="main-content">
+        <div class="community-sidebar">
+            <div class="community-header">
+                <h2>{{community.name}}</h2>
+                <p class="community-description">{{community.description}}</p>
+                <p class="post-counter">{{#if posts.length}}{{posts.length}}{{else}}0{{/if}} posts available in this community!</p>
+            </div>
         </div>
-
-        <div class="posts-section">
-            <button id="create-post-button">Create Post</button>
-            {{#each posts}}
-                <div class="post">
-                    <h3 class="post-title">{{this.title}}</h3>
-                    <p class="post-snippet">{{this.post_description}}</p>
-                </div>
-            {{/each}}
-            <button id="load-more-button">Load More</button>
+        
+        <div class="posts-container">
+            <div class="posts-header">
+                <h2>Posts</h2>
+                <button id="create-post-button" class="blue-button">Create Post</button>
+            </div>
+            <div class="posts-section">
+                {{#each posts}}
+                    <div class="post">
+                        <h3 class="post-title">{{this.title}}</h3>
+                        <p class="post-snippet">{{this.post_description}}</p>
+                        <p class="post-author">Posted by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
+                    </div>
+                {{else}}
+                    <p id="no-posts-message">No posts available yet</p>
+                {{/each}}
+                <button id="load-more-button" class="green-button">Load More</button>
+            </div>
         </div>
     </div>
 </body>
