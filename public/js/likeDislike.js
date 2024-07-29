@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function updateLikeDislike(postId, action) {
     try {
-        const response = await fetch(`/post/${postId}/${action}`, {
+        const response = await fetch(`/api/post/${postId}/${action}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
