@@ -6,9 +6,11 @@
     <title>ReadIT Posts</title>
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style_post.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/submitComment.js" defer></script>
     <script src="/js/commentActions.js" defer></script>
+    <script src="/js/likeDislike.js" defer></script>
 </head>
 <body data-username="{{user.username}}">
     <div class="header">
@@ -38,28 +40,34 @@
                     <p>{{post.post_description}}</p>
                     <p class="post-community">Posted in <a href="/api/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a> by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a></p>
                     <div class="post-stats">
-                        <span class="likes-count">{{post.likes}} 👍</span>
-                        <span class="dislikes-count">{{post.dislikes}} 👎</span>
+                        <button class="like-button"  aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
+                        <button class="dislike-button"  aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
                         <span class="comments-count">{{post.comments.length}} Comments</span>
                     </div>
                     <div class="comments-section">
                         <h4>Comments</h4>
                         <ul>
                             {{#each post.comments}}
-                                <li>
+                                <li class="comment-item">
                                     <p class="comment-user">
                                         <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> 
                                         {{this.text}} 
                                         {{#if this.edited}}<em>(edited)</em>{{/if}}
                                     </p>
-                                    <button class="edit-button" style="display:none;" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">Edit</button>
-                                    <button class="delete-button" style="display:none;" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">Delete</button>
+                                    <div class="comment-actions">
+                                        <button class="edit-button" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button class="delete-button" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </li>
                             {{/each}}
                         </ul>
                         <form class="comment-form" data-post-id="{{post._id}}">
                             <textarea name="comment" placeholder="Add a comment..." required></textarea>
-                            <button type="submit">Submit</button>
+                            <button type="submit"><i class="fa-solid fa-comment"></i> Comment</button>
                         </form>
                     </div>
                 </div>
