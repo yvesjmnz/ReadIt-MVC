@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style_community.css">
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/createPost.js" defer></script>
+    <script src="/js/navigateToPost.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -44,7 +45,7 @@
             </div>
             <div class="posts-section">
                 {{#each posts}}
-                    <div class="post">
+                    <div class="post" data-post-id="{{this._id}}">
                         <h3 class="post-title">{{this.title}}</h3>
                         <p class="post-snippet">{{this.post_description}}</p>
                         <p class="post-author">Posted by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>

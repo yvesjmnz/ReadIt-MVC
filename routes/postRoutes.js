@@ -105,10 +105,20 @@ router.post('/post/:_id/dislike', async (req, res) => {
     }
 });
 
+// Render a post by ID
+router.get('/post/:_id', async (req, res) => {
+    const { _id } = req.params;
 
-
-
-
-
+    try {
+        const post = await Post.findById(_id).lean();
+        if (!post) {
+            return res.status(404).send('Post not found');
+        }
+        res.render('post', { post });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Failed to retrieve post');
+    }
+});
 
 module.exports = router;
