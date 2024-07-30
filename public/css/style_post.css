@@ -337,3 +337,23 @@ body {
 .delete-button:hover {
     color: red;
 }
+
+/* Additional styles for edit and delete post buttons */
+.post-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.edit-post-button, .delete-post-button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.edit-post-button:hover, .delete-post-button:hover {
+    color: #18a863;
+}
+

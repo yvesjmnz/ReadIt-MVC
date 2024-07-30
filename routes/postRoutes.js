@@ -139,7 +139,6 @@ router.post('/post/:_id/dislike', async (req, res) => {
     }
 });
 
-
 // Render a post by ID
 router.get('/post/:_id', async (req, res) => {
     const { _id } = req.params;
@@ -160,6 +159,49 @@ router.get('/post/:_id', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Failed to retrieve post');
+    }
+});
+
+// Edit a post
+router.put('/post/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, post_description } = req.body;
+
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    try {
+        const post = await Post.findByIdAndUpdate(id, { title, post_description }, { new: true });
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        res.json({ success: true, post });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to edit post' });
+    }
+});
+
+// Delete a post
+router.delete('/post/:id', async (req, res) => {
+    const { id } = req.params;
+
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    try {
+        const post = await Post.findByIdAndDelete(id);
+        if (!post) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+        }
+
+        res.json({ success: true, message: 'Post deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Failed to delete post' });
     }
 });
 
@@ -230,6 +272,5 @@ router.delete('/post/:postId/comment/:commentId', async (req, res) => {
         res.status(500).json({ success: false, error: 'Failed to delete comment' });
     }
 });
-
 
 module.exports = router;

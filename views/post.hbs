@@ -11,6 +11,8 @@
     <script src="/js/submitComment.js" defer></script>
     <script src="/js/commentActions.js" defer></script>
     <script src="/js/likeDislike.js" defer></script>
+    <script src="/js/postActions.js" defer></script>
+
 </head>
 <body data-username="{{user.username}}">
     <div class="header">
@@ -39,9 +41,17 @@
                     <h2>{{post.title}}</h2>
                     <p>{{post.post_description}}</p>
                     <p class="post-community">Posted in <a href="/api/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a> by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a></p>
+                    <div class="post-actions">
+                        <button class="edit-post-button" onclick="editPost('{{post._id}}', '{{post.title}}', '{{post.post_description}}')" style="display:none;">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                        <button class="delete-post-button" onclick="deletePost('{{post._id}}')" style="display:none;">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </div>
                     <div class="post-stats">
-                        <button class="like-button"  aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
-                        <button class="dislike-button"  aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
+                        <button class="like-button" aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
+                        <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
                         <span class="comments-count">{{post.comments.length}} Comments</span>
                     </div>
                     <div class="comments-section">
