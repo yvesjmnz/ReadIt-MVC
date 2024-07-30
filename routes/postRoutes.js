@@ -68,6 +68,7 @@ router.post('/post/:_id/comment', async (req, res) => {
 // Like a post
 router.post('/post/:_id/like', async (req, res) => {
     const { _id } = req.params;
+    const userId = req.session.user.username;
 
     try {
         const post = await Post.findById(_id);
@@ -75,7 +76,24 @@ router.post('/post/:_id/like', async (req, res) => {
             return res.status(404).json({ success: false, error: 'Post not found' });
         }
 
-        post.likes += 1;
+        post.likedBy = post.likedBy || [];
+        post.dislikedBy = post.dislikedBy || [];
+
+        if (post.likedBy.includes(userId)) {
+            // User already liked, so unlike
+            post.likes -= 1;
+            post.likedBy.pull(userId);
+        } else {
+            // User liked the post
+            post.likes += 1;
+            post.likedBy.push(userId);
+            // If the user had previously disliked the post, remove the dislike
+            if (post.dislikedBy.includes(userId)) {
+                post.dislikes -= 1;
+                post.dislikedBy.pull(userId);
+            }
+        }
+
         await post.save();
         res.json({ likes: post.likes, dislikes: post.dislikes });
     } catch (error) {
@@ -87,6 +105,7 @@ router.post('/post/:_id/like', async (req, res) => {
 // Dislike a post
 router.post('/post/:_id/dislike', async (req, res) => {
     const { _id } = req.params;
+    const userId = req.session.user.username;
 
     try {
         const post = await Post.findById(_id);
@@ -94,7 +113,24 @@ router.post('/post/:_id/dislike', async (req, res) => {
             return res.status(404).json({ success: false, error: 'Post not found' });
         }
 
-        post.dislikes += 1;
+        post.likedBy = post.likedBy || [];
+        post.dislikedBy = post.dislikedBy || [];
+
+        if (post.dislikedBy.includes(userId)) {
+            // User already disliked, so remove dislike
+            post.dislikes -= 1;
+            post.dislikedBy.pull(userId);
+        } else {
+            // User disliked the post
+            post.dislikes += 1;
+            post.dislikedBy.push(userId);
+            // If the user had previously liked the post, remove the like
+            if (post.likedBy.includes(userId)) {
+                post.likes -= 1;
+                post.likedBy.pull(userId);
+            }
+        }
+
         await post.save();
         res.json({ likes: post.likes, dislikes: post.dislikes });
     } catch (error) {
@@ -102,6 +138,7 @@ router.post('/post/:_id/dislike', async (req, res) => {
         res.status(500).json({ success: false, error: 'Failed to update dislikes' });
     }
 });
+
 
 // Render a post by ID
 router.get('/post/:_id', async (req, res) => {
