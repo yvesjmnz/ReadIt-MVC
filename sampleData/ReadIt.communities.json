@@ -1,0 +1,40 @@
+[{
+  "_id": {
+    "$oid": "66a8ad35965bedd2fb0c119b"
+  },
+  "name": "pyuterperipherals",
+  "description": "If you think of something, there's probably a usb peripheral for it!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b109965bedd2fb0c123f"
+  },
+  "name": "DLSU",
+  "description": "Animo La Salle!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b166965bedd2fb0c1252"
+  },
+  "name": "C Programming Tutors",
+  "description": "Ask away! We don't bite (usually)",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b425965bedd2fb0c1298"
+  },
+  "name": "Am I Wrong",
+  "description": "Where your questions either get answered or viciously scrutinized",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b52c965bedd2fb0c12fd"
+  },
+  "name": "All Time Low",
+  "description": "For fans of pop/punk rock band All Time Low",
+  "__v": 0
+}]

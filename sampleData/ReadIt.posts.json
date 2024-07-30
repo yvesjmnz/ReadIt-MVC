@@ -1,0 +1,248 @@
+[{
+  "_id": {
+    "$oid": "66a8ad5a965bedd2fb0c11a2"
+  },
+  "user": "WehSingSing1",
+  "title": "Mouse Grip tape recos?",
+  "post_description": "i recently got a new attack shark x3 mouse from amazon, the included grip tape is great but do you have any recommendations for better ones?",
+  "likes": 15,
+  "dislikes": 2,
+  "likedBy": [
+    "meowzzician1224"
+  ],
+  "dislikedBy": [],
+  "communityName": "pyuterperipherals",
+  "comments": [
+    {
+      "user": "meowzzician1224",
+      "text": "thats probably the best you'll get",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b0e8965bedd2fb0c1238"
+      },
+      "date": {
+        "$date": "2024-07-30T09:22:48.932Z"
+      }
+    },
+    {
+      "user": "hungrydegen293",
+      "text": "lmao you shouldve just bought the kysona m600 its the same mouse with better firmware XD",
+      "edited": true,
+      "_id": {
+        "$oid": "66a8b2f9965bedd2fb0c126e"
+      },
+      "date": {
+        "$date": "2024-07-30T09:31:37.049Z"
+      }
+    },
+    {
+      "user": "DesperateOtaku",
+      "text": "W all gs",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b4ba965bedd2fb0c12c2"
+      },
+      "date": {
+        "$date": "2024-07-30T09:39:06.869Z"
+      }
+    },
+    {
+      "user": "katsuract",
+      "text": "gamer here",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b5db965bedd2fb0c1337"
+      },
+      "date": {
+        "$date": "2024-07-30T09:43:55.821Z"
+      }
+    }
+  ],
+  "date": {
+    "$date": "2024-07-30T09:07:38.606Z"
+  },
+  "__v": 36
+},
+{
+  "_id": {
+    "$oid": "66a8b13a965bedd2fb0c1246"
+  },
+  "user": "meowzzician1224",
+  "title": "can I survive taking CCPROG3 and CCINFOM in the same term???",
+  "post_description": "hi im scared, im taking prog3 and infom under sir oli, any tips to at least pass both?",
+  "likes": 10,
+  "dislikes": 1,
+  "likedBy": [
+    "hungrydegen293",
+    "DesperateOtaku"
+  ],
+  "dislikedBy": [],
+  "communityName": "DLSU",
+  "comments": [
+    {
+      "user": "hungrydegen293",
+      "text": "ive done it, and i passed both",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b3c8965bedd2fb0c1280"
+      },
+      "date": {
+        "$date": "2024-07-30T09:35:04.426Z"
+      }
+    },
+    {
+      "user": "DesperateOtaku",
+      "text": "YIKESS",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b4cd965bedd2fb0c12cf"
+      },
+      "date": {
+        "$date": "2024-07-30T09:39:25.759Z"
+      }
+    },
+    {
+      "user": "katsuract",
+      "text": "ggs in the chat",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b5e8965bedd2fb0c1349"
+      },
+      "date": {
+        "$date": "2024-07-30T09:44:08.201Z"
+      }
+    }
+  ],
+  "date": {
+    "$date": "2024-07-30T09:24:10.018Z"
+  },
+  "__v": 5
+},
+{
+  "_id": {
+    "$oid": "66a8b183965bedd2fb0c1259"
+  },
+  "user": "meowzzician1224",
+  "title": "Trying to reprogram my smart fridge from python to C, tips?",
+  "post_description": "My fridge is currently running on python but I want to convert it to C for better performance.",
+  "likes": 54,
+  "dislikes": 7,
+  "likedBy": [
+    "hungrydegen293"
+  ],
+  "dislikedBy": [],
+  "communityName": "C Programming Tutors",
+  "comments": [
+    {
+      "user": "hungrydegen293",
+      "text": "what kind of fridge is that",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b3d5965bedd2fb0c1289"
+      },
+      "date": {
+        "$date": "2024-07-30T09:35:17.426Z"
+      }
+    },
+    {
+      "user": "DesperateOtaku",
+      "text": "hmmm i have the same problem",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b4e3965bedd2fb0c12e0"
+      },
+      "date": {
+        "$date": "2024-07-30T09:39:47.233Z"
+      }
+    }
+  ],
+  "date": {
+    "$date": "2024-07-30T09:25:23.316Z"
+  },
+  "__v": 3
+},
+{
+  "_id": {
+    "$oid": "66a8b442965bedd2fb0c129f"
+  },
+  "user": "hungrydegen293",
+  "title": "is it true that 5G causes cancer?",
+  "post_description": "Hi! I recently read that being exposed to the new 5G long term causes sickness.",
+  "likes": 0,
+  "dislikes": 2395,
+  "likedBy": [],
+  "dislikedBy": [
+    "DesperateOtaku",
+    "katsuract"
+  ],
+  "communityName": "Am I Wrong",
+  "comments": [
+    {
+      "user": "DesperateOtaku",
+      "text": "??????????????",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b4fd965bedd2fb0c12ed"
+      },
+      "date": {
+        "$date": "2024-07-30T09:40:13.029Z"
+      }
+    },
+    {
+      "user": "katsuract",
+      "text": "get this man a map",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b5f4965bedd2fb0c135b"
+      },
+      "date": {
+        "$date": "2024-07-30T09:44:20.467Z"
+      }
+    }
+  ],
+  "date": {
+    "$date": "2024-07-30T09:37:06.105Z"
+  },
+  "__v": 4
+},
+{
+  "_id": {
+    "$oid": "66a8b547965bedd2fb0c1304"
+  },
+  "user": "DesperateOtaku",
+  "title": "Free Tickets pls, haven't been to a concert in years",
+  "post_description": "I have been a fan for years and I really need a break. Anyone has free tickets?",
+  "likes": 3,
+  "dislikes": 22,
+  "likedBy": [],
+  "dislikedBy": [],
+  "communityName": "All Time Low",
+  "comments": [
+    {
+      "user": "DesperateOtaku",
+      "text": "plsplspls",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b55a965bedd2fb0c1316"
+      },
+      "date": {
+        "$date": "2024-07-30T09:41:46.660Z"
+      }
+    },
+    {
+      "user": "katsuract",
+      "text": "imma pass bro",
+      "edited": false,
+      "_id": {
+        "$oid": "66a8b605965bedd2fb0c1372"
+      },
+      "date": {
+        "$date": "2024-07-30T09:44:37.210Z"
+      }
+    }
+  ],
+  "date": {
+    "$date": "2024-07-30T09:41:27.316Z"
+  },
+  "__v": 2
+}]

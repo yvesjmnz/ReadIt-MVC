@@ -65,10 +65,10 @@
                                         {{#if this.edited}}<em>(edited)</em>{{/if}}
                                     </p>
                                     <div class="comment-actions">
-                                        <button class="edit-button" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">
+                                        <button class="edit-button" style="display:none;" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button class="delete-button" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">
+                                        <button class="delete-button" style="display:none;" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </div>

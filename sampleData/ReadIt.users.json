@@ -1,0 +1,55 @@
+[{
+  "_id": {
+    "$oid": "66a8acdc965bedd2fb0c1194"
+  },
+  "username": "WehSingSing1",
+  "password": "$2b$10$SOY059rgiVR83AM2RDtQn.jj6T1JPambrTtMS2cWVhjnKSXxnVBTO",
+  "profilePic": "/img/WehSingSing1.jpg",
+  "quote": "Even the best fall down sometimes.",
+  "favoriteCommunities": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8adc2965bedd2fb0c11cd"
+  },
+  "username": "meowzzician1224",
+  "password": "$2b$10$bj5n8shEH3KsnJxp1xmq/uFtx.FURRcpWqxDSLfKGMhWszwznyhwG",
+  "profilePic": "/img/orangecar.jpg",
+  "quote": "\"Sometimes I'm alone, sometimes I'm not; you just gotta learn to live with it.\"",
+  "favoriteCommunities": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b2d0965bedd2fb0c1266"
+  },
+  "username": "hungrydegen293",
+  "password": "$2b$10$M36kONVN94elnixrqnyzOuwF0SBTYl6BdzutM0.hWfrIGAzNZwYsm",
+  "profilePic": "/img/hungrydegen293.jpg",
+  "quote": "\"Long live the reckless and the brave.\"",
+  "favoriteCommunities": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b48d965bedd2fb0c12af"
+  },
+  "username": "DesperateOtaku",
+  "password": "$2b$10$7aVLrFm5FGZHo6EaGRtDpuq2FimdOBrIfWFG7L730D4uLAlm4okai",
+  "profilePic": "/img/DesperateOtaku.jpg",
+  "quote": "\"Dokkan Dokkan tsuiteru!\"",
+  "favoriteCommunities": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a8b5c4965bedd2fb0c1325"
+  },
+  "username": "katsuract",
+  "password": "$2b$10$e4pphFD/lL./7sh8dtUZ5uH47wyeKD9YGDwfBx4.0Or/GB34or4Tu",
+  "profilePic": "/img/katsuract.jpg",
+  "quote": "\"what are you looking at?? im just lurking here...\"",
+  "favoriteCommunities": [],
+  "__v": 0
+}]
