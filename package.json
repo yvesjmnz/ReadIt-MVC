@@ -27,6 +27,7 @@
     "define-data-property": "^1.1.4",
     "depd": "^2.0.0",
     "destroy": "^1.2.0",
+    "dotenv": "^16.4.5",
     "eastasianwidth": "^0.2.0",
     "ee-first": "^1.1.1",
     "emoji-regex": "^9.2.2",
@@ -135,8 +136,5 @@
   "engines": {
     "node": "20.15"
   },
-  "description": "",
-  "devDependencies": {
-    "dotenv": "^16.4.5"
-  }
+  "description": ""
 }

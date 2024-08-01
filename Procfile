@@ -1,1 +1,1 @@
-web: node -r dotenv/config app.js
+web: node app.js
