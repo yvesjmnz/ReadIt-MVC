@@ -10,6 +10,7 @@
     "array-flatten": "^1.1.1",
     "balanced-match": "^1.0.2",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "brace-expansion": "^2.0.1",
     "bson": "^6.8.0",
@@ -128,13 +129,14 @@
   },
   "scripts": {
     "devStart": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "heroku-postbuild": "npm rebuild bcrypt --build-from-source"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "20.15"
+    "node": "20.x"
   },
   "description": ""
 }

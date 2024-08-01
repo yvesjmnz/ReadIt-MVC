@@ -2,7 +2,7 @@ const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
 const sampleProfiles = require('../models/sampleProfiles');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10; // Define the salt rounds for bcrypt
 
 const requireLogin = (req, res, next) => {
