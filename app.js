@@ -10,7 +10,7 @@ const multer = require('multer');
 const fileUpload = require('express-fileupload');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
-
+require('dotenv').config();
 const config = require('./config'); // Import configuration
 
 const app = express();
