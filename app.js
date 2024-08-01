@@ -1,22 +1,20 @@
+// app.js
+
 const express = require('express');
 const mongoose = require('mongoose');
 const { engine } = require('express-handlebars');
 const path = require('path');
-const dotenv = require('dotenv');
 const session = require('express-session');
 const cookieParser = require('cookie-parser'); 
 const multer = require('multer');
 const fileUpload = require('express-fileupload');
-const communityRoutes = require('./routes/communityRoutes'); // Import community routes
-const postRoutes = require('./routes/postRoutes'); // Import post routes
-const userRoutes = require('./routes/userRoutes');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
 
-dotenv.config();
+const config = require('./config'); // Import configuration
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.port;
 
 // Multer Storage
 const storage = multer.diskStorage({
@@ -59,7 +57,7 @@ app.use(fileUpload());
 
 // Session middleware setup
 app.use(session({
-    secret: 'your-secret-key', // Change this to a random string (can be generated using a tool)
+    secret: config.sessionSecret, // Use secret from config
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Set secure: true if using HTTPS
@@ -80,14 +78,12 @@ app.engine('hbs', engine({
 }));
 app.set('view engine', 'hbs');
 
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(config.mongodbUri)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
 
-app.use('/api', communityRoutes); // Mount community routes under /api
-app.use('/api', postRoutes); // Ensure this line is present and correct
-app.use('/', userRoutes);
-
+app.use('/api', require('./routes/communityRoutes')); // Mount community routes under /api
+app.use('/api', require('./routes/postRoutes')); // Ensure this line is present and correct
 app.use('/', require('./routes/userRoutes'));
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

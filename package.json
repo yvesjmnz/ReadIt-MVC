@@ -27,7 +27,6 @@
     "define-data-property": "^1.1.4",
     "depd": "^2.0.0",
     "destroy": "^1.2.0",
-    "dotenv": "^16.4.5",
     "eastasianwidth": "^0.2.0",
     "ee-first": "^1.1.1",
     "emoji-regex": "^9.2.2",
@@ -73,7 +72,7 @@
     "minimatch": "^9.0.5",
     "minimist": "^1.2.8",
     "minipass": "^7.1.2",
-    "mongodb": "^6.7.0",
+    "mongodb": "^6.8.0",
     "mongodb-connection-string-url": "^3.0.1",
     "mongoose": "^8.5.0",
     "mpath": "^0.9.0",
@@ -127,10 +126,13 @@
     "wrap-ansi-cjs": "^7.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "devStart": "npx nodemon app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
 }
