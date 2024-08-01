@@ -14,7 +14,7 @@ const Handlebars = require('handlebars');
 const config = require('./config'); // Import configuration
 
 const app = express();
-const PORT = config.port;
+const PORT = config.port || 3000;
 
 // Multer Storage
 const storage = multer.diskStorage({

@@ -126,11 +126,15 @@
     "wrap-ansi-cjs": "^7.0.0"
   },
   "scripts": {
-    "devStart": "npx nodemon app.js"
+    "devStart": "nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "20.15"
+  },
   "description": "",
   "devDependencies": {
     "dotenv": "^16.4.5"
