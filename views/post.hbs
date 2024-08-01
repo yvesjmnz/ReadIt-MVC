@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReadIT Posts</title>
+    <title>ReadIT Post</title>
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style_post.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -37,7 +37,7 @@
     <div class="main-content">
         <div class="content">
             <div id="posts-container" class="posts-section">
-                <div class="post">
+                <div class="post" data-post-id="{{post._id}}">
                     <h2>{{post.title}}</h2>
                     <p>{{post.post_description}}</p>
                     <p class="post-community">Posted in <a href="/api/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a> by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a></p>
@@ -50,8 +50,8 @@
                         </button>
                     </div>
                     <div class="post-stats">
-                         <button class="like-button" aria-label="Like post"><span class="likes-count">{{this.likes}}</span> 👍</button>
-                         <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{this.dislikes}}</span> 👎</button>
+                        <button class="like-button" aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
+                        <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
                         <span class="comments-count">{{post.comments.length}} Comments</span>
                     </div>
                     <div class="comments-section">
