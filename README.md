@@ -2,14 +2,16 @@ Arucan, Oliver Aldrin
 Jimenez, Yves Alvin Andrei
 Sanchez, Darren Julian
 
-To run: make a database called ReadIt in mongodDB compass. 
+To run: 
+1) Make a database called ReadIt in mongodDB compass. 
 
-Look at .env for db setup 
+2) Look at .env for db setup 
 
-run npm install to install all dependencies
+3) run npm install to install all dependencies
 
 then simply run using:
 
-"node app.js" 
+5) "node app.js" 
+6) Access via localhost:3000
 
 *make sure to open cmd in the right directory
