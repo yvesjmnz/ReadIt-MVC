@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         postDiv.addEventListener('click', () => {
             const postId = postDiv.getAttribute('data-post-id');
             if (postId) {
-                window.location.href = `/api/post/${postId}`;
+                window.location.href = `/post/${postId}`;
             }
         });
     });
