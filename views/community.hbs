@@ -8,8 +8,12 @@
     <script src="/js/profileDropdown.js" defer></script>
     <script src="/js/createPost.js" defer></script>
     <script src="/js/navigateToPost.js" defer></script>
+    <script src="/js/moderatorActions.js" defer></script>
 </head>
 <body>
+    <!-- Notification System -->
+    <div id="notification-container"></div>
+
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -20,7 +24,7 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username" id="username">{{user.username}}</span>
-                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="dropdown-content" id="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="#" id="logout">Logout</a>
@@ -35,6 +39,45 @@
                 <h2>{{community.name}}</h2>
                 <p class="community-description">{{community.description}}</p>
                 <p class="post-counter">{{#if posts.length}}{{posts.length}}{{else}}0{{/if}} posts available in this community!</p>
+                
+                <!-- Community Stats -->
+                <div class="community-stats">
+                    <p><strong>Creator:</strong> <a href="/profile/{{community.creator}}">{{community.creator}}</a></p>
+                    <p><strong>Members:</strong> {{community.members.length}}</p>
+                    <p><strong>Moderators:</strong> {{community.moderators.length}}</p>
+                </div>
+
+                <!-- User Role Badge -->
+                {{#if community.userRole}}
+                    <div class="user-role-badge {{community.userRole}}">
+                        {{#if (eq community.userRole 'creator')}}
+                            👑 Creator
+                        {{else if (eq community.userRole 'moderator')}}
+                            🛡️ Moderator
+                        {{else}}
+                            👤 Member
+                        {{/if}}
+                    </div>
+                {{/if}}
+
+                <!-- Moderator Actions (Only for Creator) -->
+                {{#if (eq community.userRole 'creator')}}
+                    <div class="moderator-actions">
+                        <h3>Moderator Management</h3>
+                        <button id="add-moderator-btn" class="blue-button">Add Moderator</button>
+                        <button id="view-moderators-btn" class="green-button">View Moderators</button>
+                    </div>
+                {{/if}}
+
+                <!-- Join/Leave Community -->
+                {{#if user}}
+                    {{#unless (or (eq community.userRole 'creator') (includes community.members user.username))}}
+                        <button id="join-community-btn" class="green-button" data-community="{{community.name}}">Join Community</button>
+                    {{/unless}}
+                    {{#if (and (includes community.members user.username) (ne community.userRole 'creator'))}}
+                        <button id="leave-community-btn" class="red-button" data-community="{{community.name}}">Leave Community</button>
+                    {{/if}}
+                {{/if}}
             </div>
         </div>
         
@@ -48,7 +91,26 @@
                     <div class="post" data-post-id="{{this._id}}">
                         <h3 class="post-title">{{this.title}}</h3>
                         <p class="post-snippet">{{this.post_description}}</p>
-                        <p class="post-author">Posted by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
+                        <div class="post-meta">
+                            <p class="post-author">Posted by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
+                            <div class="post-actions">
+                                <span class="likes">👍 {{this.likes}}</span>
+                                <span class="dislikes">👎 {{this.dislikes}}</span>
+                                <span class="comments">💬 {{this.comments.length}}</span>
+                                
+                                <!-- Moderator Actions for Posts -->
+                                {{#if (or (eq ../community.userRole 'creator') (eq ../community.userRole 'moderator') (eq this.user ../user.username))}}
+                                    <div class="post-mod-actions">
+                                        {{#if (eq this.user ../user.username)}}
+                                            <button class="edit-post-btn" data-post-id="{{this._id}}">Edit</button>
+                                        {{/if}}
+                                        {{#if (or (eq ../community.userRole 'creator') (eq ../community.userRole 'moderator') (eq this.user ../user.username))}}
+                                            <button class="delete-post-btn" data-post-id="{{this._id}}">Delete</button>
+                                        {{/if}}
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
                     </div>
                 {{else}}
                     <p id="no-posts-message">No posts available yet</p>
@@ -57,5 +119,88 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Moderator Modal -->
+    <div id="add-moderator-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Moderator</h2>
+            <div id="moderator-selection-loading" class="loading-spinner" style="display: none;">
+                Loading members...
+            </div>
+            <div id="moderator-selection-content">
+                <p>Select a member to promote to moderator:</p>
+                <div id="available-members" class="member-list">
+                    <!-- Members will be loaded here -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Moderators Modal -->
+    <div id="view-moderators-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Community Moderators</h2>
+            <div id="moderators-loading" class="loading-spinner" style="display: none;">
+                Loading moderators...
+            </div>
+            <div id="moderators-list">
+                <!-- Moderators will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="create-post-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Post</h2>
+            <form id="create-post-form">
+                <div class="form-group">
+                    <label for="post-title">Title:</label>
+                    <input type="text" id="post-title" name="title" required maxlength="200" minlength="5">
+                    <div class="char-counter">
+                        <span id="title-char-count">0/200</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="post-description">Description:</label>
+                    <textarea id="post-description" name="post_description" required maxlength="5000" minlength="10" rows="6"></textarea>
+                    <div class="char-counter">
+                        <span id="description-char-count">0/5000</span>
+                    </div>
+                </div>
+                <input type="hidden" id="post-community" name="communityName" value="{{community.name}}">
+                <div class="form-actions">
+                    <button type="submit" class="blue-button" id="submit-post-btn">Create Post</button>
+                    <button type="button" class="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3 id="confirmation-title">Confirm Action</h3>
+            <p id="confirmation-message">Are you sure you want to perform this action?</p>
+            <div class="form-actions">
+                <button id="confirm-yes" class="red-button">Yes</button>
+                <button id="confirm-no" class="cancel-btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pass community data to JavaScript
+        window.communityData = {
+            name: '{{community.name}}',
+            userRole: '{{community.userRole}}'
+        };
+    </script>
 </body>
 </html>

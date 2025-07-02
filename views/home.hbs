@@ -25,7 +25,7 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username" id="username">{{user.username}}</span>
-                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="dropdown-content" id="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="#" id="logout">Logout</a>
@@ -63,11 +63,11 @@
                 <div id="posts-container">
                     {{#each posts}}
                         <div class="post" data-post-id="{{this._id}}" data-tags="{{this.tags}}">
-                            <a href="/api/post/{{this._id}}" style="color:inherit">
+                            <a href="/post/{{this._id}}" style="color:inherit">
                             <p>{{this.date}}</p>
                             <h3 class="post-title">{{this.title}}</h3>
                             <p class="post-snippet">{{this.post_description}}</p>
-                            <p class="post-community">Posted in <a href="api/community/{{this.communityName}}" style="color:inherit">{{this.communityName}}</a> by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
+                            <p class="post-community">Posted in <a href="/community/{{this.communityName}}" style="color:inherit">{{this.communityName}}</a> by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
                             <div class="post-stats">
                                 <button class="like-button" aria-label="Like post"><span class="likes-count">{{this.likes}}</span> 👍</button>
                                 <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{this.dislikes}}</span> 👎</button>

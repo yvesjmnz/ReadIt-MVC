@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReadIT Post</title>
+    <title>{{post.title}} - ReadIT</title>
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style_post.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -12,9 +12,12 @@
     <script src="/js/commentActions.js" defer></script>
     <script src="/js/likeDislike.js" defer></script>
     <script src="/js/postActions.js" defer></script>
-
+    <script src="/js/moderatorActions.js" defer></script>
 </head>
-<body data-username="{{user.username}}">
+<body data-username="{{#if user}}{{user.username}}{{/if}}">
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -22,67 +25,181 @@
                 <h1 class="site-title">Read<span class="highlight">IT</span></h1>
             </a>
         </div>
+        {{#if user}}
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username" id="username">{{user.username}}</span>
-                <img src="{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="dropdown-content" id="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="#" id="logout">Logout</a>
                 </div>
             </div>
         </div>
+        {{else}}
+        <div class="user-info">
+            <a href="/login" class="login-link">Login</a>
+            <a href="/register" class="register-link">Register</a>
+        </div>
+        {{/if}}
     </div>
 
     <div class="main-content">
         <div class="content">
             <div id="posts-container" class="posts-section">
                 <div class="post" data-post-id="{{post._id}}">
-                    <h2>{{post.title}}</h2>
-                    <p>{{post.post_description}}</p>
-                    <p class="post-community">Posted in <a href="/api/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a> by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a></p>
-                    <div class="post-actions">
-                        <button class="edit-post-button" onclick="editPost('{{post._id}}', '{{post.title}}', '{{post.post_description}}')" style="display:none;">
-                            <i class="fa-solid fa-pen-to-square"></i> Edit
-                        </button>
-                        <button class="delete-post-button" onclick="deletePost('{{post._id}}')" style="display:none;">
-                            <i class="fa-solid fa-trash"></i> Delete
-                        </button>
+                    <div class="post-header">
+                        <h2>{{post.title}}</h2>
+                        {{#if showModeratorBadge}}
+                            <div class="moderator-badge {{userRole}}">
+                                {{#if isCreator}}
+                                    👑 Creator
+                                {{else}}
+                                    🛡️ Moderator
+                                {{/if}}
+                            </div>
+                        {{/if}}
                     </div>
+                    
+                    <p class="post-description">{{post.post_description}}</p>
+                    
+                    <div class="post-meta">
+                        <p class="post-community">
+                            Posted in 
+                            {{#if post.communityName}}
+                                <a href="/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a>
+                            {{else}}
+                                <span>General</span>
+                            {{/if}}
+                            by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a>
+                            {{#if post.formattedDate}}
+                                <span class="post-date">on {{post.formattedDate}}</span>
+                            {{/if}}
+                        </p>
+                    </div>
+
+                    {{#if isLoggedIn}}
+                    <div class="post-actions">
+                        {{#if post.canEdit}}
+                            <button class="edit-post-button" onclick="editPost('{{post._id}}', '{{post.title}}', '{{post.post_description}}')">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                        {{/if}}
+                        
+                        {{#if post.canDelete}}
+                            <button class="delete-post-button" onclick="deletePost('{{post._id}}')">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        {{/if}}
+                        
+                        {{#if post.showModLabel}}
+                            <span class="mod-action-label">Moderator Action</span>
+                        {{/if}}
+                    </div>
+                    {{/if}}
+
                     <div class="post-stats">
-                        <button class="like-button" aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
-                        <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
+                        {{#if isLoggedIn}}
+                            <button class="like-button" aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
+                            <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
+                        {{else}}
+                            <span class="likes-display">{{post.likes}} 👍</span>
+                            <span class="dislikes-display">{{post.dislikes}} 👎</span>
+                        {{/if}}
                         <span class="comments-count">{{post.comments.length}} Comments</span>
                     </div>
+
                     <div class="comments-section">
                         <h4>Comments</h4>
+                        {{#if post.comments.length}}
                         <ul>
                             {{#each post.comments}}
-                                <li class="comment-item">
-                                    <p class="comment-user">
-                                        <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> 
-                                        {{this.text}} 
-                                        {{#if this.edited}}<em>(edited)</em>{{/if}}
-                                    </p>
-                                    <div class="comment-actions">
-                                        <button class="edit-button" style="display:none;" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
-                                        <button class="delete-button" style="display:none;" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                <li class="comment-item" data-comment-id="{{this._id}}">
+                                    <div class="comment-content">
+                                        <p class="comment-user">
+                                            <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> 
+                                            <span class="comment-text">{{this.text}}</span>
+                                            {{#if this.edited}}<em class="edited-label">(edited)</em>{{/if}}
+                                        </p>
+                                        {{#if this.formattedDate}}
+                                        <div class="comment-meta">
+                                            <span class="comment-date">{{this.formattedDate}}</span>
+                                        </div>
+                                        {{/if}}
                                     </div>
+                                    
+                                    {{#if ../isLoggedIn}}
+                                    <div class="comment-actions">
+                                        {{#if this.canEdit}}
+                                            <button class="edit-button" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        {{/if}}
+                                        
+                                        {{#if this.canDelete}}
+                                            <button class="delete-button" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        {{/if}}
+                                        
+                                        {{#if this.showModLabel}}
+                                            <span class="mod-action-label">Mod</span>
+                                        {{/if}}
+                                    </div>
+                                    {{/if}}
                                 </li>
                             {{/each}}
                         </ul>
-                        <form class="comment-form" data-post-id="{{post._id}}">
-                            <textarea name="comment" placeholder="Add a comment..." required></textarea>
-                            <button type="submit"><i class="fa-solid fa-comment"></i> Comment</button>
-                        </form>
+                        {{else}}
+                        <p class="no-comments">No comments yet. Be the first to comment!</p>
+                        {{/if}}
+                        
+                        {{#if isLoggedIn}}
+                            <form class="comment-form" data-post-id="{{post._id}}">
+                                <textarea name="comment" placeholder="Add a comment..." required maxlength="1000"></textarea>
+                                <div class="comment-form-actions">
+                                    <span class="char-count">0/1000</span>
+                                    <button type="submit"><i class="fa-solid fa-comment"></i> Comment</button>
+                                </div>
+                            </form>
+                        {{else}}
+                            <p class="login-prompt">Please <a href="/login">login</a> to comment.</p>
+                        {{/if}}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Pass data to JavaScript
+        window.postData = {
+            id: '{{post._id}}',
+            communityName: '{{#if post.communityName}}{{post.communityName}}{{/if}}',
+            userRole: '{{userRole}}',
+            isLoggedIn: {{#if isLoggedIn}}true{{else}}false{{/if}}
+        };
+        
+        // Character counter for comment form
+        document.addEventListener('DOMContentLoaded', function() {
+            const commentTextarea = document.querySelector('.comment-form textarea');
+            const charCount = document.querySelector('.char-count');
+            
+            if (commentTextarea && charCount) {
+                commentTextarea.addEventListener('input', function() {
+                    const length = this.value.length;
+                    charCount.textContent = `${length}/1000`;
+                    
+                    if (length > 900) {
+                        charCount.style.color = '#dc3545';
+                    } else if (length > 800) {
+                        charCount.style.color = '#ffc107';
+                    } else {
+                        charCount.style.color = '#6c757d';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

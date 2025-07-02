@@ -1,76 +1,42 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // This file is now handled by moderatorActions.js for the community page
+    // The create post functionality has been moved to a proper modal interface
+    
+    // If this is being used on other pages, we'll keep a basic fallback
     const createPostButton = document.getElementById('create-post-button');
+    
+    if (createPostButton && !document.getElementById('create-post-modal')) {
+        // Fallback for pages that don't have the modal
+        createPostButton.addEventListener('click', function() {
+            // Redirect to a create post page or show a message
+            window.location.href = '/create-post';
+        });
+    }
 
-    createPostButton.addEventListener('click', async function() {
-        const postTitle = prompt("Enter post title:");
-        const postDescription = prompt("Enter post description:");
-        const communityName = document.querySelector('.community-header h2').textContent.trim();
-
-        if (postTitle && postDescription) {
-            try {
-                const response = await fetch('/api/post', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ communityName: communityName, title: postTitle, post_description: postDescription })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert("Post created successfully!");
-                    window.location.reload();
-                } else {
-                    alert(`Failed to create post: ${data.error}`);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert("Error creating post.");
-            }
-        } else {
-            alert("Post title and description cannot be empty.");
-        }
-    });
-
-
+    // Load posts function for community pages
     async function loadPosts() {
-        const communityName = document.querySelector('.community-header h2').textContent.trim();
+        const communityHeader = document.querySelector('.community-header h2');
+        if (!communityHeader) return;
+        
+        const communityName = communityHeader.textContent.trim();
 
         try {
             const response = await fetch(`/api/community/${encodeURIComponent(communityName)}`);
             if (!response.ok) {
-                throw new Error('Failed to load posts');
+                throw new Error('Failed to load community data');
             }
             const data = await response.json();
 
-            if (data.posts.length > 0) {
-                const postsContainer = document.querySelector('.posts-section');
-                postsContainer.innerHTML = '';
-
-                data.posts.forEach(post => {
-                    const postElement = document.createElement('div');
-                    postElement.className = 'post';
-
-                    const postTitleElement = document.createElement('h3');
-                    postTitleElement.textContent = post.title;
-
-                    const postDescriptionElement = document.createElement('p');
-                    postDescriptionElement.textContent = post.post_description;
-
-                    postElement.appendChild(postTitleElement);
-                    postElement.appendChild(postDescriptionElement);
-
-                    postsContainer.appendChild(postElement);
-                });
-            } else {
-                const postsContainer = document.querySelector('.posts-section');
-                postsContainer.innerHTML = '<p>No posts available in this community.</p>';
-            }
+            // This would be handled by the server-side rendering now
+            // Keeping this for potential dynamic updates
+            
         } catch (error) {
             console.error('Error loading posts:', error);
         }
     }
 
-    loadPosts();
+    // Only load posts if we're on a community page
+    if (document.querySelector('.community-header')) {
+        loadPosts();
+    }
 });

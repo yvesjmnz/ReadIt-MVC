@@ -10,6 +10,7 @@ const multer = require('multer');
 const fileUpload = require('express-fileupload');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
+const handlebarsHelpers = require('./helpers/handlebarsHelpers');
 require('dotenv').config();
 
 const config = require('./config'); // Import configuration
@@ -75,7 +76,8 @@ app.use((req, res, next) => {
 app.engine('hbs', engine({
     extname: 'hbs',
     defaultLayout: false,
-    handlebars: allowInsecurePrototypeAccess(Handlebars) // Allow prototype access
+    handlebars: allowInsecurePrototypeAccess(Handlebars), // Allow prototype access
+    helpers: handlebarsHelpers // Register custom helpers
 }));
 app.set('view engine', 'hbs');
 
@@ -83,8 +85,9 @@ mongoose.connect(config.mongodbUri)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
 
-app.use('/api', require('./routes/communityRoutes')); // Mount community routes under /api
-app.use('/api', require('./routes/postRoutes')); // Ensure this line is present and correct
-app.use('/', require('./routes/userRoutes'));
+// Mount all routes
+app.use('/', require('./routes/userRoutes')); // User routes (includes auth)
+app.use('/', require('./routes/communityRoutes')); // Community routes (API + views)
+app.use('/', require('./routes/postRoutes')); // Post routes (API + views)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
