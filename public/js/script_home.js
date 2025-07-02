@@ -14,36 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) {
             container = document.createElement('div');
             container.id = 'notification-container';
-            container.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 10000;
-                max-width: 400px;
-            `;
             document.body.appendChild(container);
         }
 
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        notification.style.cssText = `
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.3s ease-out;
-            ${type === 'success' ? 'background-color: #28a745; color: white;' : ''}
-            ${type === 'error' ? 'background-color: #dc3545; color: white;' : ''}
-            ${type === 'info' ? 'background-color: #007bff; color: white;' : ''}
-            ${type === 'warning' ? 'background-color: #ffc107; color: #212529;' : ''}
-        `;
         
         notification.innerHTML = `
             <span class="notification-message">${message}</span>
-            <button class="notification-close" style="background: none; border: none; color: inherit; font-size: 18px; cursor: pointer; margin-left: 10px;">&times;</button>
+            <button class="notification-close">&times;</button>
         `;
         
         container.appendChild(notification);

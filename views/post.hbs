@@ -18,6 +18,12 @@
     <!-- Notification Container -->
     <div id="notification-container"></div>
 
+    {{#if moderationMessage}}
+    <div class="moderation-success">
+        ✅ {{moderationMessage}}
+    </div>
+    {{/if}}
+
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -47,18 +53,24 @@
     <div class="main-content">
         <div class="content">
             <div id="posts-container" class="posts-section">
-                <div class="post" data-post-id="{{post._id}}">
+                <div class="post {{#if post.locked}}locked-post{{/if}}" data-post-id="{{post._id}}">
+                    {{#if post.locked}}
+                        <div class="locked-indicator">
+                            🔒 This post is locked
+                            {{#if post.lockedBy}}
+                                by {{post.lockedBy}}
+                            {{/if}}
+                            {{#if post.lockedFormattedDate}}
+                                on {{post.lockedFormattedDate}}
+                            {{/if}}
+                            {{#if post.lockReason}}
+                                <div class="lock-reason">Reason: {{post.lockReason}}</div>
+                            {{/if}}
+                        </div>
+                    {{/if}}
+                    
                     <div class="post-header">
                         <h2>{{post.title}}</h2>
-                        {{#if showModeratorBadge}}
-                            <div class="moderator-badge {{userRole}}">
-                                {{#if isCreator}}
-                                    👑 Creator
-                                {{else}}
-                                    🛡️ Moderator
-                                {{/if}}
-                            </div>
-                        {{/if}}
                     </div>
                     
                     <p class="post-description">{{post.post_description}}</p>
@@ -71,7 +83,15 @@
                             {{else}}
                                 <span>General</span>
                             {{/if}}
-                            by <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a>
+                            by 
+                            <span class="post-author-info">
+                                <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a>
+                                {{#if post.authorIsCreator}}
+                                    <span class="author-role-badge creator">👑 Creator</span>
+                                {{else if post.authorIsModerator}}
+                                    <span class="author-role-badge moderator">🛡️ Moderator</span>
+                                {{/if}}
+                            </span>
                             {{#if post.formattedDate}}
                                 <span class="post-date">on {{post.formattedDate}}</span>
                             {{/if}}
@@ -81,25 +101,39 @@
                     {{#if isLoggedIn}}
                     <div class="post-actions">
                         {{#if post.canEdit}}
-                            <button class="edit-post-button" onclick="editPost('{{post._id}}', '{{post.title}}', '{{post.post_description}}')">
+                            <button class="edit-post-button yellow-button" onclick="editPost('{{post._id}}', '{{post.title}}', '{{post.post_description}}')">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                             </button>
                         {{/if}}
                         
                         {{#if post.canDelete}}
-                            <button class="delete-post-button" onclick="deletePost('{{post._id}}')">
+                            <button class="delete-post-button red-button" onclick="deletePost('{{post._id}}')">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </button>
                         {{/if}}
                         
+                        {{#if post.canLock}}
+                            {{#if post.locked}}
+                                <!-- Unlock Button -->
+                                <button class="moderate-post-button unlock-button" onclick="showUnlockConfirmation('{{post._id}}')">
+                                    <i class="fa-solid fa-unlock"></i> Unlock
+                                </button>
+                            {{else}}
+                                <!-- Lock Form -->
+                                <button class="moderate-post-button lock-button" onclick="showLockForm('{{post._id}}')">
+                                    <i class="fa-solid fa-lock"></i> Lock
+                                </button>
+                            {{/if}}
+                        {{/if}}
+                        
                         {{#if post.showModLabel}}
-                            <span class="mod-action-label">Moderator Action</span>
+                            <span class="mod-action-label">You can moderate this post</span>
                         {{/if}}
                     </div>
                     {{/if}}
 
                     <div class="post-stats">
-                        {{#if isLoggedIn}}
+                        {{#if (and isLoggedIn (not post.locked))}}
                             <button class="like-button" aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
                             <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
                         {{else}}
@@ -109,6 +143,27 @@
                         <span class="comments-count">{{post.comments.length}} Comments</span>
                     </div>
 
+                    <!-- Moderation History -->
+                    {{#if (and post.violations.length viewerIsModerator)}}
+                    <div class="moderation-history">
+                        <h4>Moderation History</h4>
+                        <div class="violations-list">
+                            {{#each post.violations}}
+                            <div class="violation-item {{this.action}}">
+                                <div class="violation-header">
+                                    <span class="violation-action">
+                                        {{#if (eq this.action 'locked')}}🔒 Locked{{else}}🔓 Unlocked{{/if}}
+                                    </span>
+                                    <span class="violation-moderator">by {{this.moderator}}</span>
+                                    <span class="violation-date">{{this.formattedDate}}</span>
+                                </div>
+                                <div class="violation-reason">{{this.reason}}</div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                    {{/if}}
+
                     <div class="comments-section">
                         <h4>Comments</h4>
                         {{#if post.comments.length}}
@@ -117,7 +172,14 @@
                                 <li class="comment-item" data-comment-id="{{this._id}}">
                                     <div class="comment-content">
                                         <p class="comment-user">
-                                            <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a>:</strong> 
+                                            <span class="comment-author-info">
+                                                <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></strong>
+                                                {{#if this.authorIsCreator}}
+                                                    <span class="author-role-badge creator">👑</span>
+                                                {{else if this.authorIsModerator}}
+                                                    <span class="author-role-badge moderator">🛡️</span>
+                                                {{/if}}
+                                            </span>
                                             <span class="comment-text">{{this.text}}</span>
                                             {{#if this.edited}}<em class="edited-label">(edited)</em>{{/if}}
                                         </p>
@@ -143,7 +205,7 @@
                                         {{/if}}
                                         
                                         {{#if this.showModLabel}}
-                                            <span class="mod-action-label">Mod</span>
+                                            <span class="mod-action-label">Mod Action</span>
                                         {{/if}}
                                     </div>
                                     {{/if}}
@@ -154,7 +216,7 @@
                         <p class="no-comments">No comments yet. Be the first to comment!</p>
                         {{/if}}
                         
-                        {{#if isLoggedIn}}
+                        {{#if (and isLoggedIn (not post.locked))}}
                             <form class="comment-form" data-post-id="{{post._id}}">
                                 <textarea name="comment" placeholder="Add a comment..." required maxlength="1000"></textarea>
                                 <div class="comment-form-actions">
@@ -162,6 +224,8 @@
                                     <button type="submit"><i class="fa-solid fa-comment"></i> Comment</button>
                                 </div>
                             </form>
+                        {{else if post.locked}}
+                            <p class="locked-message">🔒 This post is locked. No new comments can be added.</p>
                         {{else}}
                             <p class="login-prompt">Please <a href="/login">login</a> to comment.</p>
                         {{/if}}
@@ -171,14 +235,174 @@
         </div>
     </div>
 
+    <!-- Simple Lock Form Modal -->
+    <div id="lock-form-modal" class="simple-modal" style="display: none;">
+        <div class="simple-modal-content">
+            <h3>Lock Post</h3>
+            <form method="POST" id="lock-form">
+                <div class="form-group">
+                    <label for="lock-reason">Reason for locking this post:</label>
+                    <textarea id="lock-reason" name="reason" placeholder="Enter the violation reason..." required minlength="5" maxlength="500" rows="3"></textarea>
+                    <small>Minimum 5 characters required</small>
+                </div>
+                <input type="hidden" name="action" value="lock">
+                <div class="form-actions">
+                    <button type="submit" class="red-button">Lock Post</button>
+                    <button type="button" class="cancel-btn" onclick="hideLockForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enhanced Unlock Confirmation Modal -->
+    <div id="unlock-confirmation-modal" class="simple-modal" style="display: none;">
+        <div class="simple-modal-content unlock-modal">
+            <div class="unlock-modal-header">
+                <span class="unlock-icon">🔓</span>
+                <h3>Unlock Post</h3>
+            </div>
+            <div class="unlock-modal-body">
+                <p class="unlock-message">Are you sure you want to unlock this post?</p>
+                <div class="unlock-info">
+                    <div class="unlock-info-item">
+                        <span class="info-icon">✅</span>
+                        <span>Users will be able to comment again</span>
+                    </div>
+                    <div class="unlock-info-item">
+                        <span class="info-icon">📝</span>
+                        <span>Post will be marked as unlocked in moderation history</span>
+                    </div>
+                    <div class="unlock-info-item">
+                        <span class="info-icon">👁️</span>
+                        <span>Action will be visible to other moderators</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button id="unlock-confirm-btn" class="unlock-button">
+                    <span class="button-icon">🔓</span>
+                    Unlock Post
+                </button>
+                <button id="unlock-cancel-btn" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Viewer Role Info (for debugging/info - can be removed) -->
+    {{#if isLoggedIn}}
+    <div class="viewer-info" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px;">
+        Your role: 
+        {{#if viewerIsCreator}}
+            👑 Creator
+        {{else if viewerIsModerator}}
+            🛡️ Moderator
+        {{else}}
+            👤 Member
+        {{/if}}
+    </div>
+    {{/if}}
+
     <script>
         // Pass data to JavaScript
         window.postData = {
             id: '{{post._id}}',
             communityName: '{{#if post.communityName}}{{post.communityName}}{{/if}}',
-            userRole: '{{userRole}}',
-            isLoggedIn: {{#if isLoggedIn}}true{{else}}false{{/if}}
+            viewerRole: '{{viewerRole}}',
+            isLoggedIn: {{#if isLoggedIn}}true{{else}}false{{/if}},
+            isLocked: {{#if post.locked}}true{{else}}false{{/if}}
         };
+        
+        // Simple functions to show/hide lock form
+        function showLockForm(postId) {
+            const modal = document.getElementById('lock-form-modal');
+            const form = document.getElementById('lock-form');
+            form.action = `/post/${postId}/moderate`;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            document.getElementById('lock-reason').focus();
+        }
+
+        function hideLockForm() {
+            const modal = document.getElementById('lock-form-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('lock-reason').value = '';
+        }
+
+        // Enhanced unlock confirmation function
+        function showUnlockConfirmation(postId) {
+            const modal = document.getElementById('unlock-confirmation-modal');
+            const confirmBtn = document.getElementById('unlock-confirm-btn');
+            const cancelBtn = document.getElementById('unlock-cancel-btn');
+            
+            // Set up the confirmation button
+            confirmBtn.onclick = function() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                submitUnlockForm(postId);
+            };
+            
+            // Set up the cancel button
+            cancelBtn.onclick = function() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            };
+            
+            // Show the modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Submit unlock form
+        function submitUnlockForm(postId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/post/${postId}/moderate`;
+
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'unlock';
+            form.appendChild(actionInput);
+
+            const reasonInput = document.createElement('input');
+            reasonInput.type = 'hidden';
+            reasonInput.name = 'reason';
+            reasonInput.value = 'Post unlocked by moderator';
+            form.appendChild(reasonInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            let container = document.getElementById('notification-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notification-container';
+                document.body.appendChild(container);
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            notification.innerHTML = `
+                <span class="notification-message">${message}</span>
+                <button class="notification-close">&times;</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+            
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.remove();
+            });
+        }
         
         // Character counter for comment form
         document.addEventListener('DOMContentLoaded', function() {
@@ -199,7 +423,414 @@
                     }
                 });
             }
+
+            // Close modal when clicking outside
+            const modal = document.getElementById('lock-form-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        hideLockForm();
+                    }
+                });
+            }
+            
+            // Auto-hide moderation success message
+            const moderationSuccess = document.querySelector('.moderation-success');
+            if (moderationSuccess) {
+                setTimeout(() => {
+                    moderationSuccess.style.opacity = '0';
+                    setTimeout(() => {
+                        moderationSuccess.remove();
+                    }, 300);
+                }, 5000);
+            }
         });
     </script>
+
+    <style>
+        .post-author-info, .comment-author-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .author-role-badge {
+            font-size: 0.7em;
+            padding: 2px 4px;
+            border-radius: 8px;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+        
+        .author-role-badge.creator {
+            background-color: #ffd700;
+            color: #000;
+        }
+        
+        .author-role-badge.moderator {
+            background-color: #007BFF;
+            color: #fff;
+        }
+        
+        .mod-action-label {
+            font-size: 0.7em;
+            color: #007BFF;
+            font-weight: bold;
+            padding: 2px 6px;
+            background-color: rgba(0, 123, 255, 0.1);
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        
+        .viewer-info {
+            z-index: 1000;
+        }
+
+        /* Moderation Success Message */
+        .moderation-success {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Yellow Edit Button */
+        .yellow-button {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+        }
+
+        .yellow-button:hover {
+            background-color: #e0a800 !important;
+        }
+
+        /* Red Delete Button */
+        .red-button {
+            background-color: #dc3545 !important;
+            color: white !important;
+        }
+
+        .red-button:hover {
+            background-color: #c82333 !important;
+        }
+
+        /* Lock/Unlock Buttons */
+        .lock-button {
+            background-color: #fd7e14 !important;
+            color: white !important;
+        }
+
+        .lock-button:hover {
+            background-color: #e8690b !important;
+        }
+
+        .unlock-button {
+            background-color: #20c997 !important;
+            color: white !important;
+        }
+
+        .unlock-button:hover {
+            background-color: #1aa085 !important;
+        }
+
+        /* Locked Post Styling */
+        .locked-post {
+            opacity: 0.8;
+            border-left: 4px solid #fd7e14;
+            background-color: rgba(253, 126, 20, 0.05);
+        }
+
+        .locked-indicator {
+            background-color: #fd7e14;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .lock-reason {
+            font-size: 0.8em;
+            margin-top: 6px;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .locked-message {
+            background-color: rgba(253, 126, 20, 0.1);
+            color: #fd7e14;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* Moderation History */
+        .moderation-history {
+            background-color: rgba(0, 123, 255, 0.05);
+            border: 1px solid rgba(0, 123, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .moderation-history h4 {
+            margin: 0 0 15px 0;
+            color: #007BFF;
+            font-size: 1.1em;
+        }
+
+        .violations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .violation-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 12px;
+            border-left: 4px solid;
+        }
+
+        .violation-item.locked {
+            border-left-color: #fd7e14;
+        }
+
+        .violation-item.unlocked {
+            border-left-color: #20c997;
+        }
+
+        .violation-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .violation-action {
+            font-weight: bold;
+        }
+
+        .violation-moderator {
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        .violation-date {
+            color: #6c757d;
+            font-size: 0.8em;
+        }
+
+        .violation-reason {
+            font-style: italic;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        /* Button spacing */
+        .post-actions button {
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+
+        /* Simple Modal Styles */
+        .simple-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .simple-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .simple-modal-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .simple-modal-content .form-group {
+            margin-bottom: 15px;
+        }
+
+        .simple-modal-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .simple-modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .simple-modal-content textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .simple-modal-content small {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .simple-modal-content .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .simple-modal-content .cancel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .simple-modal-content .cancel-btn:hover {
+            background: #5a6268;
+        }
+
+        /* Enhanced Unlock Modal Styles */
+        .unlock-modal {
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .unlock-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #20c997;
+        }
+
+        .unlock-icon {
+            font-size: 2em;
+            color: #20c997;
+        }
+
+        .unlock-modal-header h3 {
+            margin: 0;
+            color: #20c997;
+            font-size: 1.5em;
+        }
+
+        .unlock-modal-body {
+            margin-bottom: 25px;
+        }
+
+        .unlock-message {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .unlock-info {
+            background-color: rgba(32, 201, 151, 0.1);
+            border: 1px solid rgba(32, 201, 151, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .unlock-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            color: #333;
+        }
+
+        .unlock-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-icon {
+            font-size: 1.1em;
+            width: 20px;
+            text-align: center;
+        }
+
+        .unlock-modal .form-actions {
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .unlock-modal .unlock-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 1.05em;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #20c997 !important;
+            color: white !important;
+            border: none;
+            cursor: pointer;
+        }
+
+        .unlock-modal .unlock-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
+            background-color: #1aa085 !important;
+        }
+
+        .unlock-modal .cancel-btn {
+            padding: 12px 24px;
+            font-size: 1.05em;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .unlock-modal .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .button-icon {
+            font-size: 1.1em;
+        }
+    </style>
 </body>
 </html>

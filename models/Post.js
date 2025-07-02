@@ -18,6 +18,26 @@ const commentSchema = new mongoose.Schema({
     }
 });
 
+const violationSchema = new mongoose.Schema({
+    moderator: {
+        type: String,
+        required: true
+    },
+    reason: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    action: {
+        type: String,
+        enum: ['locked', 'unlocked'],
+        required: true
+    }
+});
+
 const postSchema = new mongoose.Schema({
     user: {
         type: String,
@@ -39,7 +59,6 @@ const postSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-
     likedBy: {
         type: [String],
         default: []
@@ -55,7 +74,21 @@ const postSchema = new mongoose.Schema({
     },
     communityName: {
         type: String
-    }
+    },
+    locked: {
+        type: Boolean,
+        default: false
+    },
+    lockedBy: {
+        type: String
+    },
+    lockedAt: {
+        type: Date
+    },
+    lockReason: {
+        type: String
+    },
+    violations: [violationSchema]
 });
 
 const Post = mongoose.model('Post', postSchema);

@@ -37,21 +37,37 @@ router.get('/post/:id', async (req, res) => {
 
         // Get community info if post belongs to a community
         let community = null;
-        let userRole = 'member';
-        let isCreator = false;
-        let isModerator = false;
+        let viewerRole = 'member'; // Role of the person viewing the post
+        let postAuthorRole = 'member'; // Role of the person who created the post
+        let viewerIsCreator = false;
+        let viewerIsModerator = false;
+        let postAuthorIsCreator = false;
+        let postAuthorIsModerator = false;
         
         if (post.communityName) {
             community = await Community.findOne({ name: post.communityName });
-            if (community && req.session.user) {
-                const username = req.session.user.username;
-                if (community.creator === username) {
-                    userRole = 'creator';
-                    isCreator = true;
-                    isModerator = true; // Creator is also a moderator
-                } else if (community.isModerator(username)) {
-                    userRole = 'moderator';
-                    isModerator = true;
+            if (community) {
+                // Check post author's role in the community
+                if (community.creator === post.user) {
+                    postAuthorRole = 'creator';
+                    postAuthorIsCreator = true;
+                    postAuthorIsModerator = true;
+                } else if (community.isModerator(post.user)) {
+                    postAuthorRole = 'moderator';
+                    postAuthorIsModerator = true;
+                }
+
+                // Check viewer's role in the community (for permissions)
+                if (req.session.user) {
+                    const username = req.session.user.username;
+                    if (community.creator === username) {
+                        viewerRole = 'creator';
+                        viewerIsCreator = true;
+                        viewerIsModerator = true;
+                    } else if (community.isModerator(username)) {
+                        viewerRole = 'moderator';
+                        viewerIsModerator = true;
+                    }
                 }
             }
         }
@@ -64,40 +80,79 @@ router.get('/post/:id', async (req, res) => {
         // Process comments with simplified logic
         const processedComments = post.comments.map(comment => {
             const isCommentOwner = isLoggedIn && comment.user === currentUser.username;
-            const canEditComment = isCommentOwner;
-            const canDeleteComment = isCommentOwner || isModerator;
+            const canEditComment = isCommentOwner && !post.locked;
+            const canDeleteComment = (isCommentOwner || viewerIsModerator) && !post.locked;
+            
+            // Determine comment author's role
+            let commentAuthorRole = 'member';
+            let commentAuthorIsCreator = false;
+            let commentAuthorIsModerator = false;
+            
+            if (community) {
+                if (community.creator === comment.user) {
+                    commentAuthorRole = 'creator';
+                    commentAuthorIsCreator = true;
+                    commentAuthorIsModerator = true;
+                } else if (community.isModerator(comment.user)) {
+                    commentAuthorRole = 'moderator';
+                    commentAuthorIsModerator = true;
+                }
+            }
             
             return {
                 ...comment,
                 isOwner: isCommentOwner,
                 canEdit: canEditComment,
                 canDelete: canDeleteComment,
-                showModLabel: !isCommentOwner && isModerator,
-                formattedDate: comment.date ? new Date(comment.date).toLocaleString() : ''
+                showModLabel: !isCommentOwner && viewerIsModerator,
+                formattedDate: comment.date ? new Date(comment.date).toLocaleString() : '',
+                authorRole: commentAuthorRole,
+                authorIsCreator: commentAuthorIsCreator,
+                authorIsModerator: commentAuthorIsModerator
             };
         });
+
+        // Process violations for display
+        const processedViolations = post.violations ? post.violations.map(violation => ({
+            ...violation,
+            formattedDate: violation.date ? new Date(violation.date).toLocaleString() : ''
+        })) : [];
 
         // Prepare post data with simplified flags
         const postData = {
             ...post,
             comments: processedComments,
-            canEdit: isPostOwner,
-            canDelete: isPostOwner || isModerator,
-            showModLabel: !isPostOwner && isModerator,
-            formattedDate: post.date ? new Date(post.date).toLocaleString() : ''
+            violations: processedViolations,
+            canEdit: isPostOwner && !post.locked,
+            canDelete: (isPostOwner || viewerIsModerator) && !post.locked,
+            canLock: viewerIsModerator,
+            showModLabel: !isPostOwner && viewerIsModerator,
+            formattedDate: post.date ? new Date(post.date).toLocaleString() : '',
+            lockedFormattedDate: post.lockedAt ? new Date(post.lockedAt).toLocaleString() : '',
+            authorRole: postAuthorRole,
+            authorIsCreator: postAuthorIsCreator,
+            authorIsModerator: postAuthorIsModerator
         };
+
+        // Check for moderation success message
+        const moderated = req.query.moderated === 'true';
+        const action = req.query.action;
+        let moderationMessage = null;
+        if (moderated && action) {
+            moderationMessage = action === 'lock' ? 'Post has been locked successfully.' : 'Post has been unlocked successfully.';
+        }
 
         // Prepare template data
         const templateData = {
             post: postData,
             user: currentUser,
             community,
-            userRole,
-            isCreator,
-            isModerator,
+            viewerRole, // Role of the person viewing the post
+            viewerIsCreator,
+            viewerIsModerator,
             isLoggedIn,
             isPostOwner,
-            showModeratorBadge: isCreator || isModerator
+            moderationMessage
         };
 
         res.render('post', templateData);
@@ -185,7 +240,9 @@ router.post('/api/post', requireAuth, async (req, res) => {
             dislikes: 0,
             likedBy: [],
             dislikedBy: [],
-            comments: []
+            comments: [],
+            locked: false,
+            violations: []
         });
         
         await newPost.save();
@@ -196,7 +253,7 @@ router.post('/api/post', requireAuth, async (req, res) => {
     }
 });
 
-// Update a post (only by author or moderator) (API)
+// Update a post (only by author or moderator, not if locked) (API)
 router.put('/api/post/:id', requireAuth, async (req, res) => {
     const { title, post_description } = req.body;
 
@@ -217,6 +274,10 @@ router.put('/api/post/:id', requireAuth, async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot edit locked post' });
         }
 
         const username = req.session.user.username;
@@ -245,12 +306,16 @@ router.put('/api/post/:id', requireAuth, async (req, res) => {
     }
 });
 
-// Delete a post (only by author or moderator) (API)
+// Delete a post (only by author or moderator, not if locked) (API)
 router.delete('/api/post/:id', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot delete locked post' });
         }
 
         const username = req.session.user.username;
@@ -276,12 +341,127 @@ router.delete('/api/post/:id', requireAuth, async (req, res) => {
     }
 });
 
-// Like a post (API)
+// Lock/Unlock a post with violation logging (Form submission)
+router.post('/post/:id/moderate', requireAuth, async (req, res) => {
+    const { action, reason } = req.body;
+
+    // Validation
+    if (!action || !['lock', 'unlock'].includes(action)) {
+        return res.status(400).render('error', {
+            status: '400',
+            message: 'Invalid action',
+            description: 'Action must be either lock or unlock.'
+        });
+    }
+
+    if (action === 'lock' && (!reason || reason.trim().length < 5)) {
+        return res.status(400).render('error', {
+            status: '400',
+            message: 'Violation reason required',
+            description: 'Please provide a detailed reason for locking this post (minimum 5 characters).'
+        });
+    }
+
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).render('error', {
+                status: '404',
+                message: 'Post not found',
+                description: 'The post you are trying to moderate does not exist.'
+            });
+        }
+
+        const username = req.session.user.username;
+        let canModerate = false;
+
+        // Check if user is a moderator of the community
+        if (post.communityName) {
+            const community = await Community.findOne({ name: post.communityName });
+            if (community && community.isModerator(username)) {
+                canModerate = true;
+            }
+        }
+
+        if (!canModerate) {
+            return res.status(403).render('error', {
+                status: '403',
+                message: 'Permission denied',
+                description: 'Only moderators can lock/unlock posts.'
+            });
+        }
+
+        // Perform the action
+        if (action === 'lock') {
+            if (post.locked) {
+                return res.status(400).render('error', {
+                    status: '400',
+                    message: 'Post already locked',
+                    description: 'This post is already locked.'
+                });
+            }
+
+            post.locked = true;
+            post.lockedBy = username;
+            post.lockedAt = new Date();
+            post.lockReason = reason.trim();
+
+            // Add violation record
+            post.violations.push({
+                moderator: username,
+                reason: reason.trim(),
+                action: 'locked',
+                date: new Date()
+            });
+
+        } else if (action === 'unlock') {
+            if (!post.locked) {
+                return res.status(400).render('error', {
+                    status: '400',
+                    message: 'Post not locked',
+                    description: 'This post is not currently locked.'
+                });
+            }
+
+            post.locked = false;
+            post.lockedBy = undefined;
+            post.lockedAt = undefined;
+            post.lockReason = undefined;
+
+            // Add violation record for unlock
+            post.violations.push({
+                moderator: username,
+                reason: reason ? reason.trim() : 'Post unlocked by moderator',
+                action: 'unlocked',
+                date: new Date()
+            });
+        }
+
+        await post.save();
+
+        // Redirect back to the post with success message
+        res.redirect(`/post/${req.params.id}?moderated=true&action=${action}`);
+
+    } catch (error) {
+        console.error('Error moderating post:', error);
+        res.status(500).render('error', {
+            status: '500',
+            message: 'Failed to moderate post',
+            description: 'There was an error processing your moderation action. Please try again later.'
+        });
+    }
+});
+
+// Like a post (not if locked) (API)
 router.post('/api/post/:id/like', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot like locked post' });
         }
 
         const username = req.session.user.username;
@@ -309,12 +489,16 @@ router.post('/api/post/:id/like', requireAuth, async (req, res) => {
     }
 });
 
-// Dislike a post (API)
+// Dislike a post (not if locked) (API)
 router.post('/api/post/:id/dislike', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot dislike locked post' });
         }
 
         const username = req.session.user.username;
@@ -342,7 +526,7 @@ router.post('/api/post/:id/dislike', requireAuth, async (req, res) => {
     }
 });
 
-// Add a comment to a post (API)
+// Add a comment to a post (not if locked) (API)
 router.post('/api/post/:id/comment', requireAuth, async (req, res) => {
     const { text } = req.body;
 
@@ -359,6 +543,10 @@ router.post('/api/post/:id/comment', requireAuth, async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot comment on locked post' });
         }
 
         const comment = {
@@ -378,7 +566,7 @@ router.post('/api/post/:id/comment', requireAuth, async (req, res) => {
     }
 });
 
-// Update a comment (only by author or moderator) (API)
+// Update a comment (only by author or moderator, not if locked) (API)
 router.put('/api/post/:postId/comment/:commentId', requireAuth, async (req, res) => {
     const { text } = req.body;
 
@@ -395,6 +583,10 @@ router.put('/api/post/:postId/comment/:commentId', requireAuth, async (req, res)
         const post = await Post.findById(req.params.postId);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot edit comments on locked post' });
         }
 
         const comment = post.comments.id(req.params.commentId);
@@ -428,12 +620,16 @@ router.put('/api/post/:postId/comment/:commentId', requireAuth, async (req, res)
     }
 });
 
-// Delete a comment (only by author or moderator) (API)
+// Delete a comment (only by author or moderator, not if locked) (API)
 router.delete('/api/post/:postId/comment/:commentId', requireAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.postId);
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.locked) {
+            return res.status(403).json({ error: 'Cannot delete comments on locked post' });
         }
 
         const comment = post.comments.id(req.params.commentId);
