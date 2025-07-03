@@ -53,7 +53,11 @@ router.post('/register', async (req, res) => {
             profilePic: profilePicPath
         });
 
-        req.session.user = { username: newUser.username, profilePic: profilePicPath };
+        req.session.user = { 
+            username: newUser.username, 
+            profilePic: profilePicPath,
+            quote: newUser.quote 
+        };
         res.redirect('/');
     } catch (error) {
         console.error(error);
@@ -75,7 +79,11 @@ router.post('/login', async (req, res) => {
 
         const user = await UserService.authenticate(username, password);
         
-        req.session.user = { username: user.username, profilePic: user.profilePic };
+        req.session.user = { 
+            username: user.username, 
+            profilePic: user.profilePic,
+            quote: user.quote 
+        };
 
         if (rememberMe) {
             res.cookie('user', JSON.stringify(req.session.user), { 
@@ -116,7 +124,8 @@ router.get('/profile/:username', async (req, res) => {
         const isOwnProfile = loggedInUser && loggedInUser.username === username;
 
         if (isOwnProfile) {
-            res.render('userProfile', { visitedUser, loggedInUser, posts });
+            // For own profile, use the fresh data from DB instead of session
+            res.render('userProfile', { visitedUser, loggedInUser: visitedUser, posts });
         } else {
             res.render('profile', { visitedUser, loggedInUser, posts });
         }
@@ -141,7 +150,9 @@ router.post('/profile/:username', async (req, res) => {
         
         // Update session if user is updating their own profile
         if (req.session.user && req.session.user.username === req.params.username) {
+            // Update session with new profile data
             req.session.user.profilePic = updatedUser.profilePic;
+            req.session.user.quote = updatedUser.quote;
             
             // Update remember me cookie if it exists
             if (req.cookies.user) {

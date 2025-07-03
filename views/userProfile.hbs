@@ -41,7 +41,7 @@
             <div class="profile-details">
                 <h2 class="profile-username">{{loggedInUser.username}}</h2>
                 <div class="quote-container">
-                    <p class="profile-quote" id="quote-display">{{loggedInUser.quote}}</p>
+                    <p class="profile-quote" id="quote-display">{{#if loggedInUser.quote}}{{loggedInUser.quote}}{{else}}<em>No quote set. Click edit to add one!</em>{{/if}}</p>
                     <button class="edit-button btn btn-secondary" id="edit-quote-button">Edit Quote</button>
                     <div class="edit-quote-input" id="quote-form" style="display: none;">
                         <form action="/profile/{{loggedInUser.username}}" method="POST">
@@ -91,16 +91,6 @@
     <script>
         // UserProfile specific functionality
         DOMUtils.ready(() => {
-            // Profile dropdown functionality
-            const dropdown = $('#profile-dropdown');
-            if (dropdown) {
-                DOMUtils.on(dropdown, 'click', () => {
-                    const content = dropdown.querySelector('.dropdown-content');
-                    if (content) {
-                        DOMUtils.toggleClass(content, 'show');
-                    }
-                });
-            }
 
             // Edit picture functionality
             const editPicButton = $('#edit-pic-button');
@@ -165,7 +155,8 @@
                         
                         // Reset input to original value
                         if (quoteInput) {
-                            quoteInput.value = quoteDisplay.textContent;
+                            const originalQuote = quoteDisplay.textContent.includes('No quote set') ? '' : quoteDisplay.textContent;
+                            quoteInput.value = originalQuote;
                         }
                     });
                 }
@@ -209,16 +200,6 @@
                     updateCounter(); // Initial count
                 }
             }
-
-            // Close dropdown when clicking outside
-            DOMUtils.on(document, 'click', (e) => {
-                if (!e.target.closest('.dropdown')) {
-                    const dropdowns = $$('.dropdown-content.show');
-                    dropdowns.forEach(dropdown => {
-                        DOMUtils.removeClass(dropdown, 'show');
-                    });
-                }
-            });
         });
     </script>
 </body>
