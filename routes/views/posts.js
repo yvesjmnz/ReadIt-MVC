@@ -44,8 +44,11 @@ router.get('/:id', validatePostId, async (req, res, next) => {
             const isCommentOwner = isLoggedIn && comment.user === currentUser.username;
             const commentAuthorRole = community ? CommunityService.getUserRole(community, comment.user) : 'member';
             
+            const commentObj = comment.toObject();
+            
             return {
-                ...comment.toObject(),
+                ...commentObj,
+                _id: commentObj._id.toString(), // Ensure _id is a string
                 isOwner: isCommentOwner,
                 canEdit: isCommentOwner && !post.locked,
                 canDelete: (isCommentOwner || viewerIsModerator) && !post.locked,
@@ -64,8 +67,10 @@ router.get('/:id', validatePostId, async (req, res, next) => {
 
         const postAuthorRole = community ? CommunityService.getUserRole(community, post.user) : 'member';
 
+        const postObj = post.toObject();
         const postData = {
-            ...post.toObject(),
+            ...postObj,
+            _id: postObj._id.toString(), // Ensure post _id is a string
             comments: processedComments,
             violations: processedViolations,
             canEdit: isPostOwner && !post.locked,

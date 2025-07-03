@@ -19,6 +19,11 @@ class CommentActions {
         const commentId = e.target.dataset.commentId;
         const currentText = e.target.dataset.text;
 
+        if (!postId || !commentId) {
+            NotificationSystem.error('Missing post or comment ID');
+            return;
+        }
+
         const modal = new Modal({
             title: 'Edit Comment',
             content: this.createEditForm(currentText),
@@ -78,10 +83,15 @@ class CommentActions {
                 ]
             },
             onSubmit: async (data) => {
-                await PostApi.updateComment(postId, commentId, data.text);
-                NotificationSystem.success('Comment updated successfully!');
-                modal.close();
-                setTimeout(() => window.location.reload(), 1000);
+                try {
+                    await PostApi.updateComment(postId, commentId, data.text);
+                    NotificationSystem.success('Comment updated successfully!');
+                    modal.close();
+                    setTimeout(() => window.location.reload(), 1000);
+                } catch (error) {
+                    console.error('Comment update error:', error);
+                    NotificationSystem.error(`Failed to update comment: ${error.message}`);
+                }
             }
         });
     }
