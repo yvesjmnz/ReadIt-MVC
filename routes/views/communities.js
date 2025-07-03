@@ -11,11 +11,13 @@ router.get('/:name', async (req, res, next) => {
         if (!community) throw new Error('Community not found');
 
         const userRole = CommunityService.getUserRole(community, req.session.user?.username);
+        const banInfo = userRole === 'banned' ? CommunityService.getBanInfo(community, req.session.user?.username) : null;
         const posts = await PostService.findByCommunity(req.params.name);
 
         const communityData = {
             ...community.toObject(),
-            userRole
+            userRole,
+            banInfo
         };
 
         res.render('community', {

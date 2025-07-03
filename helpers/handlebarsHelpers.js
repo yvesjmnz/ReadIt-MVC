@@ -83,6 +83,7 @@ module.exports = {
             case 'creator': return '👑 Creator';
             case 'moderator': return '🛡️ Moderator';
             case 'member': return '👤 Member';
+            case 'banned': return '🚫 Banned';
             default: return '👥 Guest';
         }
     },

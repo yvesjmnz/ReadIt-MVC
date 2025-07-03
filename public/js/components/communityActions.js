@@ -18,6 +18,9 @@ class CommunityActions {
         DOMUtils.delegate(document, '#add-moderator-btn', 'click', this.handleAddModerator.bind(this));
         DOMUtils.delegate(document, '#view-moderators-btn', 'click', this.handleViewModerators.bind(this));
         DOMUtils.delegate(document, '.remove-moderator-btn', 'click', this.handleRemoveModerator.bind(this));
+        DOMUtils.delegate(document, '#ban-user-btn', 'click', this.handleBanUser.bind(this));
+        DOMUtils.delegate(document, '#view-banned-btn', 'click', this.handleViewBanned.bind(this));
+        DOMUtils.delegate(document, '.unban-user-btn', 'click', this.handleUnbanUser.bind(this));
     }
 
     async handleCreateCommunity() {
@@ -71,6 +74,78 @@ class CommunityActions {
             this.setupAddModeratorForm(modal);
         } catch (error) {
             NotificationSystem.error('Failed to load community members');
+        }
+    }
+
+    async handleBanUser() {
+        try {
+            const communityName = window.communityData?.name;
+            if (!communityName) {
+                NotificationSystem.error('Community name not found');
+                return;
+            }
+
+            // Get community data to show available members to ban
+            const community = await CommunityApi.getByName(communityName);
+            const bannableMembers = this.getBannableMembers(community);
+
+            if (bannableMembers.length === 0) {
+                NotificationSystem.warning('No members available to ban');
+                return;
+            }
+
+            const modal = new Modal({
+                title: 'Ban User',
+                content: this.createBanUserForm(bannableMembers),
+                className: 'ban-user-modal'
+            });
+
+            modal.open();
+            this.setupBanUserForm(modal);
+        } catch (error) {
+            NotificationSystem.error('Failed to load community members');
+        }
+    }
+
+    async handleViewBanned() {
+        try {
+            const communityName = window.communityData?.name;
+            if (!communityName) {
+                NotificationSystem.error('Community name not found');
+                return;
+            }
+
+            const community = await CommunityApi.getByName(communityName);
+            const modal = new Modal({
+                title: 'Banned Users',
+                content: this.createBannedUsersView(community.bannedUsers),
+                className: 'view-banned-modal'
+            });
+
+            modal.open();
+            this.setupBannedUsersView(modal);
+        } catch (error) {
+            NotificationSystem.error('Failed to load banned users');
+        }
+    }
+
+    async handleUnbanUser(e) {
+        const username = e.target.dataset.username;
+        const communityName = window.communityData?.name;
+
+        const confirmed = await Modal.confirm(
+            'Unban User',
+            `Are you sure you want to unban ${username}?`
+        );
+
+        if (confirmed) {
+            try {
+                await CommunityApi.unbanUser(communityName, username);
+                NotificationSystem.success('User unbanned successfully!');
+                setTimeout(() => window.location.reload(), 1000);
+            } catch (error) {
+                NotificationSystem.error('Failed to unban user');
+            }
         }
     }
 
@@ -155,6 +230,13 @@ class CommunityActions {
         );
     }
 
+    getBannableMembers(community) {
+        // Filter out creator (can't ban creator)
+        return community.members.filter(member => 
+            member !== community.creator
+        );
+    }
+
     createCommunityForm() {
         return `
             <form id="create-community-form">
@@ -230,6 +312,36 @@ class CommunityActions {
         `;
     }
 
+    createBanUserForm(bannableMembers) {
+        const memberOptions = bannableMembers.map(member => 
+            `<option value="${member}">${member}</option>`
+        ).join('');
+
+        return `
+            <form id="ban-user-form">
+                <div class="form-group">
+                    <label for="ban-user-select">Select Member to Ban:</label>
+                    <select id="ban-user-select" name="username" required>
+                        <option value="">Choose a member...</option>
+                        ${memberOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ban-reason">Ban Reason:</label>
+                    <textarea id="ban-reason" name="reason" 
+                              required maxlength="500" minlength="5" rows="3"
+                              data-max-length="500" data-counter="reason-count"
+                              placeholder="Explain why this user is being banned..."></textarea>
+                    <div class="char-counter" id="reason-count">0/500</div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-warning">Ban User</button>
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+
     createModeratorsView(moderators, creator) {
         if (!moderators || moderators.length === 0) {
             return '<p>No moderators assigned to this community.</p>';
@@ -252,6 +364,35 @@ class CommunityActions {
                 <hr>
                 <h4>Moderators:</h4>
                 ${moderatorsList}
+            </div>
+        `;
+    }
+
+    createBannedUsersView(bannedUsers) {
+        if (!bannedUsers || Object.keys(bannedUsers).length === 0) {
+            return '<p>No banned users in this community.</p>';
+        }
+
+        const bannedList = Object.entries(bannedUsers).map(([username, banInfo]) => `
+            <div class="banned-user-item">
+                <div class="banned-user-info">
+                    <strong>${username}</strong>
+                    <div class="ban-details">
+                        <p><strong>Reason:</strong> ${banInfo.reason}</p>
+                        <p><strong>Banned by:</strong> ${banInfo.bannedBy}</p>
+                        <p><strong>Date:</strong> ${new Date(banInfo.bannedAt).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-sm unban-user-btn" data-username="${username}">
+                    Unban
+                </button>
+            </div>
+        `).join('');
+
+        return `
+            <div class="banned-users-list">
+                <h4>Banned Users:</h4>
+                ${bannedList}
             </div>
         `;
     }
@@ -336,8 +477,38 @@ class CommunityActions {
         });
     }
 
+    setupBanUserForm(modal) {
+        const form = modal.element.querySelector('#ban-user-form');
+        
+        const formHandler = new FormHandler(form, {
+            validation: {
+                username: [ValidationRules.required],
+                reason: [
+                    ValidationRules.required,
+                    ValidationRules.minLength(5),
+                    ValidationRules.maxLength(500)
+                ]
+            },
+            onSubmit: async (data) => {
+                try {
+                    const communityName = window.communityData?.name;
+                    await CommunityApi.banUser(communityName, data.username, data.reason);
+                    NotificationSystem.success('User banned successfully!');
+                    modal.close();
+                    setTimeout(() => window.location.reload(), 1000);
+                } catch (error) {
+                    NotificationSystem.error('Failed to ban user');
+                }
+            }
+        });
+    }
+
     setupModeratorsView(modal) {
         // Event delegation for remove buttons is already handled in setupEventListeners
+    }
+
+    setupBannedUsersView(modal) {
+        // Event delegation for unban buttons is already handled in setupEventListeners
     }
 }
 

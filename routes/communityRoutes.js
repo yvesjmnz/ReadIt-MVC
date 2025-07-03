@@ -26,7 +26,7 @@ router.get('/api/community/:name/members', requireAuth, async (req, res) => {
 
         const memberDetails = await User.find(
             { username: { $in: community.members } },
-            { username: 1, profilePic: 1, _id: 0 }
+            { username: 1, _id: 0 }
         );
 
         const availableMembers = memberDetails.filter(member => 
@@ -50,7 +50,7 @@ router.get('/api/community/:name/moderators', async (req, res) => {
 
         const moderatorDetails = await User.find(
             { username: { $in: [community.creator, ...community.moderators] } },
-            { username: 1, profilePic: 1, _id: 0 }
+            { username: 1, _id: 0 }
         );
 
         const moderators = moderatorDetails.map(mod => ({

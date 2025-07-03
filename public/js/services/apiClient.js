@@ -77,6 +77,14 @@ class CommunityApi {
     static async removeModerator(name, username) {
         return ApiClient.delete(`/api/communities/${name}/moderator/${username}`);
     }
+
+    static async banUser(name, username, reason) {
+        return ApiClient.post(`/api/communities/${name}/ban`, { username, reason });
+    }
+
+    static async unbanUser(name, username) {
+        return ApiClient.post(`/api/communities/${name}/unban`, { username });
+    }
 }
 
 // Post API

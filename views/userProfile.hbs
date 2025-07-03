@@ -20,7 +20,6 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username">{{loggedInUser.username}}</span>
-                <img src="/img/{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic">
                 <div class="dropdown-content">
                     <a href="/profile/{{loggedInUser.username}}">View Profile</a>
                     <a href="/logout">Logout</a>
@@ -31,13 +30,6 @@
 
     <div class="content">
         <div class="profile-header">
-            <div class="profile-pic-container">
-                <img src="/img/{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic-large">
-                <button class="edit-button btn btn-secondary" id="edit-pic-button">Edit Picture</button>
-                <form action="/profile/{{loggedInUser.username}}" method="POST" enctype="multipart/form-data" style="display: none;" id="profile-pic-form">
-                    <input type="file" id="profile-pic-input" name="profilePic" accept="image/*">
-                </form>
-            </div>
             <div class="profile-details">
                 <h2 class="profile-username">{{loggedInUser.username}}</h2>
                 <div class="quote-container">
@@ -91,43 +83,6 @@
     <script>
         // UserProfile specific functionality
         DOMUtils.ready(() => {
-
-            // Edit picture functionality
-            const editPicButton = $('#edit-pic-button');
-            const profilePicInput = $('#profile-pic-input');
-            const profilePicForm = $('#profile-pic-form');
-            
-            if (editPicButton && profilePicInput && profilePicForm) {
-                DOMUtils.on(editPicButton, 'click', () => {
-                    profilePicInput.click();
-                });
-                
-                DOMUtils.on(profilePicInput, 'change', (e) => {
-                    if (e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        
-                        // Validate file type
-                        if (!file.type.startsWith('image/')) {
-                            NotificationSystem.error('Please select a valid image file');
-                            return;
-                        }
-                        
-                        // Validate file size (5MB limit)
-                        if (file.size > 5 * 1024 * 1024) {
-                            NotificationSystem.error('Image size must be less than 5MB');
-                            return;
-                        }
-                        
-                        // Show loading state
-                        editPicButton.textContent = 'Uploading...';
-                        editPicButton.disabled = true;
-                        
-                        // Submit form
-                        profilePicForm.submit();
-                    }
-                });
-            }
-
             // Edit quote functionality
             const editQuoteButton = $('#edit-quote-button');
             const quoteForm = $('#quote-form');

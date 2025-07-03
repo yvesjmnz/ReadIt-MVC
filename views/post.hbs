@@ -15,6 +15,16 @@
     <div class="alert alert-success">✅ {{moderationMessage}}</div>
     {{/if}}
 
+    {{#if (eq viewerRole 'banned')}}
+    <div class="ban-notice alert alert-error">
+        <h4>🚫 You are banned from this community</h4>
+        <p><strong>Reason:</strong> {{banInfo.reason}}</p>
+        <p><strong>Banned by:</strong> {{banInfo.bannedBy}}</p>
+        <p><strong>Date:</strong> {{formatDate banInfo.bannedAt}}</p>
+        <p>You cannot interact with posts or comments in this community.</p>
+    </div>
+    {{/if}}
+
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -26,7 +36,6 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username">{{user.username}}</span>
-                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic">
                 <div class="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="/logout">Logout</a>
@@ -114,7 +123,7 @@
                     {{/if}}
 
                     <div class="post-stats">
-                        {{#if (and isLoggedIn (not post.locked))}}
+                        {{#if (and isLoggedIn (not post.locked) (ne viewerRole 'banned'))}}
                             <button class="like-button" data-post-id="{{post._id}}">
                                 👍 <span class="likes-count">{{post.likes}}</span>
                             </button>
@@ -199,7 +208,7 @@
                         <p class="no-comments">No comments yet. Be the first to comment!</p>
                         {{/if}}
                         
-                        {{#if (and isLoggedIn (not post.locked))}}
+                        {{#if (and isLoggedIn (not post.locked) (ne viewerRole 'banned'))}}
                             <form id="comment-form" class="comment-form ajax-form" data-post-id="{{post._id}}">
                                 <div class="form-group">
                                     <textarea name="text" placeholder="Add a comment..." 
@@ -216,6 +225,10 @@
                         {{else if post.locked}}
                             <div class="alert alert-warning">
                                 🔒 This post is locked. No new comments can be added.
+                            </div>
+                        {{else if (eq viewerRole 'banned')}}
+                            <div class="alert alert-error">
+                                🚫 You are banned from this community and cannot comment.
                             </div>
                         {{else}}
                             <div class="alert alert-info">

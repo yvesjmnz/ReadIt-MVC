@@ -26,12 +26,18 @@ router.get('/:id', validatePostId, async (req, res, next) => {
         let community = null;
         let viewerRole = 'member';
         let viewerIsModerator = false;
+        let banInfo = null;
 
         if (post.communityName) {
             community = await CommunityService.findByName(post.communityName);
             if (community && req.session.user) {
                 viewerRole = CommunityService.getUserRole(community, req.session.user.username);
                 viewerIsModerator = viewerRole === 'creator' || viewerRole === 'moderator';
+                
+                // Get ban info if user is banned
+                if (viewerRole === 'banned') {
+                    banInfo = CommunityService.getBanInfo(community, req.session.user.username);
+                }
             }
         }
 
@@ -98,6 +104,7 @@ router.get('/:id', validatePostId, async (req, res, next) => {
             viewerRole,
             viewerIsCreator: viewerRole === 'creator',
             viewerIsModerator,
+            banInfo,
             isLoggedIn,
             isPostOwner,
             moderationMessage

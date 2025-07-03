@@ -19,7 +19,6 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username">{{loggedInUser.username}}</span>
-                <img src="{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic">
                 <div class="dropdown-content">
                     <a href="/profile/{{loggedInUser.username}}">View Profile</a>
                     <a href="/logout">Logout</a>
@@ -30,9 +29,6 @@
 
     <div class="content">
         <div class="profile-header">
-            <div class="profile-pic-container">
-                <img src="{{visitedUser.profilePic}}" alt="Profile Picture" class="profile-pic-large">
-            </div>
             <div class="profile-details">
                 <h2 class="profile-username">{{visitedUser.username}}</h2>
                 <div class="quote-container">
@@ -69,7 +65,8 @@
         </div>
     </div>
 
-    <!-- Load JavaScript Components --<script src="/js/utils/dom.js"></script>
+    <!-- Load JavaScript Components -->
+    <script src="/js/utils/dom.js"></script>
     <script src="/js/services/apiClient.js"></script>
     <script src="/js/components/notification.js"></script>
     <script src="/js/components/modal.js"></script>

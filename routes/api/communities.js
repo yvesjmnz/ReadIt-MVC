@@ -22,10 +22,12 @@ router.get('/:name', async (req, res, next) => {
         if (!community) throw new Error('Community not found');
 
         const userRole = CommunityService.getUserRole(community, req.session.user?.username);
+        const banInfo = userRole === 'banned' ? CommunityService.getBanInfo(community, req.session.user?.username) : null;
         
         res.json({
             ...community.toObject(),
-            userRole
+            userRole,
+            banInfo
         });
     } catch (error) {
         next(error);
@@ -98,6 +100,64 @@ router.delete('/:name/moderator/:username', requireCreator, async (req, res, nex
             success: true,
             message: 'Moderator removed successfully',
             moderators: community.moderators
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Ban user
+router.post('/:name/ban', requireAuth, async (req, res, next) => {
+    try {
+        const { username, reason } = req.body;
+        if (!username || !reason) {
+            return res.status(400).json({ error: 'Username and reason are required' });
+        }
+
+        const community = await CommunityService.findByName(req.params.name);
+        if (!community) {
+            return res.status(404).json({ error: 'Community not found' });
+        }
+
+        // Check if user can ban (creator or moderator)
+        const userRole = CommunityService.getUserRole(community, req.session.user.username);
+        if (userRole !== 'creator' && userRole !== 'moderator') {
+            return res.status(403).json({ error: 'Only moderators and creators can ban users' });
+        }
+
+        await CommunityService.banUser(req.params.name, username, reason, req.session.user.username);
+        res.json({
+            success: true,
+            message: 'User banned successfully'
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Unban user
+router.post('/:name/unban', requireAuth, async (req, res, next) => {
+    try {
+        const { username } = req.body;
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+
+        const community = await CommunityService.findByName(req.params.name);
+        if (!community) {
+            return res.status(404).json({ error: 'Community not found' });
+        }
+
+        // Check if user can unban (creator or moderator)
+        const userRole = CommunityService.getUserRole(community, req.session.user.username);
+        if (userRole !== 'creator' && userRole !== 'moderator') {
+            return res.status(403).json({ error: 'Only moderators and creators can unban users' });
+        }
+
+        await CommunityService.unbanUser(req.params.name, username);
+        res.json({
+            success: true,
+            message: 'User unbanned successfully'
         });
     } catch (error) {
         next(error);

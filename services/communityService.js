@@ -50,6 +50,10 @@ class CommunityService {
         const community = await this.findByName(communityName);
         if (!community) throw new Error('Community not found');
 
+        if (community.isBanned(username)) {
+            throw new Error('You are banned from this community');
+        }
+
         if (!community.members.includes(username)) {
             community.members.push(username);
             await community.save();
@@ -70,11 +74,48 @@ class CommunityService {
         return await community.save();
     }
 
+    static async banUser(communityName, username, reason, bannedBy) {
+        const community = await this.findByName(communityName);
+        if (!community) throw new Error('Community not found');
+
+        const user = await User.findOne({ username });
+        if (!user) throw new Error('User not found');
+
+        if (community.creator === username) {
+            throw new Error('Cannot ban community creator');
+        }
+
+        if (!community.members.includes(username)) {
+            throw new Error('User is not a member of this community');
+        }
+
+        community.banUser(username, reason, bannedBy);
+        return await community.save();
+    }
+
+    static async unbanUser(communityName, username) {
+        const community = await this.findByName(communityName);
+        if (!community) throw new Error('Community not found');
+
+        if (!community.isBanned(username)) {
+            throw new Error('User is not banned');
+        }
+
+        community.unbanUser(username);
+        return await community.save();
+    }
+
     static getUserRole(community, username) {
-        if (!username) return 'member';
+        if (!username) return null;
+        if (community.isBanned(username)) return 'banned';
         if (community.creator === username) return 'creator';
         if (community.isModerator(username)) return 'moderator';
-        return 'member';
+        if (community.members.includes(username)) return 'member';
+        return null;
+    }
+
+    static getBanInfo(community, username) {
+        return community.getBanInfo(username);
     }
 }
 

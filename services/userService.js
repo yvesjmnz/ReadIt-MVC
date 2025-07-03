@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const path = require('path');
 const sampleProfiles = require('../models/sampleProfiles');
 
 class UserService {
@@ -14,7 +13,7 @@ class UserService {
     }
 
     static async create(userData) {
-        const { username, password, quote, profilePic } = userData;
+        const { username, password, quote } = userData;
         
         const existingUser = await this.findByUsername(username);
         if (existingUser) {
@@ -26,8 +25,7 @@ class UserService {
         const user = new User({
             username,
             password: hashedPassword,
-            quote,
-            profilePic: profilePic || ''
+            quote
         });
 
         return await user.save();
@@ -58,28 +56,6 @@ class UserService {
 
         // Check sample profiles
         return sampleProfiles.find(profile => profile.username === username);
-    }
-
-    static handleFileUpload(file, uploadDir) {
-        if (!file) return '';
-
-        // Generate unique filename to avoid conflicts
-        const timestamp = Date.now();
-        const fileExtension = path.extname(file.name);
-        const fileName = `profile_${timestamp}${fileExtension}`;
-        const uploadPath = path.join(uploadDir, fileName);
-
-        return new Promise((resolve, reject) => {
-            file.mv(uploadPath, (err) => {
-                if (err) {
-                    console.error('File upload error:', err);
-                    reject(new Error('Error uploading file'));
-                } else {
-                    // Return just the filename, not the full path
-                    resolve(fileName);
-                }
-            });
-        });
     }
 }
 

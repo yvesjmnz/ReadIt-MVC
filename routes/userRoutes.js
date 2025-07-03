@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const UserService = require('../services/userService');
 const PostService = require('../services/postService');
 const samplePosts = require('../models/samplePost');
@@ -40,22 +39,14 @@ router.post('/register', async (req, res) => {
             return res.status(400).send('Passwords do not match');
         }
 
-        let profilePicPath = '';
-        if (req.files && req.files.profilePic) {
-            const uploadDir = path.join(__dirname, '..', 'public', 'img');
-            profilePicPath = await UserService.handleFileUpload(req.files.profilePic, uploadDir);
-        }
-
         const newUser = await UserService.create({
             username,
             password,
-            quote,
-            profilePic: profilePicPath
+            quote
         });
 
         req.session.user = { 
             username: newUser.username, 
-            profilePic: profilePicPath,
             quote: newUser.quote 
         };
         res.redirect('/');
@@ -81,7 +72,6 @@ router.post('/login', async (req, res) => {
         
         req.session.user = { 
             username: user.username, 
-            profilePic: user.profilePic,
             quote: user.quote 
         };
 
@@ -141,17 +131,11 @@ router.post('/profile/:username', async (req, res) => {
         const { quote } = req.body;
         let updateData = { quote };
 
-        if (req.files && req.files.profilePic) {
-            const uploadDir = path.join(__dirname, '..', 'public', 'img');
-            updateData.profilePic = await UserService.handleFileUpload(req.files.profilePic, uploadDir);
-        }
-
         const updatedUser = await UserService.updateProfile(req.params.username, updateData);
         
         // Update session if user is updating their own profile
         if (req.session.user && req.session.user.username === req.params.username) {
             // Update session with new profile data
-            req.session.user.profilePic = updatedUser.profilePic;
             req.session.user.quote = updatedUser.quote;
             
             // Update remember me cookie if it exists

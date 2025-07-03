@@ -9,8 +9,7 @@ router.get('/', async (req, res, next) => {
         const users = await UserService.findAll();
         // Return only necessary user info for privacy
         const publicUsers = users.map(user => ({
-            username: user.username,
-            profilePic: user.profilePic || '/img/default-avatar.png'
+            username: user.username
         }));
         res.json(publicUsers);
     } catch (error) {

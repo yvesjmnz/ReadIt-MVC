@@ -20,7 +20,6 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username">{{user.username}}</span>
-                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic">
                 <div class="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
                     <a href="/logout">Logout</a>
@@ -46,23 +45,35 @@
                     <div class="user-role-badge {{community.userRole}}">
                         {{#if (eq community.userRole 'creator')}}👑 Creator
                         {{else if (eq community.userRole 'moderator')}}🛡️ Moderator
+                        {{else if (eq community.userRole 'banned')}}🚫 Banned
                         {{else}}👤 Member{{/if}}
                     </div>
                 {{/if}}
 
-                {{#if (eq community.userRole 'creator')}}
+                {{#if (eq community.userRole 'banned')}}
+                    <div class="ban-notice alert alert-error">
+                        <h4>🚫 You are banned from this community</h4>
+                        <p><strong>Reason:</strong> {{community.banInfo.reason}}</p>
+                        <p><strong>Banned by:</strong> {{community.banInfo.bannedBy}}</p>
+                        <p><strong>Date:</strong> {{formatDate community.banInfo.bannedAt}}</p>
+                    </div>
+                {{/if}}
+
+                {{#if (or (eq community.userRole 'creator') (eq community.userRole 'moderator'))}}
                     <div class="moderator-actions">
                         <h3>Moderator Management</h3>
                         <button id="add-moderator-btn" class="btn btn-primary">Add Moderator</button>
                         <button id="view-moderators-btn" class="btn btn-success">View Moderators</button>
+                        <button id="ban-user-btn" class="btn btn-warning">Ban User</button>
+                        <button id="view-banned-btn" class="btn btn-secondary">View Banned Users</button>
                     </div>
                 {{/if}}
 
                 {{#if user}}
-                    {{#unless (or (eq community.userRole 'creator') (includes community.members user.username))}}
+                    {{#unless community.userRole}}
                         <button id="join-community-btn" class="btn btn-success" data-community="{{community.name}}">Join Community</button>
                     {{/unless}}
-                    {{#if (and (includes community.members user.username) (ne community.userRole 'creator'))}}
+                    {{#if (and community.userRole (ne community.userRole 'creator') (ne community.userRole 'banned'))}}
                         <button id="leave-community-btn" class="btn btn-danger" data-community="{{community.name}}">Leave Community</button>
                     {{/if}}
                 {{/if}}
@@ -72,7 +83,9 @@
         <div class="posts-container">
             <div class="posts-header">
                 <h2>Posts</h2>
-                <button id="create-post-btn" class="btn btn-primary">Create Post</button>
+                {{#unless (eq community.userRole 'banned')}}
+                    <button id="create-post-btn" class="btn btn-primary">Create Post</button>
+                {{/unless}}
             </div>
             <div class="posts-section" id="posts-container">
                 {{#each posts}}
@@ -91,8 +104,13 @@
                             <p class="post-author">Posted by <a href="/profile/{{this.user}}" onclick="event.stopPropagation();">{{this.user}}</a></p>
                             <div class="post-actions" onclick="event.stopPropagation();">
                                 <div class="post-stats">
-                                    <button class="like-button" data-post-id="{{this._id}}">👍 <span class="likes-count">{{this.likes}}</span></button>
-                                    <button class="dislike-button" data-post-id="{{this._id}}">👎 <span class="dislikes-count">{{this.dislikes}}</span></button>
+                                    {{#unless (eq ../community.userRole 'banned')}}
+                                        <button class="like-button" data-post-id="{{this._id}}">👍 <span class="likes-count">{{this.likes}}</span></button>
+                                        <button class="dislike-button" data-post-id="{{this._id}}">👎 <span class="dislikes-count">{{this.dislikes}}</span></button>
+                                    {{else}}
+                                        <span class="likes-display">👍 {{this.likes}}</span>
+                                        <span class="dislikes-display">👎 {{this.dislikes}}</span>
+                                    {{/unless}}
                                     <span class="comments">💬 {{this.comments.length}}</span>
                                 </div>
                                 
