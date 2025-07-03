@@ -1,0 +1,1 @@
+    console.log(`[AUTH CHECK] ${req.path} → ${isPublic ? 'PUBLIC' : 'PROTECTED'}`);

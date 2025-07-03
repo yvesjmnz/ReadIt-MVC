@@ -68,8 +68,26 @@ const requireCreator = async (req, res, next) => {
     }
 };
 
+//require authentication except those intended to be public
+const publicPath = [
+    '/signup',
+    '/public/',
+    '/',
+];
+//check public paths
+const checkPublicPath = (req, res, next) => {
+    const isPublic = publicPath.some(path => req.path.startsWith(path) || req.path === path);
+    console.log(`[AUTH] ${req.path} → ${isPublic ? 'Public' : 'Protected'}`);
+    if(isPublic) {
+        return next();
+    }
+    
+    return requireAuth(req, res, next);
+};
+
 module.exports = {
     requireAuth,
     requireModerator,
-    requireCreator
+    requireCreator, 
+    checkPublicPath
 };

@@ -10,12 +10,14 @@ const fileUpload = require('express-fileupload');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
 const handlebarsHelpers = require('./helpers/handlebarsHelpers');
+const {checkPublicPath } = require('./middleware/authMiddleware');
 require('dotenv').config();
 
 const config = require('./config');
 
 const app = express();
 const PORT = config.port || 3000;
+
 
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
@@ -31,6 +33,9 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
+
+// Require authentication for all except public
+app.use(checkPublicPath);
 
 // Remember me cookie middleware
 app.use((req, res, next) => {

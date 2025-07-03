@@ -229,6 +229,7 @@ class ReadItApp {
 
         posts.forEach(post => postsContainer?.appendChild(post));
     }
+
 }
 
 // Initialize the application
