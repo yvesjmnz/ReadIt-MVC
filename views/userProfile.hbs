@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/global-dark-theme.css">
     <link rel="stylesheet" href="/css/style_userprofile.css">
     <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body data-username="{{loggedInUser.username}}" data-page="userProfile">
     <div class="header">
@@ -19,7 +20,7 @@
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
                 <span class="username">{{loggedInUser.username}}</span>
-                <img src="{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic">
+                <img src="/img/{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic">
                 <div class="dropdown-content">
                     <a href="/profile/{{loggedInUser.username}}">View Profile</a>
                     <a href="/logout">Logout</a>
@@ -31,9 +32,9 @@
     <div class="content">
         <div class="profile-header">
             <div class="profile-pic-container">
-                <img src="{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic-large">
+                <img src="/img/{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic-large">
                 <button class="edit-button btn btn-secondary" id="edit-pic-button">Edit Picture</button>
-                <form action="/profile/{{loggedInUser.username}}" method="POST" enctype="multipart/form-data" style="display: none;">
+                <form action="/profile/{{loggedInUser.username}}" method="POST" enctype="multipart/form-data" style="display: none;" id="profile-pic-form">
                     <input type="file" id="profile-pic-input" name="profilePic" accept="image/*">
                 </form>
             </div>
@@ -78,7 +79,8 @@
         </div>
     </div>
 
-    <!-- Load JavaScript Components --<script src="/js/utils/dom.js"></script>
+    <!-- Load JavaScript Components -->
+    <script src="/js/utils/dom.js"></script>
     <script src="/js/services/apiClient.js"></script>
     <script src="/js/components/notification.js"></script>
     <script src="/js/components/modal.js"></script>
@@ -103,15 +105,35 @@
             // Edit picture functionality
             const editPicButton = $('#edit-pic-button');
             const profilePicInput = $('#profile-pic-input');
+            const profilePicForm = $('#profile-pic-form');
             
-            if (editPicButton && profilePicInput) {
+            if (editPicButton && profilePicInput && profilePicForm) {
                 DOMUtils.on(editPicButton, 'click', () => {
                     profilePicInput.click();
                 });
                 
                 DOMUtils.on(profilePicInput, 'change', (e) => {
                     if (e.target.files.length > 0) {
-                        e.target.closest('form').submit();
+                        const file = e.target.files[0];
+                        
+                        // Validate file type
+                        if (!file.type.startsWith('image/')) {
+                            NotificationSystem.error('Please select a valid image file');
+                            return;
+                        }
+                        
+                        // Validate file size (5MB limit)
+                        if (file.size > 5 * 1024 * 1024) {
+                            NotificationSystem.error('Image size must be less than 5MB');
+                            return;
+                        }
+                        
+                        // Show loading state
+                        editPicButton.textContent = 'Uploading...';
+                        editPicButton.disabled = true;
+                        
+                        // Submit form
+                        profilePicForm.submit();
                     }
                 });
             }
@@ -121,25 +143,70 @@
             const quoteForm = $('#quote-form');
             const quoteDisplay = $('#quote-display');
             const cancelQuoteEdit = $('#cancel-quote-edit');
+            const quoteInput = $('#quote-input');
             
             if (editQuoteButton && quoteForm && quoteDisplay) {
                 DOMUtils.on(editQuoteButton, 'click', () => {
                     DOMUtils.hide(quoteDisplay);
                     DOMUtils.hide(editQuoteButton);
-                    DOMUtils.show(quoteForm);
+                    DOMUtils.show(quoteForm, 'block');
                     
-                    const quoteInput = $('#quote-input');
                     if (quoteInput) {
                         quoteInput.focus();
+                        quoteInput.select(); // Select all text for easy editing
                     }
                 });
                 
                 if (cancelQuoteEdit) {
                     DOMUtils.on(cancelQuoteEdit, 'click', () => {
-                        DOMUtils.show(quoteDisplay);
-                        DOMUtils.show(editQuoteButton);
+                        DOMUtils.show(quoteDisplay, 'block');
+                        DOMUtils.show(editQuoteButton, 'inline-block');
                         DOMUtils.hide(quoteForm);
+                        
+                        // Reset input to original value
+                        if (quoteInput) {
+                            quoteInput.value = quoteDisplay.textContent;
+                        }
                     });
+                }
+                
+                // Handle form submission with validation
+                const quoteFormElement = quoteForm.querySelector('form');
+                if (quoteFormElement) {
+                    DOMUtils.on(quoteFormElement, 'submit', (e) => {
+                        if (quoteInput && quoteInput.value.length > 200) {
+                            e.preventDefault();
+                            NotificationSystem.error('Quote must be 200 characters or less');
+                            return;
+                        }
+                        
+                        // Show loading state
+                        const submitBtn = quoteFormElement.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.textContent = 'Saving...';
+                            submitBtn.disabled = true;
+                        }
+                    });
+                }
+                
+                // Character counter for quote input
+                if (quoteInput) {
+                    const updateCounter = () => {
+                        const length = quoteInput.value.length;
+                        let counter = quoteForm.querySelector('.char-counter');
+                        
+                        if (!counter) {
+                            counter = document.createElement('div');
+                            counter.className = 'char-counter';
+                            quoteInput.parentNode.appendChild(counter);
+                        }
+                        
+                        counter.textContent = `${length}/200`;
+                        counter.className = length > 180 ? 'char-counter warning' : 'char-counter';
+                    };
+                    
+                    DOMUtils.on(quoteInput, 'input', updateCounter);
+                    updateCounter(); // Initial count
                 }
             }
 

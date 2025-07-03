@@ -63,16 +63,20 @@ class UserService {
     static handleFileUpload(file, uploadDir) {
         if (!file) return '';
 
-        const fileName = file.name;
-        const profilePicPath = '/img/' + fileName;
+        // Generate unique filename to avoid conflicts
+        const timestamp = Date.now();
+        const fileExtension = path.extname(file.name);
+        const fileName = `profile_${timestamp}${fileExtension}`;
         const uploadPath = path.join(uploadDir, fileName);
 
         return new Promise((resolve, reject) => {
             file.mv(uploadPath, (err) => {
                 if (err) {
+                    console.error('File upload error:', err);
                     reject(new Error('Error uploading file'));
                 } else {
-                    resolve(profilePicPath);
+                    // Return just the filename, not the full path
+                    resolve(fileName);
                 }
             });
         });

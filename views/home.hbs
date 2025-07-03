@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/style_home.css">
     <link rel="stylesheet" href="/css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body data-username="{{user.username}}" data-page="home">
     <div class="header">
@@ -57,25 +58,32 @@
             <div class="posts-section">
                 <div id="posts-container">
                     {{#each posts}}
-                        <div class="post" data-post-id="{{this._id}}" data-navigate="/post/{{this._id}}">
+                        <div class="post" data-post-id="{{this._id}}">
                             <div class="post-header">
-                                <h3 class="post-title">{{this.title}}</h3>
+                                <h3 class="post-title">
+                                    <a href="/post/{{this._id}}" class="post-title-link">{{this.title}}</a>
+                                </h3>
                                 <p class="post-date">{{this.date}}</p>
                             </div>
                             <p class="post-snippet">{{this.post_description}}</p>
                             <div class="post-meta">
                                 <p class="post-community">
-                                    Posted in <a href="/community/{{this.communityName}}">{{this.communityName}}</a> 
-                                    by <a href="/profile/{{this.user}}">{{this.user}}</a>
+                                    Posted in <a href="/community/{{this.communityName}}" onclick="event.stopPropagation();">{{this.communityName}}</a> 
+                                    by <a href="/profile/{{this.user}}" onclick="event.stopPropagation();">{{this.user}}</a>
                                 </p>
-                                <div class="post-stats" onclick="event.stopPropagation();">
-                                    <button class="like-button" data-post-id="{{this._id}}">
-                                        👍 <span class="likes-count">{{this.likes}}</span>
-                                    </button>
-                                    <button class="dislike-button" data-post-id="{{this._id}}">
-                                        👎 <span class="dislikes-count">{{this.dislikes}}</span>
-                                    </button>
-                                    <span class="comments-count">💬 {{this.comments.length}}</span>
+                                <div class="post-actions">
+                                    <div class="post-stats" onclick="event.stopPropagation();">
+                                        <button class="like-button" data-post-id="{{this._id}}">
+                                            👍 <span class="likes-count">{{this.likes}}</span>
+                                        </button>
+                                        <button class="dislike-button" data-post-id="{{this._id}}">
+                                            👎 <span class="dislikes-count">{{this.dislikes}}</span>
+                                        </button>
+                                        <span class="comments-count">💬 {{this.comments.length}}</span>
+                                    </div>
+                                    <a href="/post/{{this._id}}" class="btn btn-primary btn-sm read-more-btn">
+                                        Read More
+                                    </a>
                                 </div>
                             </div>
                         </div>

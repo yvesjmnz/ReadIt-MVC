@@ -23,14 +23,6 @@ class ReadItApp {
     }
 
     setupGlobalEventListeners() {
-        // Global click handler for navigation
-        DOMUtils.delegate(document, '[data-navigate]', 'click', (e) => {
-            const url = e.target.dataset.navigate;
-            if (url) {
-                window.location.href = url;
-            }
-        });
-
         // Global form submission prevention for AJAX forms
         DOMUtils.delegate(document, '.ajax-form', 'submit', (e) => {
             e.preventDefault();
@@ -44,6 +36,14 @@ class ReadItApp {
                     DOMUtils.hide(openModal);
                     document.body.style.overflow = 'auto';
                 }
+            }
+        });
+
+        // Handle post navigation clicks (for recent posts in profile)
+        DOMUtils.delegate(document, '[data-navigate]', 'click', (e) => {
+            const url = e.target.dataset.navigate;
+            if (url) {
+                window.location.href = url;
             }
         });
     }

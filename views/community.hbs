@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/global-dark-theme.css">
     <link rel="stylesheet" href="/css/style_community.css">
     <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body data-username="{{user.username}}" data-page="community">
     <div class="header">
@@ -75,29 +76,38 @@
             </div>
             <div class="posts-section" id="posts-container">
                 {{#each posts}}
-                    <div class="post {{#if this.locked}}locked-post{{/if}}" data-post-id="{{this._id}}" data-navigate="/post/{{this._id}}">
+                    <div class="post {{#if this.locked}}locked-post{{/if}}" data-post-id="{{this._id}}">
                         {{#if this.locked}}
                             <div class="locked-indicator">
                                 🔒 This post is locked
                                 {{#if this.lockReason}}<div class="lock-reason">Reason: {{this.lockReason}}</div>{{/if}}
                             </div>
                         {{/if}}
-                        <h3 class="post-title">{{this.title}}</h3>
+                        <h3 class="post-title">
+                            <a href="/post/{{this._id}}" class="post-title-link">{{this.title}}</a>
+                        </h3>
                         <p class="post-snippet">{{this.post_description}}</p>
                         <div class="post-meta">
-                            <p class="post-author">Posted by <a href="/profile/{{this.user}}">{{this.user}}</a></p>
+                            <p class="post-author">Posted by <a href="/profile/{{this.user}}" onclick="event.stopPropagation();">{{this.user}}</a></p>
                             <div class="post-actions" onclick="event.stopPropagation();">
-                                <button class="like-button" data-post-id="{{this._id}}">👍 <span class="likes-count">{{this.likes}}</span></button>
-                                <button class="dislike-button" data-post-id="{{this._id}}">👎 <span class="dislikes-count">{{this.dislikes}}</span></button>
-                                <span class="comments">💬 {{this.comments.length}}</span>
+                                <div class="post-stats">
+                                    <button class="like-button" data-post-id="{{this._id}}">👍 <span class="likes-count">{{this.likes}}</span></button>
+                                    <button class="dislike-button" data-post-id="{{this._id}}">👎 <span class="dislikes-count">{{this.dislikes}}</span></button>
+                                    <span class="comments">💬 {{this.comments.length}}</span>
+                                </div>
                                 
-                                {{#if (eq ../user.username this.user)}}
-                                    <button class="edit-post-btn btn btn-warning" 
-                                            data-post-id="{{this._id}}" 
-                                            data-title="{{this.title}}" 
-                                            data-description="{{this.post_description}}">Edit</button>
-                                    <button class="delete-post-btn btn btn-danger" data-post-id="{{this._id}}">Delete</button>
-                                {{/if}}
+                                <div class="post-controls">
+                                    {{#if (eq ../user.username this.user)}}
+                                        <button class="edit-post-btn btn btn-warning btn-sm" 
+                                                data-post-id="{{this._id}}" 
+                                                data-title="{{this.title}}" 
+                                                data-description="{{this.post_description}}">Edit</button>
+                                        <button class="delete-post-btn btn btn-danger btn-sm" data-post-id="{{this._id}}">Delete</button>
+                                    {{/if}}
+                                    <a href="/post/{{this._id}}" class="btn btn-primary btn-sm read-more-btn">
+                                        Read More
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

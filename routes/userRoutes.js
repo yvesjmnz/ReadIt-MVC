@@ -137,7 +137,21 @@ router.post('/profile/:username', async (req, res) => {
             updateData.profilePic = await UserService.handleFileUpload(req.files.profilePic, uploadDir);
         }
 
-        await UserService.updateProfile(req.params.username, updateData);
+        const updatedUser = await UserService.updateProfile(req.params.username, updateData);
+        
+        // Update session if user is updating their own profile
+        if (req.session.user && req.session.user.username === req.params.username) {
+            req.session.user.profilePic = updatedUser.profilePic;
+            
+            // Update remember me cookie if it exists
+            if (req.cookies.user) {
+                res.cookie('user', JSON.stringify(req.session.user), { 
+                    maxAge: 30 * 24 * 60 * 60 * 1000, 
+                    httpOnly: true 
+                });
+            }
+        }
+        
         res.redirect(`/profile/${req.params.username}`);
     } catch (error) {
         console.error(error);
