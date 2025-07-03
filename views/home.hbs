@@ -31,13 +31,71 @@
 
     <div class="main-content">
         <div class="sidebar">
-            <h2>Communities</h2>
-            <button id="create-community-btn" class="btn btn-primary">Create Community</button>
-            <ul id="community-list"></ul>
+            <div class="my-communities-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> My Communities</h2>
+                    <button id="create-community-btn" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Create
+                    </button>
+                </div>
+                <div class="communities-list">
+                    {{#if userCommunities.length}}
+                        {{#each userCommunities}}
+                            <div class="community-item">
+                                <a href="/community/{{this.name}}" class="community-link">
+                                    <div class="community-info">
+                                        <span class="community-name">{{this.name}}</span>
+                                        <span class="community-role">
+                                            {{#if (eq this.creator ../user.username)}}
+                                                <i class="fas fa-crown" title="Creator"></i>
+                                            {{else if (includes this.moderators ../user.username)}}
+                                                <i class="fas fa-shield-alt" title="Moderator"></i>
+                                            {{else}}
+                                                <i class="fas fa-user" title="Member"></i>
+                                            {{/if}}
+                                        </span>
+                                    </div>
+                                    <span class="member-count">{{this.members.length}} members</span>
+                                </a>
+                            </div>
+                        {{/each}}
+                    {{else}}
+                        <div class="empty-state">
+                            <p>You haven't joined any communities yet.</p>
+                            <small>Create or join communities to see them here!</small>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
             
-            <div class="users-section">
-                <h2>Active ReadIteers</h2>
-                <ul id="user-list"></ul>
+            <div class="all-communities-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-globe"></i> All Communities</h3>
+                </div>
+                <div class="communities-list">
+                    {{#if allCommunities.length}}
+                        {{#each allCommunities}}
+                            <div class="community-item">
+                                <a href="/community/{{this.name}}" class="community-link">
+                                    <div class="community-info">
+                                        <span class="community-name">{{this.name}}</span>
+                                        {{#if (or (eq this.creator ../user.username) (includes this.members ../user.username))}}
+                                            <span class="joined-indicator">
+                                                <i class="fas fa-check-circle" title="Joined"></i>
+                                            </span>
+                                        {{/if}}
+                                    </div>
+                                    <span class="member-count">{{this.members.length}} members</span>
+                                </a>
+                            </div>
+                        {{/each}}
+                    {{else}}
+                        <div class="empty-state">
+                            <p>No communities available.</p>
+                            <small>Be the first to create one!</small>
+                        </div>
+                    {{/if}}
+                </div>
             </div>
         </div>
 

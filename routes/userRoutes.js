@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserService = require('../services/userService');
 const PostService = require('../services/postService');
+const CommunityService = require('../services/communityService');
 const samplePosts = require('../models/samplePost');
 const sampleProfiles = require('../models/sampleProfiles');
 
@@ -19,7 +20,17 @@ router.get('/', requireLogin, async (req, res) => {
         const loggedInUser = req.session.user;
         const dbPosts = await PostService.findAll();
         const posts = [...dbPosts, ...samplePosts];
-        res.render('home', { user: loggedInUser, posts });
+        
+        // Get user's communities and all communities
+        const userCommunities = await CommunityService.getUserCommunities(loggedInUser.username);
+        const allCommunities = await CommunityService.findAll();
+        
+        res.render('home', { 
+            user: loggedInUser, 
+            posts,
+            userCommunities,
+            allCommunities
+        });
     } catch (error) {
         console.error('Error fetching home page:', error);
         res.status(500).json({ error: 'Failed to load home page' });

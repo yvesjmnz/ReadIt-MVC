@@ -241,6 +241,27 @@
         </div>
     </div>
 
+    <!-- User Role Indicator -->
+    {{#if (and user post.communityName viewerRole)}}
+        <div class="user-role-indicator">
+            <div class="role-content">
+                {{#if (eq viewerRole 'creator')}}
+                    <i class="fas fa-crown"></i>
+                    <span>You are the creator of {{post.communityName}}</span>
+                {{else if (eq viewerRole 'moderator')}}
+                    <i class="fas fa-shield-alt"></i>
+                    <span>You are a moderator in {{post.communityName}}</span>
+                {{else if (eq viewerRole 'member')}}
+                    <i class="fas fa-user"></i>
+                    <span>You are a member of {{post.communityName}}</span>
+                {{else if (eq viewerRole 'banned')}}
+                    <i class="fas fa-ban"></i>
+                    <span>You are banned from {{post.communityName}}</span>
+                {{/if}}
+            </div>
+        </div>
+    {{/if}}
+
     <!-- Load JavaScript Components -->
     <script src="/js/utils/dom.js"></script>
     <script src="/js/services/apiClient.js"></script>

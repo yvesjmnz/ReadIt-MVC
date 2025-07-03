@@ -117,6 +117,16 @@ class CommunityService {
     static getBanInfo(community, username) {
         return community.getBanInfo(username);
     }
+
+    static async getUserCommunities(username) {
+        if (!username) return [];
+        
+        const communities = await this.findAll();
+        return communities.filter(community => 
+            community.members.includes(username) || 
+            community.creator === username
+        );
+    }
 }
 
 module.exports = CommunityService;
