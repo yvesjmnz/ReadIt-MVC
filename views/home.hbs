@@ -4,17 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReadIT Home</title>
+    <link rel="stylesheet" href="/css/global-dark-theme.css">
     <link rel="stylesheet" href="/css/style_home.css">
+    <link rel="stylesheet" href="/css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
-    <script src="/js/script_home.js" defer></script>
-    <script src="/js/profileDropdown.js" defer></script>
-    <script src="/js/usersection.js" defer></script>
-    <script src="/js/submitComment.js" defer></script>
-    <script src="/js/likeDislike.js" defer></script>
-    <script src="/js/search.js" defer></script>
-    <script src="/js/sortPosts.js" defer></script>
 </head>
-<body data-username="{{user.username}}">
+<body data-username="{{user.username}}" data-page="home">
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -24,11 +19,11 @@
         </div>
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
-                <span class="username" id="username">{{user.username}}</span>
-                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
-                <div class="dropdown-content" id="dropdown-content">
+                <span class="username">{{user.username}}</span>
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic">
+                <div class="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
-                    <a href="#" id="logout">Logout</a>
+                    <a href="/logout">Logout</a>
                 </div>
             </div>
         </div>
@@ -37,9 +32,9 @@
     <div class="main-content">
         <div class="sidebar">
             <h2>Communities</h2>
-            <button id="create-community-button">Create Community</button>
+            <button id="create-community-btn" class="btn btn-primary">Create Community</button>
             <ul id="community-list"></ul>
-            <br /><br /><br />
+            
             <div class="users-section">
                 <h2>Active ReadIteers</h2>
                 <ul id="user-list"></ul>
@@ -48,45 +43,40 @@
 
         <div class="content">
             <div class="filter-section">
-                <select id="sort-filter">
+                <select id="sort-filter" class="form-control">
                     <option value="recent">Recent</option>
                     <option value="most-popular">Most Popular</option>
                     <option value="least-popular">Least Popular</option>
                     <option value="my-posts">My Posts</option>
                 </select>
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Search...">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search posts...">
                 </div>
             </div>
 
             <div class="posts-section">
                 <div id="posts-container">
                     {{#each posts}}
-                        <div class="post" data-post-id="{{this._id}}" data-tags="{{this.tags}}">
-                            <a href="/post/{{this._id}}" style="color:inherit">
-                            <p>{{this.date}}</p>
-                            <h3 class="post-title">{{this.title}}</h3>
-                            <p class="post-snippet">{{this.post_description}}</p>
-                            <p class="post-community">Posted in <a href="/community/{{this.communityName}}" style="color:inherit">{{this.communityName}}</a> by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
-                            <div class="post-stats">
-                                <button class="like-button" aria-label="Like post"><span class="likes-count">{{this.likes}}</span> 👍</button>
-                                <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{this.dislikes}}</span> 👎</button>
-                                <span class="comments-count">{{this.comments.length}} Comments</span>
+                        <div class="post" data-post-id="{{this._id}}" data-navigate="/post/{{this._id}}">
+                            <div class="post-header">
+                                <h3 class="post-title">{{this.title}}</h3>
+                                <p class="post-date">{{this.date}}</p>
                             </div>
-                            <div class="comments-section">
-                                <h4>Comments</h4>
-                                <ul>
-                                    {{#each this.comments}}
-                                        <li>
-                                            <p><strong>{{this.user}}:</strong> {{this.text}}</p>
-                                        </li>
-                                    {{/each}}
-                                </ul>
-                                <form class="comment-form" data-post-id="{{this._id}}">
-                                    <textarea name="comment" placeholder="Add a comment..." required></textarea>
-                                    <button type="submit">Submit</button>
-                                </form>
-                                </a>
+                            <p class="post-snippet">{{this.post_description}}</p>
+                            <div class="post-meta">
+                                <p class="post-community">
+                                    Posted in <a href="/community/{{this.communityName}}">{{this.communityName}}</a> 
+                                    by <a href="/profile/{{this.user}}">{{this.user}}</a>
+                                </p>
+                                <div class="post-stats" onclick="event.stopPropagation();">
+                                    <button class="like-button" data-post-id="{{this._id}}">
+                                        👍 <span class="likes-count">{{this.likes}}</span>
+                                    </button>
+                                    <button class="dislike-button" data-post-id="{{this._id}}">
+                                        👎 <span class="dislikes-count">{{this.dislikes}}</span>
+                                    </button>
+                                    <span class="comments-count">💬 {{this.comments.length}}</span>
+                                </div>
                             </div>
                         </div>
                     {{/each}}
@@ -95,5 +85,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Load JavaScript Components -->
+    <script src="/js/utils/dom.js"></script>
+    <script src="/js/services/apiClient.js"></script>
+    <script src="/js/components/notification.js"></script>
+    <script src="/js/components/modal.js"></script>
+    <script src="/js/components/form.js"></script>
+    <script src="/js/components/dropdown.js"></script>
+    <script src="/js/components/postActions.js"></script>
+    <script src="/js/components/communityActions.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>

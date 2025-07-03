@@ -1,13 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { getUserProfile, updateUserProfile, registerUser, loginUser, renderSignup, renderLogin, logoutUser } = require('../controllers/userController');
-const User = require('../models/User'); 
-const userController = require('../controllers/userController');
+const UserService = require('../services/userService');
+const PostService = require('../services/postService');
 const samplePosts = require('../models/samplePost');
 const sampleProfiles = require('../models/sampleProfiles');
-const Post = require('../models/Post');
-
 
 const requireLogin = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -17,17 +14,12 @@ const requireLogin = (req, res, next) => {
     }
 };
 
-
+// Home page
 router.get('/', requireLogin, async (req, res) => {
     try {
         const loggedInUser = req.session.user;
-
-        
-        const dbPosts = await Post.find().sort({ createdAt: -1 });
-
-        
+        const dbPosts = await PostService.findAll();
         const posts = [...dbPosts, ...samplePosts];
-
         res.render('home', { user: loggedInUser, posts });
     } catch (error) {
         console.error('Error fetching home page:', error);
@@ -35,68 +27,98 @@ router.get('/', requireLogin, async (req, res) => {
     }
 });
 
-router.get('/', requireLogin, (req, res) => {
-    const user = req.session.user; 
-    res.render('home', { user });
+// Registration
+router.get('/register', (req, res) => {
+    res.render('register');
 });
 
+router.post('/register', async (req, res) => {
+    try {
+        const { username, password, confirmPassword, quote } = req.body;
 
-router.get('/register', renderSignup);
+        if (password !== confirmPassword) {
+            return res.status(400).send('Passwords do not match');
+        }
 
+        let profilePicPath = '';
+        if (req.files && req.files.profilePic) {
+            const uploadDir = path.join(__dirname, '..', 'public', 'img');
+            profilePicPath = await UserService.handleFileUpload(req.files.profilePic, uploadDir);
+        }
 
-router.post('/register', registerUser);
+        const newUser = await UserService.create({
+            username,
+            password,
+            quote,
+            profilePic: profilePicPath
+        });
 
+        req.session.user = { username: newUser.username, profilePic: profilePicPath };
+        res.redirect('/');
+    } catch (error) {
+        console.error(error);
+        if (error.message === 'User already exists') {
+            return res.status(400).send(error.message);
+        }
+        res.status(500).send('Server Error');
+    }
+});
 
-router.get('/login', renderLogin);
+// Login
+router.get('/login', (req, res) => {
+    res.render('login');
+});
 
+router.post('/login', async (req, res) => {
+    try {
+        const { username, password, rememberMe } = req.body;
 
-router.post('/login', loginUser);
+        const user = await UserService.authenticate(username, password);
+        
+        req.session.user = { username: user.username, profilePic: user.profilePic };
 
+        if (rememberMe) {
+            res.cookie('user', JSON.stringify(req.session.user), { 
+                maxAge: 30 * 24 * 60 * 60 * 1000, 
+                httpOnly: true 
+            });
+        }
 
+        res.redirect('/');
+    } catch (error) {
+        console.error(error);
+        if (error.message === 'Invalid credentials') {
+            return res.status(400).send(error.message);
+        }
+        res.status(500).send('Server Error');
+    }
+});
+
+// Profile
 router.get('/profile/:username', async (req, res) => {
     try {
         const loggedInUser = req.session.user;
         const username = req.params.username;
 
-        
-        const userFromDB = await User.findOne({ username }).lean();
-
-        
+        const userFromDB = await UserService.findByUsername(username);
         const userFromSample = sampleProfiles.find(profile => profile.username === username);
-
-
-        
-        const isLoggedInUser = loggedInUser && loggedInUser.username === username;
-
-        
-        const dbPosts = await Post.find({ user: username });
-
-        
-        const userSamplePosts = samplePosts.filter(post => post.user === username);
-
-        
-        const posts = [...dbPosts, ...userSamplePosts];
-
-
 
         if (!userFromDB && !userFromSample) {
             return res.status(404).send('User not found');
         }
 
-        
-        if (userFromDB) {
-            
-            const isOwnProfile = loggedInUser && loggedInUser.username === username;
-            if (isOwnProfile) {
-                
-                res.render('userProfile', { visitedUser: userFromDB, loggedInUser, posts });
-            } else {
-                
-                res.render('profile', { visitedUser: userFromDB, loggedInUser, posts });
-            }
-        } else if (userFromSample) {
-            
-            res.render('profile', { visitedUser: userFromSample, loggedInUser, posts });
+        const dbPosts = await PostService.findAll();
+        const userDbPosts = dbPosts.filter(post => post.user === username);
+        const userSamplePosts = samplePosts.filter(post => post.user === username);
+        const posts = [...userDbPosts, ...userSamplePosts];
+
+        const visitedUser = userFromDB || userFromSample;
+        const isOwnProfile = loggedInUser && loggedInUser.username === username;
+
+        if (isOwnProfile) {
+            res.render('userProfile', { visitedUser, loggedInUser, posts });
+        } else {
+            res.render('profile', { visitedUser, loggedInUser, posts });
         }
     } catch (error) {
         console.error(error);
@@ -104,33 +126,47 @@ router.get('/profile/:username', async (req, res) => {
     }
 });
 
+// Update profile
+router.post('/profile/:username', async (req, res) => {
+    try {
+        const { quote } = req.body;
+        let updateData = { quote };
 
-router.post('/profile/:username', (req, res) => {
-    const { username } = req.params;
-    const user = req.session.user;
+        if (req.files && req.files.profilePic) {
+            const uploadDir = path.join(__dirname, '..', 'public', 'img');
+            updateData.profilePic = await UserService.handleFileUpload(req.files.profilePic, uploadDir);
+        }
 
-    if (req.files && req.files.profilePic) {
-        const profilePic = req.files.profilePic;
-        const uploadPath = path.join(__dirname, '..', 'public', 'img', profilePic.name);
-
-        profilePic.mv(uploadPath, (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send(err);
-            }
-
-            user.profilePic = `/img/${profilePic.name}`;
-            updateUserProfile(req, res);
-        });
-    } else {
-        updateUserProfile(req, res);
+        await UserService.updateProfile(req.params.username, updateData);
+        res.redirect(`/profile/${req.params.username}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
     }
 });
 
+// Get all users (API)
+router.get('/users', async (req, res) => {
+    try {
+        const users = await UserService.findAll();
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
 
-router.get('/users', userController.getAllUsers);
-
-
-router.get('/logout', logoutUser);
+// Logout
+router.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Server Error');
+        } else {
+            res.clearCookie('user');
+            res.redirect('/login');
+        }
+    });
+});
 
 module.exports = router;

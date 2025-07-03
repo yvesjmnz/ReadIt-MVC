@@ -1,0 +1,81 @@
+const Community = require('../models/Community');
+const User = require('../models/User');
+
+class CommunityService {
+    static async findByName(name) {
+        return await Community.findOne({ name });
+    }
+
+    static async findAll() {
+        return await Community.find();
+    }
+
+    static async create(data) {
+        const community = new Community(data);
+        return await community.save();
+    }
+
+    static async addModerator(communityName, username) {
+        const community = await this.findByName(communityName);
+        if (!community) throw new Error('Community not found');
+
+        const user = await User.findOne({ username });
+        if (!user) throw new Error('User not found');
+
+        if (community.isModerator(username)) {
+            throw new Error('User is already a moderator');
+        }
+
+        if (!community.members.includes(username)) {
+            community.members.push(username);
+        }
+
+        community.addModerator(username);
+        return await community.save();
+    }
+
+    static async removeModerator(communityName, username) {
+        const community = await this.findByName(communityName);
+        if (!community) throw new Error('Community not found');
+
+        if (!community.moderators.includes(username)) {
+            throw new Error('User is not a moderator');
+        }
+
+        community.removeModerator(username);
+        return await community.save();
+    }
+
+    static async joinCommunity(communityName, username) {
+        const community = await this.findByName(communityName);
+        if (!community) throw new Error('Community not found');
+
+        if (!community.members.includes(username)) {
+            community.members.push(username);
+            await community.save();
+        }
+        return community;
+    }
+
+    static async leaveCommunity(communityName, username) {
+        const community = await this.findByName(communityName);
+        if (!community) throw new Error('Community not found');
+
+        if (community.creator === username) {
+            throw new Error('Creator cannot leave their own community');
+        }
+
+        community.members = community.members.filter(member => member !== username);
+        community.removeModerator(username);
+        return await community.save();
+    }
+
+    static getUserRole(community, username) {
+        if (!username) return 'member';
+        if (community.creator === username) return 'creator';
+        if (community.isModerator(username)) return 'moderator';
+        return 'member';
+    }
+}
+
+module.exports = CommunityService;

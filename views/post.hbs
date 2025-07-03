@@ -4,24 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{post.title}} - ReadIT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global-dark-theme.css">
     <link rel="stylesheet" href="/css/style_post.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="/js/profileDropdown.js" defer></script>
-    <script src="/js/submitComment.js" defer></script>
-    <script src="/js/commentActions.js" defer></script>
-    <script src="/js/likeDislike.js" defer></script>
-    <script src="/js/postActions.js" defer></script>
-    <script src="/js/moderatorActions.js" defer></script>
+    <link rel="stylesheet" href="/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jomhuria&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
-<body data-username="{{#if user}}{{user.username}}{{/if}}">
-    <!-- Notification Container -->
-    <div id="notification-container"></div>
-
+<body data-username="{{#if user}}{{user.username}}{{/if}}" data-page="post">
     {{#if moderationMessage}}
-    <div class="moderation-success">
-        ✅ {{moderationMessage}}
-    </div>
+    <div class="alert alert-success">✅ {{moderationMessage}}</div>
     {{/if}}
 
     <div class="header">
@@ -34,62 +25,58 @@
         {{#if user}}
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
-                <span class="username" id="username">{{user.username}}</span>
-                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
-                <div class="dropdown-content" id="dropdown-content">
+                <span class="username">{{user.username}}</span>
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic">
+                <div class="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
-                    <a href="#" id="logout">Logout</a>
+                    <a href="/logout">Logout</a>
                 </div>
             </div>
         </div>
         {{else}}
         <div class="user-info">
-            <a href="/login" class="login-link">Login</a>
-            <a href="/register" class="register-link">Register</a>
+            <a href="/login" class="btn btn-primary">Login</a>
+            <a href="/register" class="btn btn-secondary">Register</a>
         </div>
         {{/if}}
     </div>
 
     <div class="main-content">
         <div class="content">
-            <div id="posts-container" class="posts-section">
+            <div class="posts-section">
                 <div class="post {{#if post.locked}}locked-post{{/if}}" data-post-id="{{post._id}}">
                     {{#if post.locked}}
                         <div class="locked-indicator">
                             🔒 This post is locked
-                            {{#if post.lockedBy}}
-                                by {{post.lockedBy}}
-                            {{/if}}
-                            {{#if post.lockedFormattedDate}}
-                                on {{post.lockedFormattedDate}}
-                            {{/if}}
-                            {{#if post.lockReason}}
-                                <div class="lock-reason">Reason: {{post.lockReason}}</div>
-                            {{/if}}
+                            {{#if post.lockedBy}} by {{post.lockedBy}}{{/if}}
+                            {{#if post.lockedFormattedDate}} on {{post.lockedFormattedDate}}{{/if}}
+                            {{#if post.lockReason}}<div class="lock-reason">Reason: {{post.lockReason}}</div>{{/if}}
                         </div>
                     {{/if}}
                     
                     <div class="post-header">
-                        <h2>{{post.title}}</h2>
+                        <h1>{{post.title}}</h1>
                     </div>
                     
-                    <p class="post-description">{{post.post_description}}</p>
+                    <div class="post-content">
+                        <p>{{post.post_description}}</p>
+                    </div>
                     
                     <div class="post-meta">
-                        <p class="post-community">
+                        <p class="post-info">
                             Posted in 
                             {{#if post.communityName}}
-                                <a href="/community/{{post.communityName}}" style="color:inherit">{{post.communityName}}</a>
+                                <a href="/community/{{post.communityName}}">{{post.communityName}}</a>
                             {{else}}
                                 <span>General</span>
                             {{/if}}
                             by 
-                            <span class="post-author-info">
-                                <a href="/profile/{{post.user}}" style="color:inherit">{{post.user}}</a>
+                            <span class="post-author">
+                                <a href="/profile/{{post.user}}">{{post.user}}</a>
                                 {{#if post.authorIsCreator}}
-                                    <span class="author-role-badge creator">👑 Creator</span>
+                                    <span class="role-badge creator">👑 Creator</span>
                                 {{else if post.authorIsModerator}}
-                                    <span class="author-role-badge moderator">🛡️ Moderator</span>
+                                    <span class="role-badge moderator">🛡️ Moderator</span>
                                 {{/if}}
                             </span>
                             {{#if post.formattedDate}}
@@ -101,49 +88,46 @@
                     {{#if isLoggedIn}}
                     <div class="post-actions">
                         {{#if post.canEdit}}
-                            <button class="edit-post-button yellow-button" onclick="editPost('{{post._id}}', '{{post.title}}', '{{post.post_description}}')">
+                            <button class="edit-post-btn btn btn-warning" 
+                                    data-post-id="{{post._id}}" 
+                                    data-title="{{post.title}}" 
+                                    data-description="{{post.post_description}}">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                             </button>
                         {{/if}}
                         
                         {{#if post.canDelete}}
-                            <button class="delete-post-button red-button" onclick="deletePost('{{post._id}}')">
+                            <button class="delete-post-btn btn btn-danger" data-post-id="{{post._id}}">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </button>
                         {{/if}}
                         
                         {{#if post.canLock}}
-                            {{#if post.locked}}
-                                <!-- Unlock Button -->
-                                <button class="moderate-post-button unlock-button" onclick="showUnlockConfirmation('{{post._id}}')">
-                                    <i class="fa-solid fa-unlock"></i> Unlock
-                                </button>
-                            {{else}}
-                                <!-- Lock Form -->
-                                <button class="moderate-post-button lock-button" onclick="showLockForm('{{post._id}}')">
-                                    <i class="fa-solid fa-lock"></i> Lock
-                                </button>
-                            {{/if}}
-                        {{/if}}
-                        
-                        {{#if post.showModLabel}}
-                            <span class="mod-action-label">You can moderate this post</span>
+                            <button class="moderate-post-btn btn {{#if post.locked}}btn-success{{else}}btn-warning{{/if}}" 
+                                    data-post-id="{{post._id}}" 
+                                    data-locked="{{post.locked}}">
+                                <i class="fa-solid fa-{{#if post.locked}}unlock{{else}}lock{{/if}}"></i> 
+                                {{#if post.locked}}Unlock{{else}}Lock{{/if}}
+                            </button>
                         {{/if}}
                     </div>
                     {{/if}}
 
                     <div class="post-stats">
                         {{#if (and isLoggedIn (not post.locked))}}
-                            <button class="like-button" aria-label="Like post"><span class="likes-count">{{post.likes}}</span> 👍</button>
-                            <button class="dislike-button" aria-label="Dislike post"><span class="dislikes-count">{{post.dislikes}}</span> 👎</button>
+                            <button class="like-button" data-post-id="{{post._id}}">
+                                👍 <span class="likes-count">{{post.likes}}</span>
+                            </button>
+                            <button class="dislike-button" data-post-id="{{post._id}}">
+                                👎 <span class="dislikes-count">{{post.dislikes}}</span>
+                            </button>
                         {{else}}
-                            <span class="likes-display">{{post.likes}} 👍</span>
-                            <span class="dislikes-display">{{post.dislikes}} 👎</span>
+                            <span class="likes-display">👍 {{post.likes}}</span>
+                            <span class="dislikes-display">👎 {{post.dislikes}}</span>
                         {{/if}}
-                        <span class="comments-count">{{post.comments.length}} Comments</span>
+                        <span class="comments-count">💬 {{post.comments.length}} Comments</span>
                     </div>
 
-                    <!-- Moderation History -->
                     {{#if (and post.violations.length viewerIsModerator)}}
                     <div class="moderation-history">
                         <h4>Moderation History</h4>
@@ -165,69 +149,78 @@
                     {{/if}}
 
                     <div class="comments-section">
-                        <h4>Comments</h4>
+                        <h3>Comments</h3>
                         {{#if post.comments.length}}
-                        <ul>
+                        <div class="comments-list">
                             {{#each post.comments}}
-                                <li class="comment-item" data-comment-id="{{this._id}}">
+                                <div class="comment-item" data-comment-id="{{this._id}}">
                                     <div class="comment-content">
-                                        <p class="comment-user">
-                                            <span class="comment-author-info">
-                                                <strong><a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></strong>
-                                                {{#if this.authorIsCreator}}
-                                                    <span class="author-role-badge creator">👑</span>
-                                                {{else if this.authorIsModerator}}
-                                                    <span class="author-role-badge moderator">🛡️</span>
-                                                {{/if}}
-                                            </span>
-                                            <span class="comment-text">{{this.text}}</span>
-                                            {{#if this.edited}}<em class="edited-label">(edited)</em>{{/if}}
-                                        </p>
-                                        {{#if this.formattedDate}}
-                                        <div class="comment-meta">
-                                            <span class="comment-date">{{this.formattedDate}}</span>
+                                        <div class="comment-author">
+                                            <strong><a href="/profile/{{this.user}}">{{this.user}}</a></strong>
+                                            {{#if this.authorIsCreator}}
+                                                <span class="role-badge creator">👑</span>
+                                            {{else if this.authorIsModerator}}
+                                                <span class="role-badge moderator">🛡️</span>
+                                            {{/if}}
+                                            {{#if this.formattedDate}}
+                                                <span class="comment-date">{{this.formattedDate}}</span>
+                                            {{/if}}
                                         </div>
-                                        {{/if}}
+                                        <div class="comment-text">
+                                            {{this.text}}
+                                            {{#if this.edited}}<em class="edited-label">(edited)</em>{{/if}}
+                                        </div>
                                     </div>
                                     
                                     {{#if ../isLoggedIn}}
                                     <div class="comment-actions">
                                         {{#if this.canEdit}}
-                                            <button class="edit-button" onclick="editComment('{{../post._id}}', '{{this._id}}', '{{this.text}}')">
+                                            <button class="edit-comment-btn btn btn-sm btn-warning" 
+                                                    data-post-id="{{../post._id}}" 
+                                                    data-comment-id="{{this._id}}" 
+                                                    data-text="{{this.text}}">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
                                         {{/if}}
                                         
                                         {{#if this.canDelete}}
-                                            <button class="delete-button" onclick="deleteComment('{{../post._id}}', '{{this._id}}')">
+                                            <button class="delete-comment-btn btn btn-sm btn-danger" 
+                                                    data-post-id="{{../post._id}}" 
+                                                    data-comment-id="{{this._id}}">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         {{/if}}
-                                        
-                                        {{#if this.showModLabel}}
-                                            <span class="mod-action-label">Mod Action</span>
-                                        {{/if}}
                                     </div>
                                     {{/if}}
-                                </li>
+                                </div>
                             {{/each}}
-                        </ul>
+                        </div>
                         {{else}}
                         <p class="no-comments">No comments yet. Be the first to comment!</p>
                         {{/if}}
                         
                         {{#if (and isLoggedIn (not post.locked))}}
-                            <form class="comment-form" data-post-id="{{post._id}}">
-                                <textarea name="comment" placeholder="Add a comment..." required maxlength="1000"></textarea>
-                                <div class="comment-form-actions">
-                                    <span class="char-count">0/1000</span>
-                                    <button type="submit"><i class="fa-solid fa-comment"></i> Comment</button>
+                            <form id="comment-form" class="comment-form ajax-form" data-post-id="{{post._id}}">
+                                <div class="form-group">
+                                    <textarea name="text" placeholder="Add a comment..." 
+                                              required maxlength="1000" rows="3"
+                                              data-max-length="1000" data-counter="comment-count"></textarea>
+                                    <div class="char-counter" id="comment-count">0/1000</div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa-solid fa-comment"></i> Comment
+                                    </button>
                                 </div>
                             </form>
                         {{else if post.locked}}
-                            <p class="locked-message">🔒 This post is locked. No new comments can be added.</p>
+                            <div class="alert alert-warning">
+                                🔒 This post is locked. No new comments can be added.
+                            </div>
                         {{else}}
-                            <p class="login-prompt">Please <a href="/login">login</a> to comment.</p>
+                            <div class="alert alert-info">
+                                Please <a href="/login">login</a> to comment.
+                            </div>
                         {{/if}}
                     </div>
                 </div>
@@ -235,71 +228,16 @@
         </div>
     </div>
 
-    <!-- Simple Lock Form Modal -->
-    <div id="lock-form-modal" class="simple-modal" style="display: none;">
-        <div class="simple-modal-content">
-            <h3>Lock Post</h3>
-            <form method="POST" id="lock-form">
-                <div class="form-group">
-                    <label for="lock-reason">Reason for locking this post:</label>
-                    <textarea id="lock-reason" name="reason" placeholder="Enter the violation reason..." required minlength="5" maxlength="500" rows="3"></textarea>
-                    <small>Minimum 5 characters required</small>
-                </div>
-                <input type="hidden" name="action" value="lock">
-                <div class="form-actions">
-                    <button type="submit" class="red-button">Lock Post</button>
-                    <button type="button" class="cancel-btn" onclick="hideLockForm()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Enhanced Unlock Confirmation Modal -->
-    <div id="unlock-confirmation-modal" class="simple-modal" style="display: none;">
-        <div class="simple-modal-content unlock-modal">
-            <div class="unlock-modal-header">
-                <span class="unlock-icon">🔓</span>
-                <h3>Unlock Post</h3>
-            </div>
-            <div class="unlock-modal-body">
-                <p class="unlock-message">Are you sure you want to unlock this post?</p>
-                <div class="unlock-info">
-                    <div class="unlock-info-item">
-                        <span class="info-icon">✅</span>
-                        <span>Users will be able to comment again</span>
-                    </div>
-                    <div class="unlock-info-item">
-                        <span class="info-icon">📝</span>
-                        <span>Post will be marked as unlocked in moderation history</span>
-                    </div>
-                    <div class="unlock-info-item">
-                        <span class="info-icon">👁️</span>
-                        <span>Action will be visible to other moderators</span>
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button id="unlock-confirm-btn" class="unlock-button">
-                    <span class="button-icon">🔓</span>
-                    Unlock Post
-                </button>
-                <button id="unlock-cancel-btn" class="cancel-btn">Cancel</button>
-            </div>
-        </div>
-    </div>
-    <!-- Viewer Role Info (for debugging/info - can be removed) -->
-    {{#if isLoggedIn}}
-    <div class="viewer-info" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px;">
-        Your role: 
-        {{#if viewerIsCreator}}
-            👑 Creator
-        {{else if viewerIsModerator}}
-            🛡️ Moderator
-        {{else}}
-            👤 Member
-        {{/if}}
-    </div>
-    {{/if}}
+    <!-- Load JavaScript Components -->
+    <script src="/js/utils/dom.js"></script>
+    <script src="/js/services/apiClient.js"></script>
+    <script src="/js/components/notification.js"></script>
+    <script src="/js/components/modal.js"></script>
+    <script src="/js/components/form.js"></script>
+    <script src="/js/components/dropdown.js"></script>
+    <script src="/js/components/postActions.js"></script>
+    <script src="/js/components/commentActions.js"></script>
+    <script src="/js/app.js"></script>
 
     <script>
         // Pass data to JavaScript
@@ -310,527 +248,6 @@
             isLoggedIn: {{#if isLoggedIn}}true{{else}}false{{/if}},
             isLocked: {{#if post.locked}}true{{else}}false{{/if}}
         };
-        
-        // Simple functions to show/hide lock form
-        function showLockForm(postId) {
-            const modal = document.getElementById('lock-form-modal');
-            const form = document.getElementById('lock-form');
-            form.action = `/post/${postId}/moderate`;
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            document.getElementById('lock-reason').focus();
-        }
-
-        function hideLockForm() {
-            const modal = document.getElementById('lock-form-modal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            document.getElementById('lock-reason').value = '';
-        }
-
-        // Enhanced unlock confirmation function
-        function showUnlockConfirmation(postId) {
-            const modal = document.getElementById('unlock-confirmation-modal');
-            const confirmBtn = document.getElementById('unlock-confirm-btn');
-            const cancelBtn = document.getElementById('unlock-cancel-btn');
-            
-            // Set up the confirmation button
-            confirmBtn.onclick = function() {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                submitUnlockForm(postId);
-            };
-            
-            // Set up the cancel button
-            cancelBtn.onclick = function() {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            };
-            
-            // Show the modal
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Submit unlock form
-        function submitUnlockForm(postId) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/post/${postId}/moderate`;
-
-            const actionInput = document.createElement('input');
-            actionInput.type = 'hidden';
-            actionInput.name = 'action';
-            actionInput.value = 'unlock';
-            form.appendChild(actionInput);
-
-            const reasonInput = document.createElement('input');
-            reasonInput.type = 'hidden';
-            reasonInput.name = 'reason';
-            reasonInput.value = 'Post unlocked by moderator';
-            form.appendChild(reasonInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Notification function
-        function showNotification(message, type = 'info') {
-            let container = document.getElementById('notification-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'notification-container';
-                document.body.appendChild(container);
-            }
-
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            
-            notification.innerHTML = `
-                <span class="notification-message">${message}</span>
-                <button class="notification-close">&times;</button>
-            `;
-            
-            container.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 5000);
-            
-            notification.querySelector('.notification-close').addEventListener('click', () => {
-                notification.remove();
-            });
-        }
-        
-        // Character counter for comment form
-        document.addEventListener('DOMContentLoaded', function() {
-            const commentTextarea = document.querySelector('.comment-form textarea');
-            const charCount = document.querySelector('.char-count');
-            
-            if (commentTextarea && charCount) {
-                commentTextarea.addEventListener('input', function() {
-                    const length = this.value.length;
-                    charCount.textContent = `${length}/1000`;
-                    
-                    if (length > 900) {
-                        charCount.style.color = '#dc3545';
-                    } else if (length > 800) {
-                        charCount.style.color = '#ffc107';
-                    } else {
-                        charCount.style.color = '#6c757d';
-                    }
-                });
-            }
-
-            // Close modal when clicking outside
-            const modal = document.getElementById('lock-form-modal');
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        hideLockForm();
-                    }
-                });
-            }
-            
-            // Auto-hide moderation success message
-            const moderationSuccess = document.querySelector('.moderation-success');
-            if (moderationSuccess) {
-                setTimeout(() => {
-                    moderationSuccess.style.opacity = '0';
-                    setTimeout(() => {
-                        moderationSuccess.remove();
-                    }, 300);
-                }, 5000);
-            }
-        });
     </script>
-
-    <style>
-        .post-author-info, .comment-author-info {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .author-role-badge {
-            font-size: 0.7em;
-            padding: 2px 4px;
-            border-radius: 8px;
-            font-weight: bold;
-            vertical-align: middle;
-        }
-        
-        .author-role-badge.creator {
-            background-color: #ffd700;
-            color: #000;
-        }
-        
-        .author-role-badge.moderator {
-            background-color: #007BFF;
-            color: #fff;
-        }
-        
-        .mod-action-label {
-            font-size: 0.7em;
-            color: #007BFF;
-            font-weight: bold;
-            padding: 2px 6px;
-            background-color: rgba(0, 123, 255, 0.1);
-            border-radius: 10px;
-            margin-left: 5px;
-        }
-        
-        .viewer-info {
-            z-index: 1000;
-        }
-
-        /* Moderation Success Message */
-        .moderation-success {
-            background-color: #28a745;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            transition: opacity 0.3s ease;
-        }
-
-        /* Yellow Edit Button */
-        .yellow-button {
-            background-color: #ffc107 !important;
-            color: #000 !important;
-        }
-
-        .yellow-button:hover {
-            background-color: #e0a800 !important;
-        }
-
-        /* Red Delete Button */
-        .red-button {
-            background-color: #dc3545 !important;
-            color: white !important;
-        }
-
-        .red-button:hover {
-            background-color: #c82333 !important;
-        }
-
-        /* Lock/Unlock Buttons */
-        .lock-button {
-            background-color: #fd7e14 !important;
-            color: white !important;
-        }
-
-        .lock-button:hover {
-            background-color: #e8690b !important;
-        }
-
-        .unlock-button {
-            background-color: #20c997 !important;
-            color: white !important;
-        }
-
-        .unlock-button:hover {
-            background-color: #1aa085 !important;
-        }
-
-        /* Locked Post Styling */
-        .locked-post {
-            opacity: 0.8;
-            border-left: 4px solid #fd7e14;
-            background-color: rgba(253, 126, 20, 0.05);
-        }
-
-        .locked-indicator {
-            background-color: #fd7e14;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .lock-reason {
-            font-size: 0.8em;
-            margin-top: 6px;
-            opacity: 0.9;
-            font-style: italic;
-        }
-
-        .locked-message {
-            background-color: rgba(253, 126, 20, 0.1);
-            color: #fd7e14;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        /* Moderation History */
-        .moderation-history {
-            background-color: rgba(0, 123, 255, 0.05);
-            border: 1px solid rgba(0, 123, 255, 0.2);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-
-        .moderation-history h4 {
-            margin: 0 0 15px 0;
-            color: #007BFF;
-            font-size: 1.1em;
-        }
-
-        .violations-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .violation-item {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            padding: 12px;
-            border-left: 4px solid;
-        }
-
-        .violation-item.locked {
-            border-left-color: #fd7e14;
-        }
-
-        .violation-item.unlocked {
-            border-left-color: #20c997;
-        }
-
-        .violation-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-        .violation-action {
-            font-weight: bold;
-        }
-
-        .violation-moderator {
-            color: #007BFF;
-            font-weight: bold;
-        }
-
-        .violation-date {
-            color: #6c757d;
-            font-size: 0.8em;
-        }
-
-        .violation-reason {
-            font-style: italic;
-            color: #333;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-        }
-
-        /* Button spacing */
-        .post-actions button {
-            margin-right: 10px;
-            margin-bottom: 5px;
-        }
-
-        /* Simple Modal Styles */
-        .simple-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .simple-modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .simple-modal-content h3 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        .simple-modal-content .form-group {
-            margin-bottom: 15px;
-        }
-
-        .simple-modal-content label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .simple-modal-content textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: inherit;
-            resize: vertical;
-            box-sizing: border-box;
-        }
-
-        .simple-modal-content textarea:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-
-        .simple-modal-content small {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .simple-modal-content .form-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .simple-modal-content .cancel-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .simple-modal-content .cancel-btn:hover {
-            background: #5a6268;
-        }
-
-        /* Enhanced Unlock Modal Styles */
-        .unlock-modal {
-            max-width: 500px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .unlock-modal-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #20c997;
-        }
-
-        .unlock-icon {
-            font-size: 2em;
-            color: #20c997;
-        }
-
-        .unlock-modal-header h3 {
-            margin: 0;
-            color: #20c997;
-            font-size: 1.5em;
-        }
-
-        .unlock-modal-body {
-            margin-bottom: 25px;
-        }
-
-        .unlock-message {
-            font-size: 1.1em;
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
-
-        .unlock-info {
-            background-color: rgba(32, 201, 151, 0.1);
-            border: 1px solid rgba(32, 201, 151, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        .unlock-info-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-            color: #333;
-        }
-
-        .unlock-info-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-icon {
-            font-size: 1.1em;
-            width: 20px;
-            text-align: center;
-        }
-
-        .unlock-modal .form-actions {
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .unlock-modal .unlock-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 1.05em;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            background-color: #20c997 !important;
-            color: white !important;
-            border: none;
-            cursor: pointer;
-        }
-
-        .unlock-modal .unlock-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
-            background-color: #1aa085 !important;
-        }
-
-        .unlock-modal .cancel-btn {
-            padding: 12px 24px;
-            font-size: 1.05em;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .unlock-modal .cancel-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-        }
-
-        .button-icon {
-            font-size: 1.1em;
-        }
-    </style>
 </body>
 </html>

@@ -3,64 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
+    <title>{{visitedUser.username}} - ReadIT</title>
+    <link rel="stylesheet" href="/css/global-dark-theme.css">
     <link rel="stylesheet" href="/css/style_userprofile.css">
-    <script src="/js/script_userprofile.js" defer></script>
-    <script src="/js/profileDropdown.js" defer></script>
-    <script src="/js/followButton.js" defer></script>
+    <link rel="stylesheet" href="/css/components.css">
 </head>
-<body>
-<div class="header">
-    <div class="logo-container">
-        <a href="/">
-            <img src="/img/ReadIt.png" alt="ReadIT logo" class="logo">
-            <h1 class="site-title">Read<span class="highlight">IT</span></h1>
-        </a>
-    </div>
-    <div class="user-info">
-        <div class="dropdown" id="profile-dropdown" onclick="toggleDropdown()">
-            <span class="username" id="username">{{loggedInUser.username}}</span>
-            <img src="{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
-            <div class="dropdown-content" id="dropdown-content">
-                <a href="/profile/{{loggedInUser.username}}">View Profile</a>
-                <a href="#" id="logout">Logout</a>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="content">
-    <div class="profile-header">
-        <div class="profile-pic-container">
-            <img src="{{visitedUser.profilePic}}" alt="Profile Picture" class="profile-pic-large" id="profile-pic-large">
-        </div>
-        <div class="profile-details">
-            <h2 class="profile-username">{{visitedUser.username}}</h2>
-            <div class="quote-container">
-                <p class="profile-quote">{{visitedUser.quote}}</p>
-            </div>
-        </div>
-        <div class="profile-buttons">
-            <button class="follow-button" id="follow-button" onclick="followUser()">Follow</button>
-        </div>
-    </div>
-    <div class="sections">
-         <div class="recents">
-            <h3>Recent Posts</h3>
-            {{#each posts}}
-            <a href="/post/{{this._id}}" style="color:inherit">
-            <button class="recent-button" >
-                <span class="recent-title">{{this.title}}</span>
-                <div class="recent-stats">
-                    <span>&#x1F44D; {{this.likes}}</span>
-                    <span>&#x1F44E; {{this.dislikes}}</span>
-                    <span>&#x1F4AC; {{this.comments.length}} comments</span>
-                    
-                </div>
-            </button>
+<body data-username="{{loggedInUser.username}}" data-page="profile">
+    <div class="header">
+        <div class="logo-container">
+            <a href="/">
+                <img src="/img/ReadIt.png" alt="ReadIT logo" class="logo">
+                <h1 class="site-title">Read<span class="highlight">IT</span></h1>
             </a>
-            {{/each}}
+        </div>
+        <div class="user-info">
+            <div class="dropdown" id="profile-dropdown">
+                <span class="username">{{loggedInUser.username}}</span>
+                <img src="{{loggedInUser.profilePic}}" alt="Profile Picture" class="profile-pic">
+                <div class="dropdown-content">
+                    <a href="/profile/{{loggedInUser.username}}">View Profile</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <div class="content">
+        <div class="profile-header">
+            <div class="profile-pic-container">
+                <img src="{{visitedUser.profilePic}}" alt="Profile Picture" class="profile-pic-large">
+            </div>
+            <div class="profile-details">
+                <h2 class="profile-username">{{visitedUser.username}}</h2>
+                <div class="quote-container">
+                    <p class="profile-quote">{{visitedUser.quote}}</p>
+                </div>
+            </div>
+            <div class="profile-buttons">
+                {{#unless (eq loggedInUser.username visitedUser.username)}}
+                    <button class="follow-button btn btn-primary" data-username="{{visitedUser.username}}">
+                        Follow
+                    </button>
+                {{/unless}}
+            </div>
+        </div>
+
+        <div class="sections">
+            <div class="recents">
+                <h3>Recent Posts</h3>
+                {{#if posts.length}}
+                    {{#each posts}}
+                        <div class="recent-post" data-navigate="/post/{{this._id}}">
+                            <div class="recent-title">{{this.title}}</div>
+                            <div class="recent-stats">
+                                <span class="stat">👍 {{this.likes}}</span>
+                                <span class="stat">👎 {{this.dislikes}}</span>
+                                <span class="stat">💬 {{this.comments.length}}</span>
+                            </div>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <p class="no-posts">No posts yet.</p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript Components --<script src="/js/utils/dom.js"></script>
+    <script src="/js/services/apiClient.js"></script>
+    <script src="/js/components/notification.js"></script>
+    <script src="/js/components/modal.js"></script>
+    <script src="/js/components/dropdown.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>

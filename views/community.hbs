@@ -3,18 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{community.name}}</title>
+    <title>{{community.name}} - ReadIT</title>
+    <link rel="stylesheet" href="/css/global-dark-theme.css">
     <link rel="stylesheet" href="/css/style_community.css">
-    <script src="/js/profileDropdown.js" defer></script>
-    <script src="/js/createPost.js" defer></script>
-    <script src="/js/navigateToPost.js" defer></script>
-    <script src="/js/moderatorActions.js" defer></script>
-    <script src="/js/postActions.js" defer></script>
+    <link rel="stylesheet" href="/css/components.css">
 </head>
-<body>
-    <!-- Notification System -->
-    <div id="notification-container"></div>
-
+<body data-username="{{user.username}}" data-page="community">
     <div class="header">
         <div class="logo-container">
             <a href="/">
@@ -24,11 +18,11 @@
         </div>
         <div class="user-info">
             <div class="dropdown" id="profile-dropdown">
-                <span class="username" id="username">{{user.username}}</span>
-                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic" id="profile-pic">
-                <div class="dropdown-content" id="dropdown-content">
+                <span class="username">{{user.username}}</span>
+                <img src="/img/{{user.profilePic}}" alt="Profile Picture" class="profile-pic">
+                <div class="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
-                    <a href="#" id="logout">Logout</a>
+                    <a href="/logout">Logout</a>
                 </div>
             </div>
         </div>
@@ -39,44 +33,36 @@
             <div class="community-header">
                 <h2>{{community.name}}</h2>
                 <p class="community-description">{{community.description}}</p>
-                <p class="post-counter">{{#if posts.length}}{{posts.length}}{{else}}0{{/if}} posts available in this community!</p>
+                <p class="post-counter">{{#if posts.length}}{{posts.length}}{{else}}0{{/if}} posts available</p>
                 
-                <!-- Community Stats -->
                 <div class="community-stats">
                     <p><strong>Creator:</strong> <a href="/profile/{{community.creator}}">{{community.creator}}</a></p>
                     <p><strong>Members:</strong> {{community.members.length}}</p>
                     <p><strong>Moderators:</strong> {{community.moderators.length}}</p>
                 </div>
 
-                <!-- User Role Badge -->
                 {{#if community.userRole}}
                     <div class="user-role-badge {{community.userRole}}">
-                        {{#if (eq community.userRole 'creator')}}
-                            👑 Creator
-                        {{else if (eq community.userRole 'moderator')}}
-                            🛡️ Moderator
-                        {{else}}
-                            👤 Member
-                        {{/if}}
+                        {{#if (eq community.userRole 'creator')}}👑 Creator
+                        {{else if (eq community.userRole 'moderator')}}🛡️ Moderator
+                        {{else}}👤 Member{{/if}}
                     </div>
                 {{/if}}
 
-                <!-- Moderator Actions (Only for Creator) -->
                 {{#if (eq community.userRole 'creator')}}
                     <div class="moderator-actions">
                         <h3>Moderator Management</h3>
-                        <button id="add-moderator-btn" class="blue-button">Add Moderator</button>
-                        <button id="view-moderators-btn" class="green-button">View Moderators</button>
+                        <button id="add-moderator-btn" class="btn btn-primary">Add Moderator</button>
+                        <button id="view-moderators-btn" class="btn btn-success">View Moderators</button>
                     </div>
                 {{/if}}
 
-                <!-- Join/Leave Community -->
                 {{#if user}}
                     {{#unless (or (eq community.userRole 'creator') (includes community.members user.username))}}
-                        <button id="join-community-btn" class="green-button" data-community="{{community.name}}">Join Community</button>
+                        <button id="join-community-btn" class="btn btn-success" data-community="{{community.name}}">Join Community</button>
                     {{/unless}}
                     {{#if (and (includes community.members user.username) (ne community.userRole 'creator'))}}
-                        <button id="leave-community-btn" class="red-button" data-community="{{community.name}}">Leave Community</button>
+                        <button id="leave-community-btn" class="btn btn-danger" data-community="{{community.name}}">Leave Community</button>
                     {{/if}}
                 {{/if}}
             </div>
@@ -85,175 +71,53 @@
         <div class="posts-container">
             <div class="posts-header">
                 <h2>Posts</h2>
-                <button id="create-post-button" class="blue-button">Create Post</button>
+                <button id="create-post-btn" class="btn btn-primary">Create Post</button>
             </div>
-            <div class="posts-section">
+            <div class="posts-section" id="posts-container">
                 {{#each posts}}
-                    <div class="post {{#if this.locked}}locked-post{{/if}}" data-post-id="{{this._id}}" onclick="window.location.href='/post/{{this._id}}'">
+                    <div class="post {{#if this.locked}}locked-post{{/if}}" data-post-id="{{this._id}}" data-navigate="/post/{{this._id}}">
                         {{#if this.locked}}
                             <div class="locked-indicator">
                                 🔒 This post is locked
-                                {{#if this.lockReason}}
-                                    <div class="lock-reason">Reason: {{this.lockReason}}</div>
-                                {{/if}}
+                                {{#if this.lockReason}}<div class="lock-reason">Reason: {{this.lockReason}}</div>{{/if}}
                             </div>
                         {{/if}}
                         <h3 class="post-title">{{this.title}}</h3>
                         <p class="post-snippet">{{this.post_description}}</p>
                         <div class="post-meta">
-                            <p class="post-author">Posted by <a href="/profile/{{this.user}}" style="color:inherit">{{this.user}}</a></p>
+                            <p class="post-author">Posted by <a href="/profile/{{this.user}}">{{this.user}}</a></p>
                             <div class="post-actions" onclick="event.stopPropagation();">
-                                <span class="likes">👍 {{this.likes}}</span>
-                                <span class="dislikes">👎 {{this.dislikes}}</span>
+                                <button class="like-button" data-post-id="{{this._id}}">👍 <span class="likes-count">{{this.likes}}</span></button>
+                                <button class="dislike-button" data-post-id="{{this._id}}">👎 <span class="dislikes-count">{{this.dislikes}}</span></button>
                                 <span class="comments">💬 {{this.comments.length}}</span>
+                                
+                                {{#if (eq ../user.username this.user)}}
+                                    <button class="edit-post-btn btn btn-warning" 
+                                            data-post-id="{{this._id}}" 
+                                            data-title="{{this.title}}" 
+                                            data-description="{{this.post_description}}">Edit</button>
+                                    <button class="delete-post-btn btn btn-danger" data-post-id="{{this._id}}">Delete</button>
+                                {{/if}}
                             </div>
                         </div>
                     </div>
                 {{else}}
                     <p id="no-posts-message">No posts available yet</p>
                 {{/each}}
-                <button id="load-more-button" class="green-button">Load More</button>
             </div>
         </div>
     </div>
 
-    <!-- Add Moderator Modal -->
-    <div id="add-moderator-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Add Moderator</h2>
-            <div id="moderator-selection-loading" class="loading-spinner" style="display: none;">
-                Loading members...
-            </div>
-            <div id="moderator-selection-content">
-                <p>Select a member to promote to moderator:</p>
-                <div id="available-members" class="member-list">
-                    <!-- Members will be loaded here -->
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Moderators Modal -->
-    <div id="view-moderators-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Community Moderators</h2>
-            <div id="moderators-loading" class="loading-spinner" style="display: none;">
-                Loading moderators...
-            </div>
-            <div id="moderators-list">
-                <!-- Moderators will be loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Create Post Modal -->
-    <div id="create-post-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Create New Post</h2>
-            <form id="create-post-form">
-                <div class="form-group">
-                    <label for="post-title">Title:</label>
-                    <input type="text" id="post-title" name="title" required maxlength="200" minlength="5">
-                    <div class="char-counter">
-                        <span id="title-char-count">0/200</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="post-description">Description:</label>
-                    <textarea id="post-description" name="post_description" required maxlength="5000" minlength="10" rows="6"></textarea>
-                    <div class="char-counter">
-                        <span id="description-char-count">0/5000</span>
-                    </div>
-                </div>
-                <input type="hidden" id="post-community" name="communityName" value="{{community.name}}">
-                <div class="form-actions">
-                    <button type="submit" class="blue-button" id="submit-post-btn">Create Post</button>
-                    <button type="button" class="cancel-btn">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit Post Modal -->
-    <div id="edit-post-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Post</h2>
-            <form id="edit-post-form">
-                <div class="form-group">
-                    <label for="edit-post-title">Title:</label>
-                    <input type="text" id="edit-post-title" name="title" required maxlength="200" minlength="5">
-                    <div class="char-counter">
-                        <span id="edit-title-char-count">0/200</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="edit-post-description">Description:</label>
-                    <textarea id="edit-post-description" name="post_description" required maxlength="5000" minlength="10" rows="6"></textarea>
-                    <div class="char-counter">
-                        <span id="edit-description-char-count">0/5000</span>
-                    </div>
-                </div>
-                <input type="hidden" id="edit-post-id" name="postId">
-                <div class="form-actions">
-                    <button type="submit" class="blue-button" id="update-post-btn">Update Post</button>
-                    <button type="button" class="cancel-btn">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h3 id="confirmation-title">Confirm Action</h3>
-            <p id="confirmation-message">Are you sure you want to perform this action?</p>
-            <div class="form-actions">
-                <button id="confirm-yes" class="red-button">Yes</button>
-                <button id="confirm-no" class="cancel-btn">No</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Enhanced Unlock Confirmation Modal -->
-    <div id="unlock-confirmation-modal" class="modal" style="display: none;">
-        <div class="modal-content unlock-modal">
-            <div class="unlock-modal-header">
-                <span class="unlock-icon">🔓</span>
-                <h3>Unlock Post</h3>
-            </div>
-            <div class="unlock-modal-body">
-                <p class="unlock-message">Are you sure you want to unlock this post?</p>
-                <div class="unlock-info">
-                    <div class="unlock-info-item">
-                        <span class="info-icon">✅</span>
-                        <span>Users will be able to comment again</span>
-                    </div>
-                    <div class="unlock-info-item">
-                        <span class="info-icon">📝</span>
-                        <span>Post will be marked as unlocked in moderation history</span>
-                    </div>
-                    <div class="unlock-info-item">
-                        <span class="info-icon">👁️</span>
-                        <span>Action will be visible to other moderators</span>
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button id="unlock-confirm-btn" class="unlock-button">
-                    <span class="button-icon">🔓</span>
-                    Unlock Post
-                </button>
-                <button id="unlock-cancel-btn" class="cancel-btn">Cancel</button>
-            </div>
-        </div>
-    </div>
+    <!-- Load JavaScript Components -->
+    <script src="/js/utils/dom.js"></script>
+    <script src="/js/services/apiClient.js"></script>
+    <script src="/js/components/notification.js"></script>
+    <script src="/js/components/modal.js"></script>
+    <script src="/js/components/form.js"></script>
+    <script src="/js/components/dropdown.js"></script>
+    <script src="/js/components/postActions.js"></script>
+    <script src="/js/components/communityActions.js"></script>
+    <script src="/js/app.js"></script>
 
     <script>
         // Pass community data to JavaScript
@@ -261,425 +125,6 @@
             name: '{{community.name}}',
             userRole: '{{community.userRole}}'
         };
-
-        // Edit Post Function for Community Page
-        function editPost(postId, currentTitle, currentDescription) {
-            const modal = document.getElementById('edit-post-modal');
-            const form = document.getElementById('edit-post-form');
-            const titleInput = document.getElementById('edit-post-title');
-            const descriptionInput = document.getElementById('edit-post-description');
-            const postIdInput = document.getElementById('edit-post-id');
-            const titleCount = document.getElementById('edit-title-char-count');
-            const descCount = document.getElementById('edit-description-char-count');
-
-            // Populate form
-            titleInput.value = currentTitle;
-            descriptionInput.value = currentDescription;
-            postIdInput.value = postId;
-            titleCount.textContent = `${currentTitle.length}/200`;
-            descCount.textContent = `${currentDescription.length}/5000`;
-
-            // Show modal
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-
-            // Character counters
-            titleInput.addEventListener('input', () => {
-                titleCount.textContent = `${titleInput.value.length}/200`;
-            });
-
-            descriptionInput.addEventListener('input', () => {
-                descCount.textContent = `${descriptionInput.value.length}/5000`;
-            });
-        }
-
-        // Enhanced Moderate Post Function with proper modals
-        function moderatePost(postId, isLocked) {
-            if (isLocked) {
-                // For unlocking, show enhanced confirmation modal
-                showUnlockConfirmation(postId);
-            } else {
-                // For locking, ask for reason and submit form
-                const reason = prompt('Why are you locking this post? (Enter violation reason):');
-                if (reason && reason.trim().length >= 5) {
-                    submitModerationForm(postId, 'lock', reason.trim());
-                } else if (reason !== null) {
-                    alert('Please provide a detailed reason for locking the post (minimum 5 characters).');
-                }
-            }
-        }
-
-        // Enhanced unlock confirmation function
-        function showUnlockConfirmation(postId) {
-            const modal = document.getElementById('unlock-confirmation-modal');
-            const confirmBtn = document.getElementById('unlock-confirm-btn');
-            const cancelBtn = document.getElementById('unlock-cancel-btn');
-            
-            // Set up the confirmation button
-            confirmBtn.onclick = function() {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                submitModerationForm(postId, 'unlock', 'Post unlocked by moderator');
-            };
-            
-            // Set up the cancel button
-            cancelBtn.onclick = function() {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            };
-            
-            // Show the modal
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Submit moderation form properly
-        function submitModerationForm(postId, action, reason) {
-            // Validate inputs
-            if (!postId || !action || !reason) {
-                alert('Error: Missing required moderation data.');
-                return;
-            }
-
-            if (action === 'lock' && reason.trim().length < 5) {
-                alert('Error: Lock reason must be at least 5 characters long.');
-                return;
-            }
-
-            // Disable moderation buttons to prevent double submission
-            const moderateButtons = document.querySelectorAll('.moderate-post-btn');
-            moderateButtons.forEach(btn => {
-                btn.disabled = true;
-                btn.style.opacity = '0.6';
-            });
-
-            try {
-                // Create a form dynamically and submit it
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/post/${postId}/moderate`;
-
-                // Add action field
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = action;
-                form.appendChild(actionInput);
-
-                // Add reason field
-                const reasonInput = document.createElement('input');
-                reasonInput.type = 'hidden';
-                reasonInput.name = 'reason';
-                reasonInput.value = reason;
-                form.appendChild(reasonInput);
-
-                // Add to document and submit
-                document.body.appendChild(form);
-                form.submit();
-            } catch (error) {
-                console.error('Error submitting moderation form:', error);
-                alert('Error: Failed to submit moderation action. Please try again.');
-                
-                // Re-enable buttons on error
-                moderateButtons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                });
-            }
-        }
-
-        // Handle edit form submission
-        document.addEventListener('DOMContentLoaded', function() {
-            const editForm = document.getElementById('edit-post-form');
-            const editModal = document.getElementById('edit-post-modal');
-
-            if (editForm) {
-                editForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const submitBtn = document.getElementById('update-post-btn');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Updating...';
-                    submitBtn.disabled = true;
-
-                    const formData = new FormData(this);
-                    const postId = formData.get('postId');
-                    const title = formData.get('title');
-                    const post_description = formData.get('post_description');
-
-                    try {
-                        const response = await fetch(`/api/post/${postId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ title, post_description })
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            showNotification('Post updated successfully!', 'success');
-                            editModal.style.display = 'none';
-                            document.body.style.overflow = 'auto';
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showNotification(data.error || 'Failed to update post', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error updating post:', error);
-                        showNotification('An error occurred while updating the post', 'error');
-                    } finally {
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
-                    }
-                });
-            }
-
-            // Handle moderate button clicks
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('moderate-post-btn')) {
-                    const postId = e.target.dataset.postId;
-                    const isLocked = e.target.dataset.locked === 'true';
-                    moderatePost(postId, isLocked);
-                }
-            });
-
-            // Simple close modal functionality
-            const closeButtons = document.querySelectorAll('.close, .cancel-btn');
-            closeButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const modal = this.closest('.modal');
-                    if (modal) {
-                        modal.style.display = 'none';
-                        document.body.style.overflow = 'auto';
-                    }
-                });
-            });
-
-            // Close modal when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }
-            });
-        });
-
-        // Notification function
-        function showNotification(message, type = 'info') {
-            let container = document.getElementById('notification-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'notification-container';
-                document.body.appendChild(container);
-            }
-
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            
-            notification.innerHTML = `
-                <span class="notification-message">${message}</span>
-                <button class="notification-close">&times;</button>
-            `;
-            
-            container.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 5000);
-            
-            notification.querySelector('.notification-close').addEventListener('click', () => {
-                notification.remove();
-            });
-        }
     </script>
-
-    <style>
-        /* Yellow Edit Button */
-        .yellow-button {
-            background-color: #ffc107 !important;
-            color: #000 !important;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8em;
-            transition: background-color 0.2s;
-        }
-
-        .yellow-button:hover {
-            background-color: #e0a800 !important;
-        }
-
-        /* Lock/Unlock Buttons */
-        .lock-button {
-            background-color: #fd7e14;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8em;
-            transition: background-color 0.2s;
-        }
-
-        .lock-button:hover {
-            background-color: #e8690b;
-        }
-
-        .unlock-button {
-            background-color: #20c997;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8em;
-            transition: background-color 0.2s;
-        }
-
-        .unlock-button:hover {
-            background-color: #1aa085;
-        }
-
-        /* Locked Post Styling */
-        .locked-post {
-            opacity: 0.8;
-            border-left: 4px solid #fd7e14;
-            background-color: rgba(253, 126, 20, 0.05);
-        }
-
-        .locked-indicator {
-            background-color: #fd7e14;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .lock-reason {
-            font-size: 0.7em;
-            margin-top: 4px;
-            opacity: 0.9;
-            font-style: italic;
-        }
-
-        /* Button spacing */
-        .post-mod-actions button {
-            margin-right: 5px;
-            margin-bottom: 2px;
-        }
-
-        /* Moderate button specific styling */
-        .moderate-post-btn {
-            font-weight: bold;
-        }
-
-        /* Enhanced Unlock Modal Styles */
-        .unlock-modal {
-            max-width: 500px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .unlock-modal-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #20c997;
-        }
-
-        .unlock-icon {
-            font-size: 2em;
-            color: #20c997;
-        }
-
-        .unlock-modal-header h3 {
-            margin: 0;
-            color: #20c997;
-            font-size: 1.5em;
-        }
-
-        .unlock-modal-body {
-            margin-bottom: 25px;
-        }
-
-        .unlock-message {
-            font-size: 1.1em;
-            margin-bottom: 20px;
-            color: #fff;
-            text-align: center;
-        }
-
-        .unlock-info {
-            background-color: rgba(32, 201, 151, 0.1);
-            border: 1px solid rgba(32, 201, 151, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        .unlock-info-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-        }
-
-        .unlock-info-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-icon {
-            font-size: 1.1em;
-            width: 20px;
-            text-align: center;
-        }
-
-        .unlock-modal .form-actions {
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .unlock-modal .unlock-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 1.05em;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .unlock-modal .unlock-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
-        }
-
-        .unlock-modal .cancel-btn {
-            padding: 12px 24px;
-            font-size: 1.05em;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .unlock-modal .cancel-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-        }
-
-        .button-icon {
-            font-size: 1.1em;
-        }
-    </style>
 </body>
 </html>
