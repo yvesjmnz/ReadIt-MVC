@@ -78,30 +78,27 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { username, password, rememberMe } = req.body;
-
         const user = await UserService.authenticate(username, password);
-        
-        req.session.user = { 
-            username: user.username, 
-            quote: user.quote 
+
+        req.session.user = {
+            username: user.username,
+            quote: user.quote
         };
 
         if (rememberMe) {
-            res.cookie('user', JSON.stringify(req.session.user), { 
-                maxAge: 30 * 24 * 60 * 60 * 1000, 
-                httpOnly: true 
+            res.cookie('user', JSON.stringify(req.session.user), {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true
             });
         }
 
-        res.redirect('/');
+        res.status(200).send('Login successful');
     } catch (error) {
         console.error(error);
-        if (error.message === 'Invalid credentials') {
-            return res.status(400).send(error.message);
-        }
-        res.status(500).send('Server Error');
+        res.status(400).send(error.message);
     }
 });
+
 
 // Profile
 router.get('/profile/:username', async (req, res) => {

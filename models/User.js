@@ -12,6 +12,25 @@ const userSchema = new mongoose.Schema({
     },
     quote: String,
     favoriteCommunities: [String],
+
+    // 👇 Security features
+    failedAttempts: {
+        type: Number,
+        default: 0
+    },
+    lockUntil: Date,
+    lastLogin: Date,
+    lastLoginAttempt: Date,
+    passwordLastChanged: {
+        type: Date,
+        default: Date.now
+    },
+    passwordHistory: [
+        {
+            hash: String,
+            changedAt: Date
+        }
+    ]
 });
 
 const User = mongoose.model('User', userSchema);
