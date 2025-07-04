@@ -23,6 +23,9 @@
                 <span class="username">{{user.username}}</span>
                 <div class="dropdown-content">
                     <a href="/profile/{{user.username}}">View Profile</a>
+                    {{#if isAdmin}}
+                        <a href="/admin">Admin Dashboard</a>
+                    {{/if}}
                     <a href="/logout">Logout</a>
                 </div>
             </div>

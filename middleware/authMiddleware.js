@@ -1,8 +1,10 @@
 const Community = require('../models/Community');
+const logger = require('../services/loggerService');
 
 // Middleware to check if user is authenticated
 const requireAuth = (req, res, next) => {
     if (!req.session.user) {
+        logger.logAccessDenied(null, req.path, 'Not authenticated', req.ip);
         return res.status(401).json({ error: 'Authentication required' });
     }
     next();
@@ -27,6 +29,7 @@ const requireModerator = async (req, res, next) => {
 
         const username = req.session.user.username;
         if (!community.isModerator(username)) {
+            logger.logAccessDenied(username, `${req.path} (moderator)`, 'Not a moderator', req.ip);
             return res.status(403).json({ error: 'Moderator privileges required' });
         }
 
@@ -57,6 +60,7 @@ const requireCreator = async (req, res, next) => {
 
         const username = req.session.user.username;
         if (community.creator !== username) {
+            logger.logAccessDenied(username, `${req.path} (creator)`, 'Not the creator', req.ip);
             return res.status(403).json({ error: 'Creator privileges required' });
         }
 
@@ -85,9 +89,67 @@ const checkPublicPath = (req, res, next) => {
     return requireAuth(req, res, next);
 };
 
+// Middleware to check if user is banned site-wide
+const checkBanStatus = async (req, res, next) => {
+    try {
+        if (!req.session.user) {
+            return next(); // Not logged in, skip ban check
+        }
+
+        const User = require('../models/User');
+        const user = await User.findOne({ username: req.session.user.username });
+        
+        if (user && user.isBanned) {
+            // Clear session for banned user
+            req.session.destroy();
+            
+            // Always render banned page
+            return res.status(403).render('banned', {
+                banReason: user.banReason,
+                bannedBy: user.bannedBy,
+                bannedAt: user.bannedAt,
+                pageTitle: 'Account Banned'
+            });
+        }
+
+        next();
+    } catch (error) {
+        console.error('Error checking ban status:', error);
+        res.status(500).render('error', { 
+            error: 'Internal server error',
+            pageTitle: 'Error'
+        });
+    }
+};
+
+// Middleware to check if user is an admin
+const requireAdmin = async (req, res, next) => {
+    try {
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        const User = require('../models/User');
+        const user = await User.findOne({ username: req.session.user.username });
+        
+        if (!user || !user.isAdmin) {
+            logger.logAccessDenied(req.session.user.username, `${req.path} (admin)`, 'Not an administrator', req.ip);
+            return res.status(403).json({ error: 'Administrator privileges required' });
+        }
+
+        req.adminUser = user;
+        next();
+    } catch (error) {
+        console.error('Error checking admin status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 module.exports = {
     requireAuth,
     requireModerator,
     requireCreator, 
+    requireAdmin,
+    checkBanStatus,
     checkPublicPath
 };

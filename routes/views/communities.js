@@ -17,7 +17,8 @@ router.get('/:name', async (req, res, next) => {
         const communityData = {
             ...community.toObject(),
             userRole,
-            banInfo
+            banInfo,
+            bannedUsers: community.getBannedUsersList()
         };
 
         res.render('community', {

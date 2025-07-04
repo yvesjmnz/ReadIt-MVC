@@ -67,6 +67,34 @@
                         <button id="ban-user-btn" class="btn btn-warning">Ban User</button>
                         <button id="view-banned-btn" class="btn btn-secondary">View Banned Users</button>
                     </div>
+
+                    <div class="banned-users-section" id="banned-users-section" style="display: none;">
+                        <h3>Banned Users</h3>
+                        {{#if community.bannedUsers.length}}
+                            <div class="banned-users-list">
+                                {{#each community.bannedUsers}}
+                                    <div class="banned-user-item">
+                                        <div class="banned-user-info">
+                                            <strong>{{this.username}}</strong>
+                                            <small>Banned by {{this.bannedBy}} on {{formatDate this.bannedAt}}</small>
+                                            <p class="ban-reason">{{this.reason}}</p>
+                                        </div>
+                                        {{#unless (includes this.bannedBy 'admin:')}}
+                                            <button class="btn btn-sm btn-success unban-user-btn" 
+                                                    data-username="{{this.username}}" 
+                                                    data-community="{{../community.name}}">
+                                                Unban
+                                            </button>
+                                        {{else}}
+                                            <span class="admin-ban-label">Admin Ban</span>
+                                        {{/unless}}
+                                    </div>
+                                {{/each}}
+                            </div>
+                        {{else}}
+                            <p class="no-banned-users">No users are currently banned from this community.</p>
+                        {{/if}}
+                    </div>
                 {{/if}}
 
                 {{#if user}}

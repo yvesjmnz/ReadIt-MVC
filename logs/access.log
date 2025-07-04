@@ -1,0 +1,6 @@
+{"timestamp":"2025-07-04T13:12:35.441Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/revoke-admin/DJ-ADMIN (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:12:39.591Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/post/undefined (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:12:43.421Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/post/6867c192dce388967d39af19 (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:12:45.292Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/post/6867cda407e9ce19f5f5d5a2 (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:12:46.411Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/logs (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:15:09.410Z","level":"WARN","category":"ACCESS","message":"Access denied","username":null,"resource":"/","reason":"Not authenticated","ip":"::1"}

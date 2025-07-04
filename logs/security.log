@@ -1,0 +1,12 @@
+{"timestamp":"2025-07-04T13:25:30.693Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"description","value":"short","rule":"length (10-500)","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:25:31.588Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"title/description","value":{"title":"","post_description":"Valid post description here"},"rule":"required","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:25:32.067Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:25:32.355Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"ab","rule":"length (3-50)","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:25:32.623Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","rule":"length (3-50)","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:25:32.993Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"test@community!","rule":"no special characters","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:27:23.276Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/post/6867d65d339384ae71c15521 (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:27:25.655Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/post/6867d65d339384ae71c15521 (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:27:27.576Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/logs (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:27:35.811Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/ban-user (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-04T13:28:47.901Z","type":"ACCESS_DENIED","message":"Access denied","username":"admin","resource":"/new%20community%20test/moderator (creator)","reason":"Not the creator","ip":"::1"}
+{"timestamp":"2025-07-04T13:28:52.176Z","type":"ACCESS_DENIED","message":"Access denied","username":"admin","resource":"/new%20community%20test/moderator/testuser123 (creator)","reason":"Not the creator","ip":"::1"}

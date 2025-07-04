@@ -107,25 +107,16 @@ class CommunityActions {
         }
     }
 
-    async handleViewBanned() {
-        try {
-            const communityName = window.communityData?.name;
-            if (!communityName) {
-                NotificationSystem.error('Community name not found');
-                return;
-            }
-
-            const community = await CommunityApi.getByName(communityName);
-            const modal = new Modal({
-                title: 'Banned Users',
-                content: this.createBannedUsersView(community.bannedUsers),
-                className: 'view-banned-modal'
-            });
-
-            modal.open();
-            this.setupBannedUsersView(modal);
-        } catch (error) {
-            NotificationSystem.error('Failed to load banned users');
+    handleViewBanned() {
+        const bannedSection = document.getElementById('banned-users-section');
+        const viewButton = document.getElementById('view-banned-btn');
+        
+        if (bannedSection.style.display === 'none') {
+            bannedSection.style.display = 'block';
+            viewButton.textContent = 'Hide Banned Users';
+        } else {
+            bannedSection.style.display = 'none';
+            viewButton.textContent = 'View Banned Users';
         }
     }
 

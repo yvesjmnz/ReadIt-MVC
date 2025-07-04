@@ -25,12 +25,17 @@ router.get('/', requireLogin, async (req, res) => {
         const userCommunities = await CommunityService.getUserCommunities(loggedInUser.username);
         const allCommunities = await CommunityService.findAll();
         
+        // Check if user is admin
+        const AdminService = require('../services/adminService');
+        const isAdmin = await AdminService.isAdmin(loggedInUser.username);
+        
         res.render('home', { 
             user: loggedInUser, 
             posts,
             userCommunities,
             allCommunities,
-            isLoggedIn: !!loggedInUser
+            isLoggedIn: !!loggedInUser,
+            isAdmin
         });
     } catch (error) {
         console.error('Error fetching home page:', error);
@@ -79,7 +84,7 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { username, password, rememberMe } = req.body;
-        const user = await UserService.authenticate(username, password);
+        const user = await UserService.authenticate(username, password, req.ip, req.get('User-Agent'));
 
         req.session.user = {
             username: user.username,

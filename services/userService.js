@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const sampleProfiles = require('../models/sampleProfiles');
+const logger = require('./loggerService');
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
@@ -31,21 +32,31 @@ class UserService {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Check if this should be the first admin
+        const userCount = await User.countDocuments();
+        const isFirstUser = userCount === 0;
+        const isFirstAdmin = process.env.FIRST_ADMIN_USERNAME && 
+                            username === process.env.FIRST_ADMIN_USERNAME;
+
         const user = new User({
             username,
             password: hashedPassword,
             quote,
             passwordLastChanged: new Date(),
             passwordHistory: [{ hash: hashedPassword, changedAt: new Date() }],
-            failedAttempts: 0
+            failedAttempts: 0,
+            isAdmin: isFirstUser || isFirstAdmin,
+            adminGrantedBy: isFirstUser ? 'system' : (isFirstAdmin ? 'environment' : undefined),
+            adminGrantedAt: (isFirstUser || isFirstAdmin) ? new Date() : undefined
         });
 
         return await user.save();
     }
 
-    static async authenticate(username, password) {
+    static async authenticate(username, password, ip = null, userAgent = null) {
         const user = await this.findByUsername(username);
         if (!user) {
+            logger.logAuthFailure(username, ip, userAgent, 'User not found');
             throw new Error('Invalid credentials'); // Generic
         }
 
@@ -58,6 +69,7 @@ class UserService {
                 day: '2-digit',
                 month: 'short'
             });
+            logger.logAuthFailure(username, ip, userAgent, 'Account locked');
             throw new Error(`Account is temporarily locked until ${unlockTime}.`);
 }
 
@@ -74,6 +86,7 @@ class UserService {
             }
 
             await user.save();
+            logger.logAuthFailure(username, ip, userAgent, 'Invalid password');
             throw new Error('Invalid credentials'); // Generic
         }
 

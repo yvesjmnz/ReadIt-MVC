@@ -13,6 +13,23 @@ const userSchema = new mongoose.Schema({
     quote: String,
     favoriteCommunities: [String],
 
+    // 👇 Admin features
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+    adminGrantedBy: String,
+    adminGrantedAt: Date,
+
+    // 👇 Site-wide ban features
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
+    banReason: String,
+    bannedBy: String,
+    bannedAt: Date,
+
     // 👇 Security features
     failedAttempts: {
         type: Number,

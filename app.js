@@ -10,7 +10,7 @@ const fileUpload = require('express-fileupload');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const Handlebars = require('handlebars');
 const handlebarsHelpers = require('./helpers/handlebarsHelpers');
-const {checkPublicPath } = require('./middleware/authMiddleware');
+const {checkPublicPath, checkBanStatus } = require('./middleware/authMiddleware');
 require('dotenv').config();
 
 const config = require('./config');
@@ -45,6 +45,9 @@ app.use((req, res, next) => {
     next();
 });
 
+// Check if user is banned site-wide
+app.use(checkBanStatus);
+
 // Handlebars setup
 app.engine('hbs', engine({
     extname: 'hbs',
@@ -63,10 +66,15 @@ mongoose.connect(config.mongodbUri)
 app.use('/api/communities', require('./routes/api/communities'));
 app.use('/api/posts', require('./routes/api/posts'));
 app.use('/api/users', require('./routes/api/users'));
+app.use('/api/admin', require('./routes/api/admin'));
 
 // View Routes
 app.use('/', require('./routes/userRoutes'));
 app.use('/', require('./routes/communityRoutes'));
 app.use('/', require('./routes/postRoutes'));
+app.use('/admin', require('./routes/views/admin'));
+
+// Test Routes (Admin only)
+app.use('/test/validation', require('./routes/test/validation'));
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

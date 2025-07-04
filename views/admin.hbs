@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ReadIT</title>
+    <link rel="stylesheet" href="/css/global-dark-theme.css">
+    <link rel="stylesheet" href="/css/style_admin.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body data-username="{{user.username}}" data-page="admin">
+    <div class="header">
+        <div class="logo-container">
+            <a href="/">
+                <img src="/img/ReadIt.png" alt="ReadIT logo" class="logo">
+                <h1 class="site-title">Read<span class="highlight">IT</span></h1>
+            </a>
+        </div>
+        <div class="user-info">
+            <div class="admin-badge">
+                <i class="fas fa-shield-alt"></i> Administrator
+            </div>
+            <div class="dropdown" id="profile-dropdown">
+                <span class="username">{{user.username}}</span>
+                <div class="dropdown-content">
+                    <a href="/profile/{{user.username}}">View Profile</a>
+                    <a href="/">Home</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="admin-sidebar">
+            <div class="admin-nav">
+                <h3><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
+                <ul class="nav-list">
+                    <li><a href="#stats" class="nav-link active" data-section="stats">
+                        <i class="fas fa-chart-bar"></i> Site Statistics
+                    </a></li>
+                    <li><a href="#admins" class="nav-link" data-section="admins">
+                        <i class="fas fa-users-cog"></i> Manage Admins
+                    </a></li>
+                    <li><a href="#posts" class="nav-link" data-section="posts">
+                        <i class="fas fa-file-alt"></i> Manage Posts
+                    </a></li>
+                    <li><a href="#communities" class="nav-link" data-section="communities">
+                        <i class="fas fa-users"></i> Manage Communities
+                    </a></li>
+                    <li><a href="#users" class="nav-link" data-section="users">
+                        <i class="fas fa-user-slash"></i> Ban Users
+                    </a></li>
+                    <li><a href="#logs" class="nav-link" data-section="logs">
+                        <i class="fas fa-file-alt"></i> System Logs
+                    </a></li>
+                    <li><a href="#test" class="nav-link" data-section="test">
+                        <i class="fas fa-vial"></i> Test Logging
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            <!-- Site Statistics Section -->
+            <div id="stats-section" class="admin-section active">
+                <h2><i class="fas fa-chart-bar"></i> Site Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{stats.users}}</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{stats.posts}}</h3>
+                            <p>Total Posts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{stats.communities}}</h3>
+                            <p>Communities</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{stats.admins}}</h3>
+                            <p>Administrators</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Admins Section -->
+            <div id="admins-section" class="admin-section">
+                <h2><i class="fas fa-users-cog"></i> Manage Administrators</h2>
+                
+                <div class="admin-actions">
+                    <button id="grant-admin-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Grant Admin Privileges
+                    </button>
+                </div>
+
+                <div class="admins-list">
+                    <h3>Current Administrators</h3>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Granted By</th>
+                                    <th>Granted Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admins-table-body">
+                                {{#each admins}}
+                                <tr>
+                                    <td>
+                                        <strong>{{this.username}}</strong>
+                                        {{#if (eq this.username ../user.username)}}
+                                            <span class="badge badge-self">You</span>
+                                        {{/if}}
+                                    </td>
+                                    <td>{{this.adminGrantedBy}}</td>
+                                    <td>{{formatDate this.adminGrantedAt}}</td>
+                                    <td>
+                                        {{#unless (eq this.username ../user.username)}}
+                                            <button class="btn btn-danger btn-sm revoke-admin-btn" 
+                                                    data-username="{{this.username}}">
+                                                <i class="fas fa-times"></i> Revoke
+                                            </button>
+                                        {{/unless}}
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Posts Section -->
+            <div id="posts-section" class="admin-section">
+                <h2><i class="fas fa-file-alt"></i> Manage Posts</h2>
+                
+                <div class="posts-list">
+                    <h3>Recent Posts</h3>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Community</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each recentPosts}}
+                                <tr>
+                                    <td>
+                                        <a href="/post/{{this._id}}" target="_blank">
+                                            {{this.title}}
+                                        </a>
+                                    </td>
+                                    <td>{{this.user}}</td>
+                                    <td>
+                                        {{#if this.communityName}}
+                                            <a href="/community/{{this.communityName}}" target="_blank">
+                                                {{this.communityName}}
+                                            </a>
+                                        {{else}}
+                                            General
+                                        {{/if}}
+                                    </td>
+                                    <td>{{formatDate this.date}}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-post-btn" 
+                                                data-post-id="{{this._id}}"
+                                                data-title="{{this.title}}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Communities Section -->
+            <div id="communities-section" class="admin-section">
+                <h2><i class="fas fa-users"></i> Manage Communities</h2>
+                
+                <div class="communities-list">
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Creator</th>
+                                    <th>Members</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each communities}}
+                                <tr>
+                                    <td>
+                                        <a href="/community/{{this.name}}" target="_blank">
+                                            <strong>{{this.name}}</strong>
+                                        </a>
+                                    </td>
+                                    <td>{{this.creator}}</td>
+                                    <td>{{this.members.length}}</td>
+                                    <td>{{formatDate this.createdAt}}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-community-btn" 
+                                                data-community-name="{{this.name}}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ban Users Section -->
+            <div id="users-section" class="admin-section">
+                <h2><i class="fas fa-user-slash"></i> Ban Users</h2>
+                
+                <div class="ban-user-form">
+                    <button id="ban-user-btn" class="btn btn-warning">
+                        <i class="fas fa-ban"></i> Ban User Site-wide
+                    </button>
+                </div>
+
+                <div class="banned-users-list">
+                    <h3>Currently Banned Users</h3>
+                    {{#if bannedUsers.length}}
+                        <div class="table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Reason</th>
+                                        <th>Banned By</th>
+                                        <th>Banned Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each bannedUsers}}
+                                    <tr>
+                                        <td><strong>{{this.username}}</strong></td>
+                                        <td>{{this.banReason}}</td>
+                                        <td>{{this.bannedBy}}</td>
+                                        <td>{{formatDate this.bannedAt}}</td>
+                                        <td>
+                                            <button class="btn btn-success btn-sm unban-user-btn" 
+                                                    data-username="{{this.username}}">
+                                                <i class="fas fa-check"></i> Unban
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    {{else}}
+                        <p class="no-data">No users are currently banned.</p>
+                    {{/if}}
+                </div>
+            </div>
+
+            <!-- System Logs Section -->
+            <div id="logs-section" class="admin-section">
+                <h2><i class="fas fa-file-alt"></i> Security Logs</h2>
+                
+                <div class="logs-controls">
+                    <button id="refresh-logs-btn" class="btn btn-secondary">
+                        <i class="fas fa-sync"></i> Refresh Logs
+                    </button>
+                    <span class="logs-info">Showing authentication, access control, and validation failures</span>
+                </div>
+
+                <div class="logs-content">
+                    <div id="logs-display" class="logs-display">
+                        <p class="no-logs">Click refresh to load security logs.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Logging Section -->
+            <div id="test-section" class="admin-section">
+                <h2><i class="fas fa-vial"></i> Test Logging System</h2>
+                
+                <div class="test-info">
+                    <p>Use these buttons to test different types of validation logging since inputs are being validated in the frontend. Check the logs section to see the results.</p>
+                </div>
+
+                <div class="test-controls">
+                    <h3>Validation Logging Tests</h3>
+                    <div class="test-buttons">
+                        <button id="test-empty-name" class="btn btn-warning">Test Empty Community Name</button>
+                        <button id="test-short-name" class="btn btn-warning">Test Short Community Name</button>
+                        <button id="test-long-name" class="btn btn-warning">Test Long Community Name</button>
+                        <button id="test-special-chars" class="btn btn-warning">Test Special Characters</button>
+                        <button id="test-short-description" class="btn btn-warning">Test Short Description</button>
+                        <button id="test-empty-post-title" class="btn btn-warning">Test Empty Post Title</button>
+                    </div>
+                </div>
+
+                <div class="test-results">
+                    <h3>Test Results</h3>
+                    <div id="test-output" class="test-output">
+                        <p>Click a test button to see results here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript Components -->
+    <script src="/js/utils/dom.js"></script>
+    <script src="/js/services/apiClient.js"></script>
+    <script src="/js/components/notification.js"></script>
+    <script src="/js/components/modal.js"></script>
+    <script src="/js/components/form.js"></script>
+    <script src="/js/components/dropdown.js"></script>
+    <script src="/js/components/adminActions.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

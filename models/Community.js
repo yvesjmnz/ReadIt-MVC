@@ -87,4 +87,18 @@ communitySchema.methods.unbanUser = function(username) {
     this.bannedUsers.delete(username);
 };
 
+// Method to get all banned users as an array
+communitySchema.methods.getBannedUsersList = function() {
+    const bannedList = [];
+    for (const [username, banInfo] of this.bannedUsers) {
+        bannedList.push({
+            username,
+            reason: banInfo.reason,
+            bannedBy: banInfo.bannedBy,
+            bannedAt: banInfo.bannedAt
+        });
+    }
+    return bannedList;
+};
+
 module.exports = mongoose.model('Community', communitySchema);

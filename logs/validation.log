@@ -1,0 +1,6 @@
+{"timestamp":"2025-07-04T13:19:49.275Z","level":"WARN","category":"VALIDATION","message":"Validation failed","field":"title/description","value":{"title":"","post_description":"Valid post description here"},"rule":"required","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:19:53.327Z","level":"WARN","category":"VALIDATION","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:19:53.744Z","level":"WARN","category":"VALIDATION","message":"Validation failed","field":"description","value":"short","rule":"length (10-500)","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:19:54.142Z","level":"WARN","category":"VALIDATION","message":"Validation failed","field":"name","value":"ab","rule":"length (3-50)","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:19:54.620Z","level":"WARN","category":"VALIDATION","message":"Validation failed","field":"name","value":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","rule":"length (3-50)","username":"admin","ip":"::1"}
+{"timestamp":"2025-07-04T13:19:54.905Z","level":"WARN","category":"VALIDATION","message":"Validation failed","field":"name","value":"test@community!","rule":"no special characters","username":"admin","ip":"::1"}
