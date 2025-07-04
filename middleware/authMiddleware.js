@@ -77,7 +77,7 @@ const publicPath = [
 //check public paths
 const checkPublicPath = (req, res, next) => {
     const isPublic = publicPath.some(path => req.path.startsWith(path) || req.path === path);
-    console.log(`[AUTH] ${req.path} → ${isPublic ? 'Public' : 'Protected'}`);
+    // console.log(`[AUTH] ${req.path} → ${isPublic ? 'Public' : 'Protected'}`);
     if(isPublic) {
         return next();
     }

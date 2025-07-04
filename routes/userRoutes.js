@@ -29,7 +29,8 @@ router.get('/', requireLogin, async (req, res) => {
             user: loggedInUser, 
             posts,
             userCommunities,
-            allCommunities
+            allCommunities,
+            isLoggedIn: !!loggedInUser
         });
     } catch (error) {
         console.error('Error fetching home page:', error);

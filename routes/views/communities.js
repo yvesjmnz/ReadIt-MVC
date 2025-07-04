@@ -23,7 +23,9 @@ router.get('/:name', async (req, res, next) => {
         res.render('community', {
             community: communityData,
             posts: posts.length > 0 ? posts : null,
-            user: req.session.user
+            user: req.session.user,
+            isLoggedIn: !!req.session.user,
+            viewerRole: userRole
         });
     } catch (error) {
         next(error);

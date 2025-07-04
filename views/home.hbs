@@ -128,14 +128,19 @@
                                     Posted in <a href="/community/{{this.communityName}}" onclick="event.stopPropagation();">{{this.communityName}}</a> 
                                     by <a href="/profile/{{this.user}}" onclick="event.stopPropagation();">{{this.user}}</a>
                                 </p>
-                                <div class="post-actions">
-                                    <div class="post-stats" onclick="event.stopPropagation();">
-                                        <button class="like-button" data-post-id="{{this._id}}">
-                                            👍 <span class="likes-count">{{this.likes}}</span>
-                                        </button>
-                                        <button class="dislike-button" data-post-id="{{this._id}}">
-                                            👎 <span class="dislikes-count">{{this.dislikes}}</span>
-                                        </button>
+                                <div class="post-actions" onclick="event.stopPropagation();">
+                                    <div class="post-stats">
+                                        {{#if isLoggedIn}}
+                                            <button class="like-button" data-post-id="{{this._id}}">
+                                                👍 <span class="likes-count">{{this.likes}}</span>
+                                            </button>
+                                            <button class="dislike-button" data-post-id="{{this._id}}">
+                                                👎 <span class="dislikes-count">{{this.dislikes}}</span>
+                                            </button>
+                                        {{else}}
+                                            <span class="likes-display">👍 {{this.likes}}</span>
+                                            <span class="dislikes-display">👎 {{this.dislikes}}</span>
+                                        {{/if}}
                                         <span class="comments-count">💬 {{this.comments.length}}</span>
                                     </div>
                                     <a href="/post/{{this._id}}" class="btn btn-primary btn-sm read-more-btn">

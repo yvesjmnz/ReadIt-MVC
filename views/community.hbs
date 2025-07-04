@@ -105,8 +105,8 @@
                             <div class="post-actions" onclick="event.stopPropagation();">
                                 <div class="post-stats">
                                     {{#unless (eq ../community.userRole 'banned')}}
-                                        <button class="like-button" data-post-id="{{this._id}}">👍 <span class="likes-count">{{this.likes}}</span></button>
-                                        <button class="dislike-button" data-post-id="{{this._id}}">👎 <span class="dislikes-count">{{this.dislikes}}</span></button>
+                                        <span class="likes-display">👍 {{this.likes}}</span>
+                                        <span class="dislikes-display">👎 {{this.dislikes}}</span>
                                     {{else}}
                                         <span class="likes-display">👍 {{this.likes}}</span>
                                         <span class="dislikes-display">👎 {{this.dislikes}}</span>
@@ -115,13 +115,6 @@
                                 </div>
                                 
                                 <div class="post-controls">
-                                    {{#if (eq ../user.username this.user)}}
-                                        <button class="edit-post-btn btn btn-warning btn-sm" 
-                                                data-post-id="{{this._id}}" 
-                                                data-title="{{this.title}}" 
-                                                data-description="{{this.post_description}}">Edit</button>
-                                        <button class="delete-post-btn btn btn-danger btn-sm" data-post-id="{{this._id}}">Delete</button>
-                                    {{/if}}
                                     <a href="/post/{{this._id}}" class="btn btn-primary btn-sm read-more-btn">
                                         Read More
                                     </a>
