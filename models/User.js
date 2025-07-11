@@ -47,6 +47,18 @@ const userSchema = new mongoose.Schema({
             hash: String,
             changedAt: Date
         }
+    ],
+
+    // 👇 Security questions for password reset
+    securityQuestions: [
+        {
+            question: String,
+            answer: String, // Hashed answer
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
     ]
 });
 

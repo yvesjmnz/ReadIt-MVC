@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Questions - ReadIt</title>
+    <link rel="stylesheet" href="/css/global-dark-theme.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .security-form {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .header-section h2 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .header-section p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+        
+        .current-questions {
+            background-color: rgba(35, 134, 54, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-green);
+        }
+        
+        .current-questions h4 {
+            margin: 0 0 0.75rem 0;
+            color: var(--accent-green);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .current-questions ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .security-info {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--border-focus);
+        }
+        
+        .security-info h4 {
+            margin: 0 0 0.75rem 0;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .security-info ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .question-set {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .question-set h4 {
+            margin: 0 0 1rem 0;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-green);
+            color: white;
+            border-color: var(--accent-green);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent-green-hover);
+            border-color: var(--accent-green-hover);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-primary);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--bg-hover);
+            border-color: var(--border-primary);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .message.error {
+            background-color: rgba(218, 54, 51, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+        
+        .message.success {
+            background-color: rgba(35, 134, 54, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .security-form {
+                padding: 1.5rem;
+            }
+            
+            .header-section h2 {
+                font-size: 1.5rem;
+            }
+            
+            .question-set {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="security-form">
+        <div class="header-section">
+            <h2><i class="fas fa-shield-alt" style="color: var(--accent-green); margin-right: 0.5rem;"></i>Security Questions</h2>
+            <p>Hello, <strong>{{user.username}}</strong>. Set up security questions for password recovery.</p>
+        </div>
+        
+        {{#if hasQuestions}}
+        <div class="current-questions">
+            <h4><i class="fas fa-check-circle"></i>Current Security Questions</h4>
+            <p>You have already set up security questions. You can update them below if needed.</p>
+            <ul>
+                {{#each userQuestions}}
+                <li>{{this.question}}</li>
+                {{/each}}
+            </ul>
+        </div>
+        {{/if}}
+        
+        <div class="security-info">
+            <h4><i class="fas fa-info-circle"></i>Important Security Guidelines</h4>
+            <ul>
+                <li><strong>Use specific, unique answers</strong> - Avoid common responses like "blue", "mom", or "The Bible"</li>
+                <li><strong>Combine multiple elements</strong> - Use answers like "Fluffy Oak Street" instead of just "Fluffy"</li>
+                <li><strong>Remember your exact answers</strong> - Answers are case-insensitive but must match exactly</li>
+                <li><strong>Keep answers private</strong> - Don't share your security answers with anyone</li>
+            </ul>
+        </div>
+        
+        <form id="securityQuestionsForm">
+            <div class="question-set">
+                <h4><i class="fas fa-question-circle" style="color: var(--accent-green);"></i>Question 1</h4>
+                <div class="form-group">
+                    <label for="question1">Choose a question:</label>
+                    <select id="question1" name="question1" required>
+                        <option value="">Select a question...</option>
+                        {{#each availableQuestions}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="answer1">Your answer:</label>
+                    <input type="text" id="answer1" name="answer1" required 
+                           placeholder="Be specific and unique (e.g., 'Fluffy Oak Street')">
+                </div>
+            </div>
+            
+            <div class="question-set">
+                <h4><i class="fas fa-question-circle" style="color: var(--accent-green);"></i>Question 2</h4>
+                <div class="form-group">
+                    <label for="question2">Choose a question:</label>
+                    <select id="question2" name="question2" required>
+                        <option value="">Select a question...</option>
+                        {{#each availableQuestions}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="answer2">Your answer:</label>
+                    <input type="text" id="answer2" name="answer2" required 
+                           placeholder="Be specific and unique (e.g., 'Dune Herbert')">
+                </div>
+            </div>
+            
+            <div class="question-set">
+                <h4><i class="fas fa-question-circle" style="color: var(--accent-green);"></i>Question 3</h4>
+                <div class="form-group">
+                    <label for="question3">Choose a question:</label>
+                    <select id="question3" name="question3" required>
+                        <option value="">Select a question...</option>
+                        {{#each availableQuestions}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="answer3">Your answer:</label>
+                    <input type="text" id="answer3" name="answer3" required 
+                           placeholder="Be specific and unique (e.g., 'Buddy March')">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save" style="margin-right: 0.5rem;"></i>
+                    {{#if hasQuestions}}Update{{else}}Set{{/if}} Security Questions
+                </button>
+                <a href="/profile/{{user.username}}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                    Back to Profile
+                </a>
+            </div>
+            
+            <div id="message"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('securityQuestionsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const messageDiv = document.getElementById('message');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            // Collect questions and answers
+            const questions = [];
+            for (let i = 1; i <= 3; i++) {
+                const question = formData.get(`question${i}`);
+                const answer = formData.get(`answer${i}`);
+                
+                if (question && answer) {
+                    questions.push({ question, answer });
+                }
+            }
+            
+            // Validate unique questions
+            const questionTexts = questions.map(q => q.question);
+            const uniqueQuestions = new Set(questionTexts);
+            if (uniqueQuestions.size !== questions.length) {
+                messageDiv.innerHTML = '<div class="message error">Please select different questions for each slot</div>';
+                return;
+            }
+            
+            // Show loading state
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Saving...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/security-questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ questions })
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = '<div class="message success">' + result + '</div>';
+                    setTimeout(() => {
+                        window.location.href = '/profile/{{user.username}}';
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">' + result + '</div>';
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">An error occurred. Please try again.</div>';
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

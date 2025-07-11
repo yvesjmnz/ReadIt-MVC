@@ -2,6 +2,11 @@ Arucan, Oliver Aldrin
 Jimenez, Yves Alvin Andrei
 Sanchez, Darren Julian
 
+*MODIFIED SECURITY MEASURES IN LIEU OF ITSECWB
+
+Additional Collaborator:
+Llenarez, Gabrielle Denise
+
 To run: 
 1) Make a database called ReadIt in mongodDB compass. 
 

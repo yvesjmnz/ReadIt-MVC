@@ -22,7 +22,7 @@ class UserService {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{12,}$/.test(password);
     }
 
-    static async create({ username, password, quote }) {
+    static async create({ username, password, quote, securityQuestions = null }) {
         const existingUser = await this.findByUsername(username);
         if (existingUser) throw new Error('User already exists');
 
@@ -38,7 +38,7 @@ class UserService {
         const isFirstAdmin = process.env.FIRST_ADMIN_USERNAME && 
                             username === process.env.FIRST_ADMIN_USERNAME;
 
-        const user = new User({
+        const userData = {
             username,
             password: hashedPassword,
             quote,
@@ -48,8 +48,21 @@ class UserService {
             isAdmin: isFirstUser || isFirstAdmin,
             adminGrantedBy: isFirstUser ? 'system' : (isFirstAdmin ? 'environment' : undefined),
             adminGrantedAt: (isFirstUser || isFirstAdmin) ? new Date() : undefined
-        });
+        };
 
+        // Add security questions if provided
+        if (securityQuestions && Array.isArray(securityQuestions)) {
+            const hashedQuestions = await Promise.all(
+                securityQuestions.map(async (qa) => ({
+                    question: qa.question,
+                    answer: await bcrypt.hash(qa.answer.trim().toLowerCase(), 10),
+                    createdAt: new Date()
+                }))
+            );
+            userData.securityQuestions = hashedQuestions;
+        }
+
+        const user = new User(userData);
         return await user.save();
     }
 

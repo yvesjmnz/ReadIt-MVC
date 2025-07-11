@@ -3,6 +3,7 @@ const router = express.Router();
 const UserService = require('../services/userService');
 const PostService = require('../services/postService');
 const CommunityService = require('../services/communityService');
+const PasswordResetService = require('../services/passwordResetService');
 const samplePosts = require('../models/samplePost');
 const sampleProfiles = require('../models/sampleProfiles');
 
@@ -176,6 +177,107 @@ router.get('/users', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
+    }
+});
+
+// Change Password (authenticated users)
+router.get('/change-password', requireLogin, (req, res) => {
+    res.render('changePassword', { user: req.session.user });
+});
+
+router.post('/change-password', requireLogin, async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        
+        if (newPassword !== confirmPassword) {
+            return res.status(400).send('New passwords do not match');
+        }
+
+        await UserService.updatePassword(
+            req.session.user.username, 
+            currentPassword, 
+            newPassword
+        );
+
+        res.status(200).send('Password changed successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(400).send(error.message);
+    }
+});
+
+// Security Questions Setup (authenticated users)
+router.get('/security-questions', requireLogin, async (req, res) => {
+    try {
+        const questions = PasswordResetService.getSecurityQuestions();
+        const userQuestions = await PasswordResetService.getUserSecurityQuestions(req.session.user.username);
+        
+        res.render('securityQuestions', { 
+            user: req.session.user,
+            availableQuestions: questions,
+            hasQuestions: userQuestions.length > 0,
+            userQuestions
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+router.post('/security-questions', requireLogin, async (req, res) => {
+    try {
+        const { questions } = req.body;
+        
+        if (!Array.isArray(questions) || questions.length < 3) {
+            return res.status(400).send('You must set at least 3 security questions');
+        }
+
+        await PasswordResetService.setSecurityQuestions(req.session.user.username, questions);
+        res.status(200).send('Security questions set successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(400).send(error.message);
+    }
+});
+
+// Password Reset (unauthenticated)
+router.get('/forgot-password', (req, res) => {
+    res.render('forgotPassword');
+});
+
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { username } = req.body;
+        const questions = await PasswordResetService.getUserSecurityQuestions(username);
+        
+        if (questions.length === 0) {
+            return res.status(400).send('No security questions found for this user. Please contact support.');
+        }
+
+        res.render('resetPassword', { username, questions });
+    } catch (error) {
+        console.error(error);
+        res.status(400).send('User not found or no security questions set');
+    }
+});
+
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { username, newPassword, confirmPassword, answers } = req.body;
+        
+        if (newPassword !== confirmPassword) {
+            return res.status(400).send('Passwords do not match');
+        }
+
+        if (!Array.isArray(answers) || answers.length < 2) {
+            return res.status(400).send('You must answer at least 2 security questions');
+        }
+
+        await PasswordResetService.resetPassword(username, newPassword, answers);
+        res.status(200).send('Password reset successfully. You can now log in with your new password.');
+    } catch (error) {
+        console.error(error);
+        res.status(400).send(error.message);
     }
 });
 
