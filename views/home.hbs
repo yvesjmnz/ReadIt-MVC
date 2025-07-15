@@ -31,6 +31,14 @@
             </div>
         </div>
     </div>
+    {{#if user.lastLogin}}
+        <div id="login-toast" class="toast-notification">
+            <strong>Welcome back!</strong><br>
+            Last login: {{formatDate user.lastLogin}}<br>
+            Last attempt: {{formatDate user.lastLoginAttempt}}
+        </div>
+    {{/if}}
+
 
     <div class="main-content">
         <div class="sidebar">
@@ -169,5 +177,12 @@
     <script src="/js/components/postActions.js"></script>
     <script src="/js/components/communityActions.js"></script>
     <script src="/js/app.js"></script>
+    <script>
+    setTimeout(() => {
+        const toast = document.getElementById('login-toast');
+        if (toast) toast.remove();
+    }, 3000);
+</script>
+
 </body>
 </html>

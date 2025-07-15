@@ -67,50 +67,57 @@ class UserService {
     }
 
     static async authenticate(username, password, ip = null, userAgent = null) {
-        const user = await this.findByUsername(username);
-        if (!user) {
-            logger.logAuthFailure(username, ip, userAgent, 'User not found');
-            throw new Error('Invalid credentials'); // Generic
-        }
+    const user = await this.findByUsername(username);
+    const now = new Date();
 
-        // Account lock check
-        if (user.lockUntil && user.lockUntil > Date.now()) {
-            const unlockTime = new Date(user.lockUntil).toLocaleString('en-PH', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true,
-                day: '2-digit',
-                month: 'short'
-            });
-            logger.logAuthFailure(username, ip, userAgent, 'Account locked');
-            throw new Error(`Account is temporarily locked until ${unlockTime}.`);
-}
+    if (!user) {
+        logger.logAuthFailure(username, ip, userAgent, 'User not found');
+        throw new Error('Invalid credentials');
+    }
 
+    // update lastLoginAttempt
+    user.lastLoginAttempt = now;
 
-        const isValid = await bcrypt.compare(password, user.password);
-        user.lastLoginAttempt = new Date();
-
-        if (!isValid) {
-            user.failedAttempts = (user.failedAttempts || 0) + 1;
-
-            if (user.failedAttempts >= MAX_FAILED_ATTEMPTS) {
-                user.lockUntil = Date.now() + LOCK_TIME;
-                user.failedAttempts = 0;
-            }
-
-            await user.save();
-            logger.logAuthFailure(username, ip, userAgent, 'Invalid password');
-            throw new Error('Invalid credentials'); // Generic
-        }
-
-        // Successful login
-        user.failedAttempts = 0;
-        user.lockUntil = undefined;
-        user.lastLogin = new Date();
+    // Account lock check
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+        const unlockTime = new Date(user.lockUntil).toLocaleString('en-PH', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+            day: '2-digit',
+            month: 'short'
+        });
+        logger.logAuthFailure(username, ip, userAgent, 'Account locked');
 
         await user.save();
-        return user;
+        throw new Error(`Account is temporarily locked until ${unlockTime}.`);
     }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+        user.failedAttempts += 1;
+        logger.logAuthFailure(username, ip, userAgent, 'Invalid password');
+
+        // Account lock logic
+        if (user.failedAttempts >= 5) {
+            const lockMinutes = 5;
+            user.lockUntil = new Date(Date.now() + lockMinutes * 60 * 1000);
+            logger.logAccountLock(username, ip);
+        }
+
+        await user.save(); 
+        throw new Error('Invalid credentials');
+    }
+
+    // Success
+    user.failedAttempts = 0;
+    user.lockUntil = null;
+    user.lastLogin = now; 
+    await user.save();
+
+    return user;
+}
+
 
     static async updatePassword(username, currentPassword, newPassword) {
         const user = await this.findByUsername(username);

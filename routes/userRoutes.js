@@ -85,11 +85,18 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { username, password, rememberMe } = req.body;
+
+        const userBefore = await UserService.findByUsername(username);
+        const previousLogin = userBefore?.lastLogin;
+        const previousAttempt = userBefore?.lastLoginAttempt;
+
         const user = await UserService.authenticate(username, password, req.ip, req.get('User-Agent'));
 
         req.session.user = {
             username: user.username,
-            quote: user.quote
+            quote: user.quote,
+            lastLogin: previousLogin,
+            lastLoginAttempt: previousAttempt
         };
 
         if (rememberMe) {
@@ -105,6 +112,7 @@ router.post('/login', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
 
 
 // Profile

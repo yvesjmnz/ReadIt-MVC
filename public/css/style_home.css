@@ -233,9 +233,6 @@ body {
     border-bottom: 1px solid var(--border-primary);
 }
 
-.all-communities-section {
-    /* No border-bottom for last section */
-}
 
 .communities-list {
     max-height: 300px;
@@ -533,5 +530,6 @@ body {
         transform: translateX(-50%) !important;
         width: 95% !important;
         max-width: none !important;
-    }
+    } 
+    
 }
