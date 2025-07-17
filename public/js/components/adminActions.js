@@ -449,8 +449,13 @@ class AdminActions {
 
             const result = await response.json();
             
+            if (response.status === 403){
+                NotificationSystem.error('Administrator privileges required.');
+                return;
+            }
+
             this.displayTestResult(test.description, response.status, result);
-            
+
             if (!response.ok) {
                 NotificationSystem.success(`Validation test "${test.description}" triggered successfully! Check security logs for the logged entry.`);
             } else {

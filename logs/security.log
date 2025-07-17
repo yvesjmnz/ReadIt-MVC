@@ -55,3 +55,22 @@
 {"timestamp":"2025-07-17T14:10:44.834Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
 {"timestamp":"2025-07-17T14:10:52.027Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
 {"timestamp":"2025-07-17T14:12:30.313Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:29:40.755Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:29:48.663Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community/new%20community%20test (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:39:53.961Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:40:05.270Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:40:43.689Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:40:55.970Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:40:59.823Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:43:15.315Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:43:17.296Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"ab","rule":"length (3-50)","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:43:27.586Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:43:32.472Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:44:47.452Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:44:50.795Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"title/description","value":{"title":"","post_description":"Valid post description here"},"rule":"required","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:45:09.452Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:45:11.885Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:45:13.643Z","type":"ACCESS_DENIED","message":"Access denied","username":"GDL TEST","resource":"/community (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-07-17T14:45:57.846Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name/description","value":{"name":"","description":"Valid description here"},"rule":"required","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:45:58.358Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"description","value":"short","rule":"length (10-500)","username":"GDLUSER","ip":"::1"}
+{"timestamp":"2025-07-17T14:45:58.955Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"ab","rule":"length (3-50)","username":"GDLUSER","ip":"::1"}

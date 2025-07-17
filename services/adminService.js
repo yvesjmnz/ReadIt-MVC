@@ -192,6 +192,7 @@ class AdminService {
         });
     }
 
+
     // Check if user is admin
     static async isAdmin(username) {
         const user = await User.findOne({ username, isAdmin: true });
