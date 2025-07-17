@@ -531,5 +531,16 @@ body {
         width: 95% !important;
         max-width: none !important;
     } 
-    
+ 
+}
+
+.toast-notification{
+    margin-left: 50px;
+    margin-bottom: 10px;
+    background-color: #28a745;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 6px;
+    max-width: 300px;
+    min-width: 200px;
 }

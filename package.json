@@ -138,5 +138,9 @@
   "engines": {
     "node": "20.x"
   },
-  "description": ""
+  "description": "Arucan, Oliver Aldrin Jimenez, Yves Alvin Andrei Sanchez, Darren Julian",
+  "directories": {
+    "test": "tests"
+  },
+  "devDependencies": {}
 }

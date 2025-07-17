@@ -35,13 +35,7 @@
                     <p class="profile-quote">{{visitedUser.quote}}</p>
                 </div>
             </div>
-            <div class="profile-buttons">
-                {{#unless (eq loggedInUser.username visitedUser.username)}}
-                    <button class="follow-button btn btn-primary" data-username="{{visitedUser.username}}">
-                        Follow
-                    </button>
-                {{/unless}}
-            </div>
+    
         </div>
 
         <div class="sections">
