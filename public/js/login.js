@@ -21,13 +21,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const message = await res.text();
 
                 if (res.ok) {
-                    window.location.href = '/'; // success: go home
+                    NotificationSystem.success('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
                 } else {
-                    alert(message); // show error like "Invalid credentials"
+                    NotificationSystem.error(message);
                 }
             } catch (err) {
-                console.error(err);
-                alert('An error occurred. Please try again.');
+                console.error('Login error:', err);
+                NotificationSystem.error('An error occurred. Please try again.');
             }
         });
     }

@@ -19,7 +19,7 @@ class UserService {
 
     static isPasswordStrong(password) {
         // Minimum 12 chars, upper, lower, number, special
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{12,}$/.test(password);
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&_.])[A-Za-z\d@$!%*?#&_.]{12,}$/.test(password);
     }
 
     static async create({ username, password, quote, securityQuestions = null }) {
@@ -28,6 +28,7 @@ class UserService {
 
         if (!this.isPasswordStrong(password)) {
             throw new Error('Password must be at least 12 characters and include uppercase, lowercase, number, and special character.');
+            
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
