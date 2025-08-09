@@ -63,6 +63,15 @@ class LoggerService {
         this.writeLog(entry);
     }
 
+    // Log account lock
+    logAccountLock(username, ip){
+        const entry = this.formatLogEntry('ACCOUNT_LOCKED', 'Account Locked', {
+            username,
+            ip
+        });
+        this.writeLog(entry);
+    }
+
     // Read log content (admin only)
     readLogs(lines = 100) {
         try {
