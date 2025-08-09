@@ -157,7 +157,7 @@ class UserService {
         }
 
         await user.save();
-        logger.logPasswordChange(username);
+        logger.logPasswordChange(username, ip);
         return true;
     }
 
