@@ -21,3 +21,4 @@
 {"timestamp":"2025-08-09T15:30:27.049Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
 {"timestamp":"2025-08-09T15:30:27.958Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
 {"timestamp":"2025-08-09T15:31:44.443Z","type":"AUTH_SUCCESS","message":"Authentication successful","username":"admin","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36","reason":"Authentication successful"}
+{"timestamp":"2025-08-09T15:33:35.206Z","type":"ACCESS_DENIED","message":"Access denied","username":"admin","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
