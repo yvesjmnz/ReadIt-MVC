@@ -22,7 +22,7 @@ class UserService {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&_.])[A-Za-z\d@$!%*?#&_.]{12,}$/.test(password);
     }
 
-    static async create({ username, password, quote, securityQuestions = null }) {
+    static async create({ username, password, quote, securityQuestions = null, ip = null}) {
         const existingUser = await this.findByUsername(username);
         if (existingUser) throw new Error('User already exists');
 
@@ -64,6 +64,7 @@ class UserService {
         }
 
         const user = new User(userData);
+        logger.logAccountCreated(username, ip);
         return await user.save();
     }
 
@@ -116,11 +117,13 @@ class UserService {
     user.lastLogin = now; 
     await user.save();
 
+    logger.logAuthSuccess(username, ip, userAgent, 'Authentication successful');
+
     return user;
 }
 
 
-    static async updatePassword(username, currentPassword, newPassword) {
+    static async updatePassword(username, currentPassword, newPassword, ip = null) {
         const user = await this.findByUsername(username);
         if (!user) throw new Error('User not found');
 
@@ -155,6 +158,7 @@ class UserService {
         }
 
         await user.save();
+        logger.logPasswordChange(username);
         return true;
     }
 

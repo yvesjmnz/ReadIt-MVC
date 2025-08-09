@@ -29,6 +29,16 @@ class LoggerService {
         fs.appendFileSync(this.logFile, entry);
     }
 
+    // Log authentication success
+    logAuthSuccess(username, ip, userAgent, reason){
+        const entry = this.formatLogEntry('AUTH_SUCCESS', 'Authentication successful', {
+            username, 
+            ip,
+            userAgent,
+            reason
+        });
+        this.writeLog(entry);
+    }
     // Log authentication failures only
     logAuthFailure(username, ip, userAgent, reason) {
         const entry = this.formatLogEntry('AUTH_FAILURE', 'Authentication failed', {
@@ -67,6 +77,24 @@ class LoggerService {
     logAccountLock(username, ip){
         const entry = this.formatLogEntry('ACCOUNT_LOCKED', 'Account Locked', {
             username,
+            ip
+        });
+        this.writeLog(entry);
+    }
+
+    // Log Password change success
+    logPasswordChange(username, ip){
+        const entry = this.formatLogEntry('PASSWORD_CHANGED', 'Password changed', {
+            username, 
+            ip
+        });
+        this.writeLog(entry);
+    }
+
+    // Log Password change success
+    logAccountCreated(username, ip){
+        const entry = this.formatLogEntry('ACCOUNT_CREATED', 'Account created', {
+            username, 
             ip
         });
         this.writeLog(entry);
