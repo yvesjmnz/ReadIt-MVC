@@ -143,12 +143,41 @@ router.delete('/community/:name', requireAdmin, async (req, res, next) => {
     }
 });
 
-// Get logs
-router.get('/logs', requireAdmin, async (req, res, next) => {
+// Get logs by category
+router.get('/logs/:category?', requireAdmin, async (req, res, next) => {
     try {
+        const category = req.params.category || 'security';
         const lines = parseInt(req.query.lines) || 100;
-        const logs = logger.readLogs(lines);
-        res.json(logs);
+        
+        // Validate category
+        const validCategories = logger.getLogCategories();
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({ 
+                error: 'Invalid log category',
+                validCategories 
+            });
+        }
+        
+        const logs = logger.readLogs(category, lines);
+        res.json({
+            category,
+            logs,
+            totalEntries: logs.length
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Get log categories and stats
+router.get('/logs-info', requireAdmin, async (req, res, next) => {
+    try {
+        const categories = logger.getLogCategories();
+        const stats = logger.getLogStats();
+        res.json({
+            categories,
+            stats
+        });
     } catch (error) {
         next(error);
     }

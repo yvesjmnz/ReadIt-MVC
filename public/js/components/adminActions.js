@@ -31,6 +31,8 @@ class AdminActions {
         
         // Logs functionality
         DOMUtils.delegate(document, '#refresh-logs-btn', 'click', this.handleRefreshLogs.bind(this));
+        DOMUtils.delegate(document, '.log-tab-btn', 'click', this.handleLogTabClick.bind(this));
+        DOMUtils.delegate(document, '#logs-limit', 'change', this.handleLogsLimitChange.bind(this));
         
         // Test functionality
         DOMUtils.delegate(document, '#test-empty-name', 'click', () => this.runValidationTest('empty-name'));
@@ -69,7 +71,7 @@ class AdminActions {
             
             // Load logs if logs section is selected
             if (sectionName === 'logs') {
-                this.loadLogs();
+                this.initializeLogs();
             }
         }
     }
@@ -342,25 +344,90 @@ class AdminActions {
         }
     }
 
+    async initializeLogs() {
+        this.currentLogCategory = 'security';
+        this.currentLogLimit = 100;
+        await this.loadLogStats();
+        await this.loadLogs();
+    }
+
+    async loadLogStats() {
+        try {
+            const response = await fetch('/api/admin/logs-info');
+            const data = await response.json();
+            this.displayLogStats(data.stats);
+        } catch (error) {
+            console.error('Failed to load log stats:', error);
+        }
+    }
+
+    displayLogStats(stats) {
+        const display = document.getElementById('logs-stats-display');
+        
+        const statsHtml = Object.entries(stats).map(([category, stat]) => {
+            const icon = this.getCategoryIcon(category);
+            return `
+                <div class="stat-item">
+                    <i class="${icon}"></i>
+                    <span class="stat-label">${category.charAt(0).toUpperCase() + category.slice(1)}:</span>
+                    <span class="stat-value">${stat.count} entries</span>
+                </div>
+            `;
+        }).join('');
+        
+        display.innerHTML = `<div class="stats-grid">${statsHtml}</div>`;
+    }
+
+    getCategoryIcon(category) {
+        const icons = {
+            security: 'fas fa-shield-alt',
+            auth: 'fas fa-sign-in-alt',
+            access: 'fas fa-lock',
+            validation: 'fas fa-exclamation-triangle'
+        };
+        return icons[category] || 'fas fa-file-alt';
+    }
+
     async loadLogs() {
         try {
-            const response = await fetch('/api/admin/logs?lines=100');
-            const logs = await response.json();
-            this.displayLogs(logs);
+            const response = await fetch(`/api/admin/logs/${this.currentLogCategory}?lines=${this.currentLogLimit}`);
+            const data = await response.json();
+            this.displayLogs(data.logs, data.category);
         } catch (error) {
             NotificationSystem.error('Failed to load logs');
         }
     }
 
     async handleRefreshLogs() {
+        await this.loadLogStats();
         await this.loadLogs();
     }
 
-    displayLogs(logs) {
+    handleLogTabClick(e) {
+        const category = e.target.dataset.category;
+        if (!category) return;
+
+        // Update active tab
+        document.querySelectorAll('.log-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        e.target.classList.add('active');
+
+        // Update current category and load logs
+        this.currentLogCategory = category;
+        this.loadLogs();
+    }
+
+    handleLogsLimitChange(e) {
+        this.currentLogLimit = parseInt(e.target.value);
+        this.loadLogs();
+    }
+
+    displayLogs(logs, category) {
         const display = document.getElementById('logs-display');
         
         if (!logs || logs.length === 0) {
-            display.innerHTML = '<p class="no-logs">No log entries found.</p>';
+            display.innerHTML = `<p class="no-logs">No ${category} log entries found.</p>`;
             return;
         }
 
@@ -370,12 +437,13 @@ class AdminActions {
             }
 
             const typeClass = log.type ? log.type.toLowerCase() : '';
+            const typeColor = this.getTypeColor(log.type);
             
             return `
                 <div class="log-entry ${typeClass}">
                     <div class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
                     <div class="log-header">
-                        <span class="log-type">[${log.type || 'UNKNOWN'}]</span>
+                        <span class="log-type" style="color: ${typeColor}">[${log.type || 'UNKNOWN'}]</span>
                     </div>
                     <div class="log-message">${log.message}</div>
                     ${this.formatLogDetails(log)}
@@ -385,6 +453,19 @@ class AdminActions {
 
         display.innerHTML = logHtml;
         display.scrollTop = display.scrollHeight;
+    }
+
+    getTypeColor(type) {
+        const colors = {
+            'AUTH_SUCCESS': '#28a745',
+            'AUTH_FAILURE': '#dc3545',
+            'ACCESS_DENIED': '#fd7e14',
+            'VALIDATION_FAILURE': '#ffc107',
+            'ACCOUNT_LOCKED': '#dc3545',
+            'PASSWORD_CHANGED': '#17a2b8',
+            'ACCOUNT_CREATED': '#28a745'
+        };
+        return colors[type] || '#6c757d';
     }
 
     formatLogDetails(log) {

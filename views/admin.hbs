@@ -297,18 +297,45 @@
 
             <!-- System Logs Section -->
             <div id="logs-section" class="admin-section">
-                <h2><i class="fas fa-file-alt"></i> Security Logs</h2>
+                <h2><i class="fas fa-file-alt"></i> System Logs</h2>
                 
                 <div class="logs-controls">
-                    <button id="refresh-logs-btn" class="btn btn-secondary">
-                        <i class="fas fa-sync"></i> Refresh Logs
-                    </button>
-                    <span class="logs-info">Showing authentication, access control, and validation failures</span>
+                    <div class="logs-tabs">
+                        <button class="log-tab-btn active" data-category="security">
+                            <i class="fas fa-shield-alt"></i> All Security
+                        </button>
+                        <button class="log-tab-btn" data-category="auth">
+                            <i class="fas fa-sign-in-alt"></i> Authentication
+                        </button>
+                        <button class="log-tab-btn" data-category="access">
+                            <i class="fas fa-lock"></i> Access Control
+                        </button>
+                        <button class="log-tab-btn" data-category="validation">
+                            <i class="fas fa-exclamation-triangle"></i> Validation
+                        </button>
+                    </div>
+                    <div class="logs-actions">
+                        <button id="refresh-logs-btn" class="btn btn-secondary">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                        <select id="logs-limit" class="form-select">
+                            <option value="50">Last 50</option>
+                            <option value="100" selected>Last 100</option>
+                            <option value="200">Last 200</option>
+                            <option value="500">Last 500</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="logs-stats">
+                    <div id="logs-stats-display" class="stats-summary">
+                        <p>Loading log statistics...</p>
+                    </div>
                 </div>
 
                 <div class="logs-content">
                     <div id="logs-display" class="logs-display">
-                        <p class="no-logs">Click refresh to load security logs.</p>
+                        <p class="no-logs">Select a log category and click refresh to load logs.</p>
                     </div>
                 </div>
             </div>

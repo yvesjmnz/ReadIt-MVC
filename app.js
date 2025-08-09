@@ -77,4 +77,53 @@ app.use('/admin', require('./routes/views/admin'));
 // Test Routes (Admin only)
 app.use('/test/validation', require('./routes/test/validation'));
 
+// Error handling middleware (must be last)
+const { handleApiError, handleViewError } = require('./middleware/errorHandler');
+
+// API error handler
+app.use('/api', handleApiError);
+
+// View error handler for all other routes
+app.use(handleViewError);
+
+// Global error handler for unhandled errors
+app.use((error, req, res, next) => {
+    const logger = require('./services/loggerService');
+    
+    // Log the error without exposing details
+    logger.logValidationFailure('global', req.path, 'unhandled error', req.session?.user?.username || null, req.ip);
+    
+    // Check if it's an API route
+    if (req.path.startsWith('/api/')) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+    
+    // For view routes, render error page
+    res.status(500).render('error', {
+        status: '500',
+        message: 'Internal server error',
+        description: 'There was an error processing your request. Please try again later.'
+    });
+});
+
+// Handle 404 errors
+app.use((req, res) => {
+    const logger = require('./services/loggerService');
+    
+    // Log 404 attempts
+    logger.logValidationFailure('route', req.path, '404 not found', req.session?.user?.username || null, req.ip);
+    
+    // Check if it's an API route
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Route not found' });
+    }
+    
+    // For view routes, render error page
+    res.status(404).render('error', {
+        status: '404',
+        message: 'Page not found',
+        description: 'The page you are looking for does not exist.'
+    });
+});
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

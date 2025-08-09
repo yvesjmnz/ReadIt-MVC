@@ -24,11 +24,14 @@ class UserService {
 
     static async create({ username, password, quote, securityQuestions = null, ip = null}) {
         const existingUser = await this.findByUsername(username);
-        if (existingUser) throw new Error('User already exists');
+        if (existingUser) {
+            logger.logValidationFailure('username', username, 'user already exists', username, ip);
+            throw new Error('User already exists');
+        }
 
         if (!this.isPasswordStrong(password)) {
+            logger.logValidationFailure('password', '[REDACTED]', 'weak password', username, ip);
             throw new Error('Password must be at least 12 characters and include uppercase, lowercase, number, and special character.');
-            
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -128,20 +131,26 @@ class UserService {
         if (!user) throw new Error('User not found');
 
         const valid = await bcrypt.compare(currentPassword, user.password);
-        if (!valid) throw new Error('Current password is incorrect');
+        if (!valid) {
+            logger.logValidationFailure('currentPassword', '[REDACTED]', 'incorrect current password', username, ip);
+            throw new Error('Current password is incorrect');
+        }
 
         const lastChanged = user.passwordLastChanged || new Date(0);
         if (Date.now() - new Date(lastChanged).getTime() < PASSWORD_MIN_AGE) {
+            logger.logValidationFailure('passwordLastChanged', lastChanged, 'password change before min age', username, ip);
             throw new Error('You can only change your password once every 24 hours.');
         }
 
         if (!this.isPasswordStrong(newPassword)) {
+            logger.logValidationFailure('newPassword', '[REDACTED]', 'weak password', username, ip);
             throw new Error('New password is not strong enough.');
         }
 
         // Prevent password reuse
         for (const old of user.passwordHistory || []) {
             if (await bcrypt.compare(newPassword, old.hash)) {
+                logger.logValidationFailure('newPassword', '[REDACTED]', 'password reuse detected', username, ip);
                 throw new Error('You cannot reuse a previously used password.');
             }
         }

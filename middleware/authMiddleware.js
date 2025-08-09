@@ -14,6 +14,7 @@ const requireAuth = (req, res, next) => {
 const requireModerator = async (req, res, next) => {
     try {
         if (!req.session.user) {
+            logger.logAccessDenied(null, `${req.path} (moderator)`, 'Not authenticated', req.ip);
             return res.status(401).json({ error: 'Authentication required' });
         }
 
@@ -36,7 +37,7 @@ const requireModerator = async (req, res, next) => {
         req.community = community;
         next();
     } catch (error) {
-        console.error('Error checking moderator status:', error);
+        logger.logValidationFailure('authMiddleware', req.path, 'moderator check error', req.session?.user?.username || null, req.ip);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -45,6 +46,7 @@ const requireModerator = async (req, res, next) => {
 const requireCreator = async (req, res, next) => {
     try {
         if (!req.session.user) {
+            logger.logAccessDenied(null, `${req.path} (creator)`, 'Not authenticated', req.ip);
             return res.status(401).json({ error: 'Authentication required' });
         }
 
@@ -67,7 +69,7 @@ const requireCreator = async (req, res, next) => {
         req.community = community;
         next();
     } catch (error) {
-        console.error('Error checking creator status:', error);
+        logger.logValidationFailure('authMiddleware', req.path, 'creator check error', req.session?.user?.username || null, req.ip);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -114,7 +116,7 @@ const checkBanStatus = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.error('Error checking ban status:', error);
+        logger.logValidationFailure('authMiddleware', req.path, 'ban check error', req.session?.user?.username || null, req.ip);
         res.status(500).render('error', { 
             error: 'Internal server error',
             pageTitle: 'Error'
@@ -126,6 +128,7 @@ const checkBanStatus = async (req, res, next) => {
 const requireAdmin = async (req, res, next) => {
     try {
         if (!req.session.user) {
+            logger.logAccessDenied(null, `${req.path} (admin)`, 'Not authenticated', req.ip);
             return res.status(401).json({ error: 'Authentication required' });
         }
 
@@ -140,7 +143,7 @@ const requireAdmin = async (req, res, next) => {
         req.adminUser = user;
         next();
     } catch (error) {
-        console.error('Error checking admin status:', error);
+        logger.logValidationFailure('authMiddleware', req.path, 'admin check error', req.session?.user?.username || null, req.ip);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

@@ -6,6 +6,7 @@ const CommunityService = require('../services/communityService');
 const PasswordResetService = require('../services/passwordResetService');
 const samplePosts = require('../models/samplePost');
 const sampleProfiles = require('../models/sampleProfiles');
+const logger = require('../services/loggerService');
 
 const requireLogin = (req, res, next) => {
     if (req.session && req.session.user) {
@@ -54,6 +55,7 @@ router.post('/register', async (req, res) => {
         const { username, password, confirmPassword, quote } = req.body;
 
         if (password !== confirmPassword) {
+            logger.logValidationFailure('confirmPassword', '[REDACTED]', 'passwords do not match', username, req.ip);
             return res.status(400).send('Passwords do not match');
         }
 
@@ -198,6 +200,7 @@ router.post('/change-password', requireLogin, async (req, res) => {
         const { currentPassword, newPassword, confirmPassword } = req.body;
         
         if (newPassword !== confirmPassword) {
+            logger.logValidationFailure('confirmPassword', '[REDACTED]', 'passwords do not match', req.session.user.username, req.ip);
             return res.status(400).send('New passwords do not match');
         }
 
@@ -237,6 +240,7 @@ router.post('/security-questions', requireLogin, async (req, res) => {
         const { questions } = req.body;
         
         if (!Array.isArray(questions) || questions.length < 3) {
+            logger.logValidationFailure('securityQuestions', questions, 'insufficient questions (min 3)', req.session.user.username, req.ip);
             return res.status(400).send('You must set at least 3 security questions');
         }
 
@@ -259,6 +263,7 @@ router.post('/forgot-password', async (req, res) => {
         const questions = await PasswordResetService.getUserSecurityQuestions(username);
         
         if (questions.length === 0) {
+            logger.logValidationFailure('securityQuestions', username, 'no security questions found', username, req.ip);
             return res.status(400).send('No security questions found for this user. Please contact support.');
         }
 
@@ -274,10 +279,12 @@ router.post('/reset-password', async (req, res) => {
         const { username, newPassword, confirmPassword, answers } = req.body;
         
         if (newPassword !== confirmPassword) {
+            logger.logValidationFailure('confirmPassword', '[REDACTED]', 'passwords do not match', username, req.ip);
             return res.status(400).send('Passwords do not match');
         }
 
         if (!Array.isArray(answers) || answers.length < 2) {
+            logger.logValidationFailure('securityAnswers', answers, 'insufficient answers (min 2)', username, req.ip);
             return res.status(400).send('You must answer at least 2 security questions');
         }
 

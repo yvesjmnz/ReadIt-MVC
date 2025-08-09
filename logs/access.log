@@ -1,6 +1,17 @@
-{"timestamp":"2025-07-04T13:12:35.441Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/revoke-admin/DJ-ADMIN (admin)","reason":"Not an administrator","ip":"::1"}
-{"timestamp":"2025-07-04T13:12:39.591Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/post/undefined (admin)","reason":"Not an administrator","ip":"::1"}
-{"timestamp":"2025-07-04T13:12:43.421Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/post/6867c192dce388967d39af19 (admin)","reason":"Not an administrator","ip":"::1"}
-{"timestamp":"2025-07-04T13:12:45.292Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/post/6867cda407e9ce19f5f5d5a2 (admin)","reason":"Not an administrator","ip":"::1"}
-{"timestamp":"2025-07-04T13:12:46.411Z","level":"WARN","category":"ACCESS","message":"Access denied","username":"testuser123","resource":"/logs (admin)","reason":"Not an administrator","ip":"::1"}
-{"timestamp":"2025-07-04T13:15:09.410Z","level":"WARN","category":"ACCESS","message":"Access denied","username":null,"resource":"/","reason":"Not authenticated","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:42.310Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/unban-user (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:44.367Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs-info (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:44.461Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/security (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:45.780Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/access (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:46.221Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/auth (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:47.004Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/security (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:47.661Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/auth (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:48.327Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs-info (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:48.422Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/auth (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:48.701Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs-info (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:48.797Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/auth (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:52.732Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/grant-admin (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:55.381Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/revoke-admin/DJ-ADMIN (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:57.484Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs-info (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:29:57.578Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser3","resource":"/logs/security (admin)","reason":"Not an administrator","ip":"::1"}
+{"timestamp":"2025-08-09T15:30:27.049Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
+{"timestamp":"2025-08-09T15:30:27.958Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}

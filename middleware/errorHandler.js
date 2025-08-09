@@ -1,5 +1,8 @@
+const logger = require('../services/loggerService');
+
 const handleApiError = (error, req, res, next) => {
-    console.error('API Error:', error);
+    // Do not leak stack traces; log a sanitized entry instead
+    logger.logValidationFailure('api', req.path, 'api error', req.session?.user?.username || null, req.ip);
 
     if (error.code === 11000) {
         return res.status(400).json({ error: 'Resource already exists' });
@@ -17,7 +20,8 @@ const handleApiError = (error, req, res, next) => {
 };
 
 const handleViewError = (error, req, res, next) => {
-    console.error('View Error:', error);
+    // Do not leak stack traces; log a sanitized entry instead
+    logger.logValidationFailure('view', req.path, 'view error', req.session?.user?.username || null, req.ip);
 
     if (error.message === 'Community not found' || error.message === 'Post not found') {
         return res.status(404).render('error', {

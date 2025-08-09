@@ -4,7 +4,12 @@ const path = require('path');
 class LoggerService {
     constructor() {
         this.logDir = path.join(__dirname, '../logs');
-        this.logFile = path.join(this.logDir, 'security.log');
+        this.logFiles = {
+            security: path.join(this.logDir, 'security.log'),
+            auth: path.join(this.logDir, 'auth.log'),
+            access: path.join(this.logDir, 'access.log'),
+            validation: path.join(this.logDir, 'validation.log')
+        };
         this.ensureLogDirectory();
     }
 
@@ -25,8 +30,17 @@ class LoggerService {
         return JSON.stringify(logEntry) + '\n';
     }
 
-    writeLog(entry) {
-        fs.appendFileSync(this.logFile, entry);
+    writeLog(entry, category = 'security') {
+        // Write to category-specific log
+        const categoryFile = this.logFiles[category];
+        if (categoryFile) {
+            fs.appendFileSync(categoryFile, entry);
+        }
+        
+        // Also write to master security log for backward compatibility
+        if (category !== 'security') {
+            fs.appendFileSync(this.logFiles.security, entry);
+        }
     }
 
     // Log authentication success
@@ -37,8 +51,9 @@ class LoggerService {
             userAgent,
             reason
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'auth');
     }
+    
     // Log authentication failures only
     logAuthFailure(username, ip, userAgent, reason) {
         const entry = this.formatLogEntry('AUTH_FAILURE', 'Authentication failed', {
@@ -47,7 +62,7 @@ class LoggerService {
             userAgent,
             reason
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'auth');
     }
 
     // Log access control failures
@@ -58,7 +73,7 @@ class LoggerService {
             reason,
             ip
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'access');
     }
 
     // Log validation failures
@@ -70,7 +85,7 @@ class LoggerService {
             username,
             ip
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'validation');
     }
 
     // Log account lock
@@ -79,7 +94,7 @@ class LoggerService {
             username,
             ip
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'auth');
     }
 
     // Log Password change success
@@ -88,26 +103,27 @@ class LoggerService {
             username, 
             ip
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'auth');
     }
 
-    // Log Password change success
+    // Log account creation
     logAccountCreated(username, ip){
         const entry = this.formatLogEntry('ACCOUNT_CREATED', 'Account created', {
             username, 
             ip
         });
-        this.writeLog(entry);
+        this.writeLog(entry, 'auth');
     }
 
-    // Read log content (admin only)
-    readLogs(lines = 100) {
+    // Read log content by category (admin only)
+    readLogs(category = 'security', lines = 100) {
         try {
-            if (!fs.existsSync(this.logFile)) {
+            const logFile = this.logFiles[category];
+            if (!logFile || !fs.existsSync(logFile)) {
                 return [];
             }
 
-            const content = fs.readFileSync(this.logFile, 'utf8');
+            const content = fs.readFileSync(logFile, 'utf8');
             const logLines = content.trim().split('\n').filter(line => line);
             
             // Return last N lines
@@ -122,6 +138,33 @@ class LoggerService {
         } catch (error) {
             return [];
         }
+    }
+
+    // Get available log categories
+    getLogCategories() {
+        return Object.keys(this.logFiles);
+    }
+
+    // Get log stats for each category
+    getLogStats() {
+        const stats = {};
+        for (const [category, filePath] of Object.entries(this.logFiles)) {
+            try {
+                if (fs.existsSync(filePath)) {
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    const lines = content.trim().split('\n').filter(line => line);
+                    stats[category] = {
+                        count: lines.length,
+                        lastEntry: lines.length > 0 ? lines[lines.length - 1] : null
+                    };
+                } else {
+                    stats[category] = { count: 0, lastEntry: null };
+                }
+            } catch (error) {
+                stats[category] = { count: 0, lastEntry: null, error: error.message };
+            }
+        }
+        return stats;
     }
 }
 

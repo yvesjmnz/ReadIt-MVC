@@ -52,12 +52,15 @@ const validatePost = (req, res, next) => {
 
 const validateComment = (req, res, next) => {
     const { text } = req.body;
+    const username = req.session?.user?.username;
 
     if (!text || text.trim().length === 0) {
+        logger.logValidationFailure('comment_text', text, 'required', username, req.ip);
         return res.status(400).json({ error: 'Comment text is required' });
     }
 
     if (text.length > 1000) {
+        logger.logValidationFailure('comment_text', text, 'length (max 1000)', username, req.ip);
         return res.status(400).json({ error: 'Comment must be less than 1000 characters' });
     }
 
@@ -66,12 +69,15 @@ const validateComment = (req, res, next) => {
 
 const validateModeration = (req, res, next) => {
     const { action, reason } = req.body;
+    const username = req.session?.user?.username;
 
     if (!action || !['lock', 'unlock'].includes(action)) {
+        logger.logValidationFailure('moderation_action', action, 'invalid action', username, req.ip);
         return res.status(400).json({ error: 'Action must be either lock or unlock' });
     }
 
     if (action === 'lock' && (!reason || reason.trim().length < 5)) {
+        logger.logValidationFailure('moderation_reason', reason, 'insufficient reason length', username, req.ip);
         return res.status(400).json({ error: 'Violation reason required (minimum 5 characters)' });
     }
 
