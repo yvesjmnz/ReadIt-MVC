@@ -115,6 +115,36 @@ class LoggerService {
         this.writeLog(entry, 'auth');
     }
 
+    // Log password reset failure
+    logPasswordResetFailure(username, reason, ip) {
+        const entry = this.formatLogEntry('PASSWORD_RESET_FAILURE', 'Password reset failed', {
+            username,
+            reason,
+            ip
+        });
+        this.writeLog(entry, 'auth');
+    }
+
+    // Log security questions setup failure
+    logSecurityQuestionsSetupFailure(username, reason, ip) {
+        const entry = this.formatLogEntry('SECURITY_QUESTIONS_SETUP_FAILURE', 'Security questions setup failed', {
+            username,
+            reason,
+            ip
+        });
+        this.writeLog(entry, 'security');
+    }
+
+    // Log security questions validation failure
+    logSecurityQuestionsValidationFailure(username, reason, ip) {
+        const entry = this.formatLogEntry('SECURITY_QUESTIONS_VALIDATION_FAILURE', 'Security questions validation failed', {
+            username,
+            reason,
+            ip
+        });
+        this.writeLog(entry, 'security');
+    }
+
     // Read log content by category (admin only)
     readLogs(category = 'security', lines = 100) {
         try {
