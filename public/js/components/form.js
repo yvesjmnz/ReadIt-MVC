@@ -3,33 +3,19 @@ class FormHandler {
         this.form = formElement;
         this.options = {
             onSubmit: null,
-            validation: {},
             ...options
         };
         this.init();
     }
 
     init() {
-        this.setupValidation();
         this.setupSubmission();
         this.setupCharacterCounters();
-    }
-
-    setupValidation() {
-        const inputs = this.form.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            input.addEventListener('blur', () => this.validateField(input));
-            input.addEventListener('input', () => this.clearFieldError(input));
-        });
     }
 
     setupSubmission() {
         this.form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!this.validateForm()) {
-                return;
-            }
 
             const submitBtn = this.form.querySelector('button[type="submit"]');
             const originalText = submitBtn?.textContent;
@@ -81,53 +67,8 @@ class FormHandler {
         });
     }
 
-    validateField(field) {
-        const rules = this.options.validation[field.name] || [];
-        const value = field.value.trim();
-
-        for (const rule of rules) {
-            const result = rule(value, field);
-            if (result !== true) {
-                this.showFieldError(field, result);
-                return false;
-            }
-        }
-
-        this.clearFieldError(field);
-        return true;
-    }
-
-    validateForm() {
-        const fields = this.form.querySelectorAll('input, textarea, select');
-        let isValid = true;
-
-        fields.forEach(field => {
-            if (!this.validateField(field)) {
-                isValid = false;
-            }
-        });
-
-        return isValid;
-    }
-
-    showFieldError(field, message) {
-        this.clearFieldError(field);
-        
-        const error = document.createElement('div');
-        error.className = 'field-error';
-        error.textContent = message;
-        
-        field.parentNode.appendChild(error);
-        field.classList.add('field-invalid');
-    }
-
-    clearFieldError(field) {
-        const error = field.parentNode.querySelector('.field-error');
-        if (error) {
-            error.remove();
-        }
-        field.classList.remove('field-invalid');
-    }
+    // Server-side validation handles all validation logic
+    // Character counters provide UX feedback only
 
     getFormData() {
         const formData = new FormData(this.form);
@@ -149,22 +90,4 @@ class FormHandler {
     }
 }
 
-// Common validation rules
-const ValidationRules = {
-    required: (value) => value.length > 0 || 'This field is required',
-    
-    minLength: (min) => (value) => 
-        value.length >= min || `Minimum ${min} characters required`,
-    
-    maxLength: (max) => (value) => 
-        value.length <= max || `Maximum ${max} characters allowed`,
-    
-    noSpecialChars: (value) => 
-        !/[!@#$%^&*(),.?":{}|<>]/g.test(value) || 'Special characters not allowed',
-    
-    email: (value) => 
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || 'Invalid email format'
-};
-
 window.FormHandler = FormHandler;
-window.ValidationRules = ValidationRules;

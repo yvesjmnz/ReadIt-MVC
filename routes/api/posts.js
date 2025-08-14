@@ -5,6 +5,7 @@ const { requireAuth } = require('../../middleware/authMiddleware');
 const { validatePost, validateComment } = require('../../middleware/validation');
 const { validatePostId, validateCommentRoute } = require('../../middleware/paramValidation');
 const { handleApiError } = require('../../middleware/errorHandler');
+const logger = require('../../services/loggerService');
 
 // Get all posts
 router.get('/', async (req, res, next) => {
@@ -52,6 +53,13 @@ router.post('/', requireAuth, validatePost, async (req, res, next) => {
         
         res.status(201).json({ success: true, post });
     } catch (error) {
+        logger.logPostCreationFailure(
+            req.session.user?.username,
+            req.body.title,
+            req.body.communityName,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -63,6 +71,12 @@ router.put('/:id', validatePostId, requireAuth, validatePost, async (req, res, n
         const post = await PostService.update(req.params.id, { title, post_description }, req.session.user.username);
         res.json({ success: true, post });
     } catch (error) {
+        logger.logPostUpdateFailure(
+            req.session.user?.username,
+            req.params.id,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -73,6 +87,12 @@ router.delete('/:id', validatePostId, requireAuth, async (req, res, next) => {
         await PostService.delete(req.params.id, req.session.user.username);
         res.json({ success: true, message: 'Post deleted successfully' });
     } catch (error) {
+        logger.logPostDeletionFailure(
+            req.session.user?.username,
+            req.params.id,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -104,6 +124,13 @@ router.post('/:id/comment', validatePostId, requireAuth, validateComment, async 
         const comment = await PostService.addComment(req.params.id, text, req.session.user.username);
         res.status(201).json({ success: true, comment });
     } catch (error) {
+        logger.logCommentCreationFailure(
+            req.session.user?.username,
+            req.params.id,
+            req.body.text,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -115,6 +142,13 @@ router.put('/:postId/comment/:commentId', validateCommentRoute, requireAuth, val
         const comment = await PostService.updateComment(req.params.postId, req.params.commentId, text, req.session.user.username);
         res.json({ success: true, comment });
     } catch (error) {
+        logger.logCommentUpdateFailure(
+            req.session.user?.username,
+            req.params.postId,
+            req.params.commentId,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -125,6 +159,13 @@ router.delete('/:postId/comment/:commentId', validateCommentRoute, requireAuth, 
         await PostService.deleteComment(req.params.postId, req.params.commentId, req.session.user.username);
         res.json({ success: true, message: 'Comment deleted successfully' });
     } catch (error) {
+        logger.logCommentDeletionFailure(
+            req.session.user?.username,
+            req.params.postId,
+            req.params.commentId,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const UserService = require('./userService');
+const logger = require('./loggerService');
 
 class PasswordResetService {
     // Predefined security questions that encourage unique answers
@@ -19,128 +20,143 @@ class PasswordResetService {
         ];
     }
 
-    static async setSecurityQuestions(username, questionsAndAnswers) {
-        if (!Array.isArray(questionsAndAnswers) || questionsAndAnswers.length < 3) {
-            throw new Error('You must set at least 3 security questions');
-        }
-
-        const user = await User.findOne({ username });
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        // Validate answers are not too common or short
-        for (const qa of questionsAndAnswers) {
-            if (!qa.question || !qa.answer) {
-                throw new Error('Question and answer are required');
-            }
-            
-            const answer = qa.answer.trim().toLowerCase();
-            if (answer.length < 3) {
-                throw new Error('Security answers must be at least 3 characters long');
+    static async setSecurityQuestions(username, questionsAndAnswers, ip = null) {
+        try {
+            if (!Array.isArray(questionsAndAnswers) || questionsAndAnswers.length < 3) {
+                throw new Error('You must set at least 3 security questions');
             }
 
-            // Check for common answers
-            const commonAnswers = [
-                'the bible', 'bible', 'harry potter', 'god', 'jesus', 'mom', 'dad', 
-                'mother', 'father', 'blue', 'red', 'green', 'black', 'white',
-                'john', 'mary', 'mike', 'sarah', 'david', 'love', 'money', 'family'
-            ];
-            
-            if (commonAnswers.includes(answer)) {
-                throw new Error(`"${qa.answer}" is too common. Please provide a more specific answer.`);
+            const user = await User.findOne({ username });
+            if (!user) {
+                throw new Error('User not found');
             }
-        }
 
-        // Hash the answers
-        const hashedQuestions = await Promise.all(
-            questionsAndAnswers.map(async (qa) => ({
-                question: qa.question,
-                answer: await bcrypt.hash(qa.answer.trim().toLowerCase(), 10),
-                createdAt: new Date()
-            }))
-        );
+            // Validate answers are not too common or short
+            for (const qa of questionsAndAnswers) {
+                if (!qa.question || !qa.answer) {
+                    throw new Error('Question and answer are required');
+                }
+                
+                const answer = qa.answer.trim().toLowerCase();
+                if (answer.length < 3) {
+                    throw new Error('Security answers must be at least 3 characters long');
+                }
 
-        user.securityQuestions = hashedQuestions;
-        await user.save();
-        
-        return true;
-    }
-
-    static async validateSecurityAnswers(username, answersProvided) {
-        const user = await User.findOne({ username });
-        if (!user || !user.securityQuestions || user.securityQuestions.length === 0) {
-            throw new Error('No security questions found for this user');
-        }
-
-        if (answersProvided.length < 2) {
-            throw new Error('You must answer at least 2 security questions correctly');
-        }
-
-        let correctAnswers = 0;
-        
-        for (const providedAnswer of answersProvided) {
-            const question = user.securityQuestions.find(q => 
-                q.question === providedAnswer.question
-            );
-            
-            if (question) {
-                const isValid = await bcrypt.compare(
-                    providedAnswer.answer.trim().toLowerCase(), 
-                    question.answer
-                );
-                if (isValid) {
-                    correctAnswers++;
+                // Check for common answers
+                const commonAnswers = [
+                    'the bible', 'bible', 'harry potter', 'god', 'jesus', 'mom', 'dad', 
+                    'mother', 'father', 'blue', 'red', 'green', 'black', 'white',
+                    'john', 'mary', 'mike', 'sarah', 'david', 'love', 'money', 'family'
+                ];
+                
+                if (commonAnswers.includes(answer)) {
+                    throw new Error(`"${qa.answer}" is too common. Please provide a more specific answer.`);
                 }
             }
-        }
 
-        if (correctAnswers < 2) {
-            throw new Error('Insufficient correct answers to security questions');
-        }
+            // Hash the answers
+            const hashedQuestions = await Promise.all(
+                questionsAndAnswers.map(async (qa) => ({
+                    question: qa.question,
+                    answer: await bcrypt.hash(qa.answer.trim().toLowerCase(), 10),
+                    createdAt: new Date()
+                }))
+            );
 
-        return true;
+            user.securityQuestions = hashedQuestions;
+            await user.save();
+            
+            return true;
+        } catch (error) {
+            logger.logSecurityQuestionsSetupFailure(username, error.message, ip);
+            throw error;
+        }
     }
 
-    static async resetPassword(username, newPassword, securityAnswers) {
-        // Validate security answers first
-        await this.validateSecurityAnswers(username, securityAnswers);
-
-        const user = await User.findOne({ username });
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        // Use existing password validation from UserService
-        if (!UserService.isPasswordStrong(newPassword)) {
-            throw new Error('New password is not strong enough.');
-        }
-
-        // Check password history
-        for (const old of user.passwordHistory || []) {
-            if (await bcrypt.compare(newPassword, old.hash)) {
-                throw new Error('You cannot reuse a previously used password.');
+    static async validateSecurityAnswers(username, answersProvided, ip = null) {
+        try {
+            const user = await User.findOne({ username });
+            if (!user || !user.securityQuestions || user.securityQuestions.length === 0) {
+                throw new Error('No security questions found for this user');
             }
+
+            if (answersProvided.length < 2) {
+                throw new Error('You must answer at least 2 security questions correctly');
+            }
+
+            let correctAnswers = 0;
+            
+            for (const providedAnswer of answersProvided) {
+                const question = user.securityQuestions.find(q => 
+                    q.question === providedAnswer.question
+                );
+                
+                if (question) {
+                    const isValid = await bcrypt.compare(
+                        providedAnswer.answer.trim().toLowerCase(), 
+                        question.answer
+                    );
+                    if (isValid) {
+                        correctAnswers++;
+                    }
+                }
+            }
+
+            if (correctAnswers < 2) {
+                throw new Error('Insufficient correct answers to security questions');
+            }
+
+            return true;
+        } catch (error) {
+            logger.logSecurityQuestionsValidationFailure(username, error.message, ip);
+            throw error;
         }
+    }
 
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedNewPassword;
-        user.passwordLastChanged = new Date();
-        user.failedAttempts = 0; // Reset failed attempts
-        user.lockUntil = undefined; // Remove any account lock
+    static async resetPassword(username, newPassword, securityAnswers, ip = null) {
+        try {
+            // Validate security answers first
+            await this.validateSecurityAnswers(username, securityAnswers, ip);
 
-        // Update password history
-        user.passwordHistory = user.passwordHistory || [];
-        user.passwordHistory.push({ 
-            hash: hashedNewPassword, 
-            changedAt: new Date() 
-        });
-        if (user.passwordHistory.length > 5) {
-            user.passwordHistory.shift();
+            const user = await User.findOne({ username });
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Use existing password validation from UserService
+            if (!UserService.isPasswordStrong(newPassword)) {
+                throw new Error('New password is not strong enough.');
+            }
+
+            // Check password history
+            for (const old of user.passwordHistory || []) {
+                if (await bcrypt.compare(newPassword, old.hash)) {
+                    throw new Error('You cannot reuse a previously used password.');
+                }
+            }
+
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedNewPassword;
+            user.passwordLastChanged = new Date();
+            user.failedAttempts = 0; // Reset failed attempts
+            user.lockUntil = undefined; // Remove any account lock
+
+            // Update password history
+            user.passwordHistory = user.passwordHistory || [];
+            user.passwordHistory.push({ 
+                hash: hashedNewPassword, 
+                changedAt: new Date() 
+            });
+            if (user.passwordHistory.length > 5) {
+                user.passwordHistory.shift();
+            }
+
+            await user.save();
+            return true;
+        } catch (error) {
+            logger.logPasswordResetFailure(username, error.message, ip);
+            throw error;
         }
-
-        await user.save();
-        return true;
     }
 
     static async getUserSecurityQuestions(username) {

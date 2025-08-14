@@ -127,48 +127,53 @@ class UserService {
 
 
     static async updatePassword(username, currentPassword, newPassword, ip = null) {
-        const user = await this.findByUsername(username);
-        if (!user) throw new Error('User not found');
+        try {
+            const user = await this.findByUsername(username);
+            if (!user) throw new Error('User not found');
 
-        const valid = await bcrypt.compare(currentPassword, user.password);
-        if (!valid) {
-            logger.logValidationFailure('currentPassword', '[REDACTED]', 'incorrect current password', username, ip);
-            throw new Error('Current password is incorrect');
-        }
-
-        const lastChanged = user.passwordLastChanged || new Date(0);
-        if (Date.now() - new Date(lastChanged).getTime() < PASSWORD_MIN_AGE) {
-            logger.logValidationFailure('passwordLastChanged', lastChanged, 'password change before min age', username, ip);
-            throw new Error('You can only change your password once every 24 hours.');
-        }
-
-        if (!this.isPasswordStrong(newPassword)) {
-            logger.logValidationFailure('newPassword', '[REDACTED]', 'weak password', username, ip);
-            throw new Error('New password is not strong enough.');
-        }
-
-        // Prevent password reuse
-        for (const old of user.passwordHistory || []) {
-            if (await bcrypt.compare(newPassword, old.hash)) {
-                logger.logValidationFailure('newPassword', '[REDACTED]', 'password reuse detected', username, ip);
-                throw new Error('You cannot reuse a previously used password.');
+            const valid = await bcrypt.compare(currentPassword, user.password);
+            if (!valid) {
+                logger.logValidationFailure('currentPassword', '[REDACTED]', 'incorrect current password', username, ip);
+                throw new Error('Current password is incorrect');
             }
+
+            const lastChanged = user.passwordLastChanged || new Date(0);
+            if (Date.now() - new Date(lastChanged).getTime() < PASSWORD_MIN_AGE) {
+                logger.logValidationFailure('passwordLastChanged', lastChanged, 'password change before min age', username, ip);
+                throw new Error('You can only change your password once every 24 hours.');
+            }
+
+            if (!this.isPasswordStrong(newPassword)) {
+                logger.logValidationFailure('newPassword', '[REDACTED]', 'weak password', username, ip);
+                throw new Error('New password is not strong enough.');
+            }
+
+            // Prevent password reuse
+            for (const old of user.passwordHistory || []) {
+                if (await bcrypt.compare(newPassword, old.hash)) {
+                    logger.logValidationFailure('newPassword', '[REDACTED]', 'password reuse detected', username, ip);
+                    throw new Error('You cannot reuse a previously used password.');
+                }
+            }
+
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedNewPassword;
+            user.passwordLastChanged = new Date();
+
+            // Save password history (keep last 5)
+            user.passwordHistory = user.passwordHistory || [];
+            user.passwordHistory.push({ hash: hashedNewPassword, changedAt: new Date() });
+            if (user.passwordHistory.length > 5) {
+                user.passwordHistory.shift();
+            }
+
+            await user.save();
+            logger.logPasswordChange(username, ip);
+            return true;
+        } catch (error) {
+            logger.logPasswordChangeFailure(username, error.message, ip);
+            throw error;
         }
-
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedNewPassword;
-        user.passwordLastChanged = new Date();
-
-        // Save password history (keep last 5)
-        user.passwordHistory = user.passwordHistory || [];
-        user.passwordHistory.push({ hash: hashedNewPassword, changedAt: new Date() });
-        if (user.passwordHistory.length > 5) {
-            user.passwordHistory.shift();
-        }
-
-        await user.save();
-        logger.logPasswordChange(username, ip);
-        return true;
     }
 
     static async updateProfile(username, updateData) {

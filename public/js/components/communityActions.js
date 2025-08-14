@@ -234,16 +234,13 @@ class CommunityActions {
                 <div class="form-group">
                     <label for="community-name">Community Name:</label>
                     <input type="text" id="community-name" name="name" 
-                           required maxlength="50" minlength="3"
                            data-max-length="50" data-counter="name-count">
                     <div class="char-counter" id="name-count">0/50</div>
-                    <small>No special characters allowed</small>
                 </div>
                 <div class="form-group">
                     <label for="community-description">Description:</label>
                     <textarea id="community-description" name="description" 
-                              required maxlength="500" minlength="10" rows="4"
-                              data-max-length="500" data-counter="description-count"></textarea>
+                              rows="4" data-max-length="500" data-counter="description-count"></textarea>
                     <div class="char-counter" id="description-count">0/500</div>
                 </div>
                 <div class="form-actions">
@@ -261,15 +258,13 @@ class CommunityActions {
                 <div class="form-group">
                     <label for="post-title">Title:</label>
                     <input type="text" id="post-title" name="title" 
-                           required maxlength="200" minlength="5"
                            data-max-length="200" data-counter="title-count">
                     <div class="char-counter" id="title-count">0/200</div>
                 </div>
                 <div class="form-group">
                     <label for="post-description">Description:</label>
                     <textarea id="post-description" name="post_description" 
-                              required maxlength="5000" minlength="10" rows="6"
-                              data-max-length="5000" data-counter="description-count"></textarea>
+                              rows="6" data-max-length="5000" data-counter="description-count"></textarea>
                     <div class="char-counter" id="description-count">0/5000</div>
                 </div>
                 <div class="form-actions">
@@ -289,7 +284,7 @@ class CommunityActions {
             <form id="add-moderator-form">
                 <div class="form-group">
                     <label for="moderator-select">Select Member to Promote:</label>
-                    <select id="moderator-select" name="username" required>
+                    <select id="moderator-select" name="username">
                         <option value="">Choose a member...</option>
                         ${memberOptions}
                     </select>
@@ -312,7 +307,7 @@ class CommunityActions {
             <form id="ban-user-form">
                 <div class="form-group">
                     <label for="ban-user-select">Select Member to Ban:</label>
-                    <select id="ban-user-select" name="username" required>
+                    <select id="ban-user-select" name="username">
                         <option value="">Choose a member...</option>
                         ${memberOptions}
                     </select>
@@ -320,8 +315,7 @@ class CommunityActions {
                 <div class="form-group">
                     <label for="ban-reason">Ban Reason:</label>
                     <textarea id="ban-reason" name="reason" 
-                              required maxlength="500" minlength="5" rows="3"
-                              data-max-length="500" data-counter="reason-count"
+                              rows="3" data-max-length="500" data-counter="reason-count"
                               placeholder="Explain why this user is being banned..."></textarea>
                     <div class="char-counter" id="reason-count">0/500</div>
                 </div>
@@ -392,19 +386,6 @@ class CommunityActions {
         const form = modal.element.querySelector('#create-community-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                name: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(3),
-                    ValidationRules.maxLength(50),
-                    ValidationRules.noSpecialChars
-                ],
-                description: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(10),
-                    ValidationRules.maxLength(500)
-                ]
-            },
             onSubmit: async (data) => {
                 try {
                     await CommunityApi.create(data);
@@ -422,18 +403,6 @@ class CommunityActions {
         const form = modal.element.querySelector('#create-post-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                title: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(5),
-                    ValidationRules.maxLength(200)
-                ],
-                post_description: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(10),
-                    ValidationRules.maxLength(5000)
-                ]
-            },
             onSubmit: async (data) => {
                 try {
                     await PostApi.create(data);
@@ -451,9 +420,6 @@ class CommunityActions {
         const form = modal.element.querySelector('#add-moderator-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                username: [ValidationRules.required]
-            },
             onSubmit: async (data) => {
                 try {
                     const communityName = window.communityData?.name;
@@ -472,14 +438,6 @@ class CommunityActions {
         const form = modal.element.querySelector('#ban-user-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                username: [ValidationRules.required],
-                reason: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(5),
-                    ValidationRules.maxLength(500)
-                ]
-            },
             onSubmit: async (data) => {
                 try {
                     const communityName = window.communityData?.name;

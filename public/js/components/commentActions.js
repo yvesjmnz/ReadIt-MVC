@@ -60,8 +60,7 @@ class CommentActions {
                 <div class="form-group">
                     <label for="edit-comment-text">Comment:</label>
                     <textarea id="edit-comment-text" name="text" 
-                              required maxlength="1000" minlength="1" rows="4"
-                              data-max-length="1000" data-counter="edit-comment-count">${currentText}</textarea>
+                              rows="4" data-max-length="1000" data-counter="edit-comment-count">${currentText}</textarea>
                     <div class="char-counter" id="edit-comment-count"></div>
                 </div>
                 <div class="form-actions">
@@ -76,12 +75,6 @@ class CommentActions {
         const form = modal.element.querySelector('#edit-comment-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                text: [
-                    ValidationRules.required,
-                    ValidationRules.maxLength(1000)
-                ]
-            },
             onSubmit: async (data) => {
                 try {
                     await PostApi.updateComment(postId, commentId, data.text);

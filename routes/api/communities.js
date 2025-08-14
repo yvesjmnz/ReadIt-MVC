@@ -4,6 +4,7 @@ const CommunityService = require('../../services/communityService');
 const { requireAuth, requireCreator } = require('../../middleware/authMiddleware');
 const { validateCommunity } = require('../../middleware/validation');
 const { handleApiError } = require('../../middleware/errorHandler');
+const logger = require('../../services/loggerService');
 
 // Get all communities
 router.get('/', async (req, res, next) => {
@@ -49,6 +50,12 @@ router.post('/', requireAuth, validateCommunity, async (req, res, next) => {
         
         res.status(201).json({ success: true, community });
     } catch (error) {
+        logger.logCommunityCreationFailure(
+            req.session.user?.username,
+            req.body.name,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -59,6 +66,12 @@ router.post('/:name/join', requireAuth, async (req, res, next) => {
         await CommunityService.joinCommunity(req.params.name, req.session.user.username);
         res.json({ success: true, message: 'Successfully joined community' });
     } catch (error) {
+        logger.logCommunityJoinFailure(
+            req.session.user?.username,
+            req.params.name,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -69,6 +82,12 @@ router.post('/:name/leave', requireAuth, async (req, res, next) => {
         await CommunityService.leaveCommunity(req.params.name, req.session.user.username);
         res.json({ success: true, message: 'Successfully left community' });
     } catch (error) {
+        logger.logCommunityLeaveFailure(
+            req.session.user?.username,
+            req.params.name,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -131,6 +150,14 @@ router.post('/:name/ban', requireAuth, async (req, res, next) => {
             message: 'User banned successfully'
         });
     } catch (error) {
+        logger.logModerationFailure(
+            req.session.user?.username,
+            'ban',
+            req.body.username,
+            req.params.name,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });
@@ -160,6 +187,14 @@ router.post('/:name/unban', requireAuth, async (req, res, next) => {
             message: 'User unbanned successfully'
         });
     } catch (error) {
+        logger.logModerationFailure(
+            req.session.user?.username,
+            'unban',
+            req.body.username,
+            req.params.name,
+            error.message,
+            req.ip
+        );
         next(error);
     }
 });

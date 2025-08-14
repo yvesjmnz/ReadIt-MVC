@@ -93,8 +93,7 @@ class AdminActions {
                 <div class="form-group">
                     <label for="admin-username">Username:</label>
                     <input type="text" id="admin-username" name="username" 
-                           placeholder="Enter username to grant admin privileges" 
-                           required minlength="3" maxlength="20">
+                           placeholder="Enter username to grant admin privileges">
                     <small>User must already be registered</small>
                 </div>
                 <div class="form-actions">
@@ -109,13 +108,6 @@ class AdminActions {
         const form = modal.element.querySelector('#grant-admin-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                username: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(3),
-                    ValidationRules.maxLength(20)
-                ]
-            },
             onSubmit: async (data) => {
                 await this.submitGrantAdmin(data.username);
                 modal.close();
@@ -248,14 +240,13 @@ class AdminActions {
                 <div class="form-group">
                     <label for="ban-username">Username:</label>
                     <input type="text" id="ban-username" name="username" 
-                           placeholder="Enter username to ban" 
-                           required minlength="3" maxlength="20">
+                           placeholder="Enter username to ban">
                 </div>
                 <div class="form-group">
                     <label for="ban-reason">Reason:</label>
                     <textarea id="ban-reason" name="reason" 
                               placeholder="Enter reason for site-wide ban..." 
-                              required minlength="10" maxlength="500" rows="3"></textarea>
+                              rows="3"></textarea>
                     <small>This will remove the user from all communities and prevent them from participating</small>
                 </div>
                 <div class="form-actions">
@@ -270,18 +261,6 @@ class AdminActions {
         const form = modal.element.querySelector('#ban-user-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                username: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(3),
-                    ValidationRules.maxLength(20)
-                ],
-                reason: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(10),
-                    ValidationRules.maxLength(500)
-                ]
-            },
             onSubmit: async (data) => {
                 await this.submitBanUser(data.username, data.reason);
                 modal.close();

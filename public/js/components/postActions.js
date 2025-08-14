@@ -121,10 +121,8 @@ class PostActions {
                     <label for="lock-reason">Reason for locking this post:</label>
                     <textarea id="lock-reason" name="reason" 
                               placeholder="Enter the violation reason..." 
-                              required minlength="5" maxlength="500" rows="3"
-                              data-max-length="500" data-counter="lock-reason-count"></textarea>
+                              rows="3" data-max-length="500" data-counter="lock-reason-count"></textarea>
                     <div class="char-counter" id="lock-reason-count">0/500</div>
-                    <small>Minimum 5 characters required</small>
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-danger">Lock Post</button>
@@ -138,13 +136,6 @@ class PostActions {
         const form = modal.element.querySelector('#lock-post-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                reason: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(5),
-                    ValidationRules.maxLength(500)
-                ]
-            },
             onSubmit: async (data) => {
                 await this.submitModerationAction(postId, 'lock', data.reason);
                 modal.close();
@@ -184,15 +175,13 @@ class PostActions {
                 <div class="form-group">
                     <label for="edit-title">Title:</label>
                     <input type="text" id="edit-title" name="title" value="${title}" 
-                           required maxlength="200" minlength="5"
                            data-max-length="200" data-counter="edit-title-count">
                     <div class="char-counter" id="edit-title-count"></div>
                 </div>
                 <div class="form-group">
                     <label for="edit-description">Description:</label>
                     <textarea id="edit-description" name="post_description" 
-                              required maxlength="5000" minlength="10" rows="6"
-                              data-max-length="5000" data-counter="edit-description-count">${description}</textarea>
+                              rows="6" data-max-length="5000" data-counter="edit-description-count">${description}</textarea>
                     <div class="char-counter" id="edit-description-count"></div>
                 </div>
                 <div class="form-actions">
@@ -207,18 +196,6 @@ class PostActions {
         const form = modal.element.querySelector('#edit-post-form');
         
         const formHandler = new FormHandler(form, {
-            validation: {
-                title: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(5),
-                    ValidationRules.maxLength(200)
-                ],
-                post_description: [
-                    ValidationRules.required,
-                    ValidationRules.minLength(10),
-                    ValidationRules.maxLength(5000)
-                ]
-            },
             onSubmit: async (data) => {
                 await PostApi.update(postId, data);
                 NotificationSystem.success('Post updated successfully!');

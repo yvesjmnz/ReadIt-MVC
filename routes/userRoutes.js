@@ -207,7 +207,8 @@ router.post('/change-password', requireLogin, async (req, res) => {
         await UserService.updatePassword(
             req.session.user.username, 
             currentPassword, 
-            newPassword
+            newPassword,
+            req.ip
         );
 
         res.status(200).send('Password changed successfully');
@@ -244,7 +245,7 @@ router.post('/security-questions', requireLogin, async (req, res) => {
             return res.status(400).send('You must set at least 3 security questions');
         }
 
-        await PasswordResetService.setSecurityQuestions(req.session.user.username, questions);
+        await PasswordResetService.setSecurityQuestions(req.session.user.username, questions, req.ip);
         res.status(200).send('Security questions set successfully');
     } catch (error) {
         console.error(error);
@@ -288,7 +289,7 @@ router.post('/reset-password', async (req, res) => {
             return res.status(400).send('You must answer at least 2 security questions');
         }
 
-        await PasswordResetService.resetPassword(username, newPassword, answers);
+        await PasswordResetService.resetPassword(username, newPassword, answers, req.ip);
         res.status(200).send('Password reset successfully. You can now log in with your new password.');
     } catch (error) {
         console.error(error);

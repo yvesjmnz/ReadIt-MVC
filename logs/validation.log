@@ -1,3 +1,6 @@
 {"timestamp":"2025-08-09T15:28:30.859Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"title/description","value":{"title":"","post_description":"Valid post description here"},"rule":"required","username":"admin","ip":"::1"}
 {"timestamp":"2025-08-09T15:28:33.119Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","rule":"length (3-50)","username":"admin","ip":"::1"}
 {"timestamp":"2025-08-09T15:28:34.069Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"test@community!","rule":"no special characters","username":"admin","ip":"::1"}
+{"timestamp":"2025-08-14T02:36:51.861Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"route","value":"/favicon.ico","rule":"404 not found","username":null,"ip":"::1"}
+{"timestamp":"2025-08-14T02:38:04.438Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"api","value":"/ban-user","rule":"api error","username":"admin","ip":"::1"}
+{"timestamp":"2025-08-14T02:44:47.017Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"title","value":"my","rule":"length (5-200)","username":"admin","ip":"::1"}
