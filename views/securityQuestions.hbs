@@ -357,14 +357,7 @@
                 }
             }
             
-            // Validate unique questions
-            const questionTexts = questions.map(q => q.question);
-            const uniqueQuestions = new Set(questionTexts);
-            if (uniqueQuestions.size !== questions.length) {
-                messageDiv.innerHTML = '<div class="message error">Please select different questions for each slot</div>';
-                return;
-            }
-            
+                        
             // Show loading state
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Saving...';
