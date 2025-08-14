@@ -137,20 +137,33 @@ class PostActions {
         
         const formHandler = new FormHandler(form, {
             onSubmit: async (data) => {
-                await this.submitModerationAction(postId, 'lock', data.reason);
-                modal.close();
+                try {
+                    await this.submitModerationAction(postId, 'lock', data.reason);
+                    modal.close();
+                } catch (error) {
+                    // Display specific server-side validation errors
+                    const errorMessage = this.extractErrorMessage(error);
+                    NotificationSystem.error(errorMessage);
+                }
             }
         });
     }
 
     async submitModerationAction(postId, action, reason) {
-        try {
-            await PostApi.moderate(postId, action, reason);
-            NotificationSystem.success(`Post ${action}ed successfully!`);
-            setTimeout(() => window.location.reload(), 1000);
-        } catch (error) {
-            NotificationSystem.error(`Failed to ${action} post: ${error.message}`);
+        await PostApi.moderate(postId, action, reason);
+        NotificationSystem.success(`Post ${action}ed successfully!`);
+        setTimeout(() => window.location.reload(), 1000);
+    }
+
+    extractErrorMessage(error) {
+        // Extract specific error message from server response
+        if (error.response && error.response.data && error.response.data.error) {
+            return error.response.data.error;
         }
+        if (error.message) {
+            return error.message;
+        }
+        return 'An error occurred. Please try again.';
     }
 
     getPostId(element) {
@@ -197,10 +210,16 @@ class PostActions {
         
         const formHandler = new FormHandler(form, {
             onSubmit: async (data) => {
-                await PostApi.update(postId, data);
-                NotificationSystem.success('Post updated successfully!');
-                modal.close();
-                setTimeout(() => window.location.reload(), 1000);
+                try {
+                    await PostApi.update(postId, data);
+                    NotificationSystem.success('Post updated successfully!');
+                    modal.close();
+                    setTimeout(() => window.location.reload(), 1000);
+                } catch (error) {
+                    // Display specific server-side validation errors
+                    const errorMessage = this.extractErrorMessage(error);
+                    NotificationSystem.error(errorMessage);
+                }
             }
         });
     }

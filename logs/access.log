@@ -16,3 +16,4 @@
 {"timestamp":"2025-08-09T15:30:27.049Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
 {"timestamp":"2025-08-09T15:30:27.958Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
 {"timestamp":"2025-08-09T15:33:35.206Z","type":"ACCESS_DENIED","message":"Access denied","username":"admin","resource":"/Parking1/moderator (creator)","reason":"Not the creator","ip":"::1"}
+{"timestamp":"2025-08-14T02:53:26.744Z","type":"ACCESS_DENIED","message":"Access denied","username":"testuser2","resource":"/revoke-admin/DJ-ADMIN (admin)","reason":"Not an administrator","ip":"::1"}

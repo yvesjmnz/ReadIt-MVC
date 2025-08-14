@@ -83,10 +83,23 @@ class CommentActions {
                     setTimeout(() => window.location.reload(), 1000);
                 } catch (error) {
                     console.error('Comment update error:', error);
-                    NotificationSystem.error(`Failed to update comment: ${error.message}`);
+                    // Display specific server-side validation errors
+                    const errorMessage = this.extractErrorMessage(error);
+                    NotificationSystem.error(errorMessage);
                 }
             }
         });
+    }
+
+    extractErrorMessage(error) {
+        // Extract specific error message from server response
+        if (error.response && error.response.data && error.response.data.error) {
+            return error.response.data.error;
+        }
+        if (error.message) {
+            return error.message;
+        }
+        return 'An error occurred. Please try again.';
     }
 }
 

@@ -152,12 +152,6 @@ class ReadItApp {
         const commentForm = $('#comment-form');
         if (commentForm) {
             new FormHandler(commentForm, {
-                validation: {
-                    text: [
-                        ValidationRules.required,
-                        ValidationRules.maxLength(1000)
-                    ]
-                },
                 onSubmit: this.submitComment.bind(this)
             });
         }
@@ -171,8 +165,21 @@ class ReadItApp {
             NotificationSystem.success('Comment added successfully!');
             setTimeout(() => window.location.reload(), 1000);
         } catch (error) {
-            NotificationSystem.error('Failed to add comment');
+            // Display specific server-side validation errors
+            const errorMessage = this.extractErrorMessage(error);
+            NotificationSystem.error(errorMessage);
         }
+    }
+
+    extractErrorMessage(error) {
+        // Extract specific error message from server response
+        if (error.response && error.response.data && error.response.data.error) {
+            return error.response.data.error;
+        }
+        if (error.message) {
+            return error.message;
+        }
+        return 'An error occurred. Please try again.';
     }
 
     setupProfileActions() {

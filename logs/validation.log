@@ -4,3 +4,5 @@
 {"timestamp":"2025-08-14T02:36:51.861Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"route","value":"/favicon.ico","rule":"404 not found","username":null,"ip":"::1"}
 {"timestamp":"2025-08-14T02:38:04.438Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"api","value":"/ban-user","rule":"api error","username":"admin","ip":"::1"}
 {"timestamp":"2025-08-14T02:44:47.017Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"title","value":"my","rule":"length (5-200)","username":"admin","ip":"::1"}
+{"timestamp":"2025-08-14T02:52:15.695Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"name","value":"t","rule":"length (3-50)","username":"admin","ip":"::1"}
+{"timestamp":"2025-08-14T02:52:47.012Z","type":"VALIDATION_FAILURE","message":"Validation failed","field":"api","value":"/grant-admin","rule":"api error","username":"admin","ip":"::1"}

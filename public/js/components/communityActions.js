@@ -393,7 +393,9 @@ class CommunityActions {
                     modal.close();
                     setTimeout(() => window.location.reload(), 1000);
                 } catch (error) {
-                    NotificationSystem.error('Failed to create community');
+                    // Display specific server-side validation errors
+                    const errorMessage = this.extractErrorMessage(error);
+                    NotificationSystem.error(errorMessage);
                 }
             }
         });
@@ -410,7 +412,9 @@ class CommunityActions {
                     modal.close();
                     setTimeout(() => window.location.reload(), 1000);
                 } catch (error) {
-                    NotificationSystem.error('Failed to create post');
+                    // Display specific server-side validation errors
+                    const errorMessage = this.extractErrorMessage(error);
+                    NotificationSystem.error(errorMessage);
                 }
             }
         });
@@ -458,6 +462,17 @@ class CommunityActions {
 
     setupBannedUsersView(modal) {
         // Event delegation for unban buttons is already handled in setupEventListeners
+    }
+
+    extractErrorMessage(error) {
+        // Extract specific error message from server response
+        if (error.response && error.response.data && error.response.data.error) {
+            return error.response.data.error;
+        }
+        if (error.message) {
+            return error.message;
+        }
+        return 'An error occurred. Please try again.';
     }
 }
 
